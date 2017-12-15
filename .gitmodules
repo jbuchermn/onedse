@@ -1,0 +1,12 @@
+[submodule "Simple-Web-Server"]
+	path = Simple-Web-Server
+	url = https://github.com/eidheim/Simple-Web-Server
+[submodule "json"]
+	path = json
+	url = ./server/dependencies/json/
+[submodule "server/dependencies/Simple-Web-Server"]
+	path = server/dependencies/Simple-Web-Server
+	url = https://github.com/eidheim/Simple-Web-Server
+[submodule "server/dependencies/json"]
+	path = server/dependencies/json
+	url = https://github.com/nlohmann/json
