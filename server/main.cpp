@@ -21,7 +21,7 @@ int main(int argc, char* argv[]){
     HttpServer server;
     server.config.port = 8080;
 
-    fs::path index_path = fs::canonical(fs::path(argv[0]).parent_path()/=INDEX_PATH);
+    fs::path index_path = fs::canonical(fs::path(argv[0]).parent_path()/INDEX_PATH);
 
     server.resource["^/internal$"]["POST"] = [&child](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request){
         string resp = child.process(request->content.string());
