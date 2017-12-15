@@ -7,7 +7,7 @@
 #include <boost/filesystem/path.hpp>
 #include <server_http.hpp>
 
-#include "wigner_web/server.h"
+#include "wigner_web/server/server.h"
 
 #define INDEX_PATH "../../webapp/www/index.html"
 
@@ -16,7 +16,7 @@ using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
 namespace fs = boost::filesystem;
 
 int main(int argc, char* argv[]){
-    wigner_web::Server child;
+    wigner_web::server::Server child;
 
     HttpServer server;
     server.config.port = 8080;

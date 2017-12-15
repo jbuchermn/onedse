@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace wigner_web{
+namespace wigner_web::server{
     class Server{
     public:
         std::string process(const std::string& request);
