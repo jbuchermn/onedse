@@ -1,0 +1,12 @@
+[
+{
+  "directory": "/tmp/tmpxnfw5gbo",
+  "command": "/usr/local/bin/mpicxx   -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen/Eigen    -Ofast -g -pg -std=gnu++14 -o CMakeFiles/wigner_webd.dir/main.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/main.cpp",
+  "file": "/Users/jonasbucher/Daten/wigner-web/server/main.cpp"
+},
+{
+  "directory": "/tmp/tmpxnfw5gbo",
+  "command": "/usr/local/bin/mpicxx   -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen/Eigen    -Ofast -g -pg -std=gnu++14 -o CMakeFiles/wigner_webd.dir/wigner_web/server.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/wigner_web/server.cpp",
+  "file": "/Users/jonasbucher/Daten/wigner-web/server/wigner_web/server.cpp"
+}
+]
