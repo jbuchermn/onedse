@@ -10,3 +10,6 @@
 [submodule "server/dependencies/json"]
 	path = server/dependencies/json
 	url = https://github.com/nlohmann/json
+[submodule "server/dependencies/luawrapper"]
+	path = server/dependencies/luawrapper
+	url = https://github.com/ahupowerdns/luawrapper

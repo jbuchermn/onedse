@@ -30,8 +30,14 @@ include_directories(${FFTW_INCLUDE_DIR})
 target_link_libraries(wigner_webd ${FFTW_LIBRARIES})
 target_link_libraries(wigner_webd_test ${FFTW_LIBRARIES})
 
+# Lua
+find_package(LUA REQUIRED)
+include_directories(${LUA_INCLUDE_DIR})
+target_link_libraries(wigner_webd ${LUA_LIBRARIES})
+target_link_libraries(wigner_webd_test ${LUA_LIBRARIES})
 
 # Header libraries
 include_directories("${CMAKE_SOURCE_DIR}/dependencies/Simple-Web-Server")
 include_directories("${CMAKE_SOURCE_DIR}/dependencies/json/src")
 include_directories("${CMAKE_SOURCE_DIR}/dependencies/eigen")
+include_directories("${CMAKE_SOURCE_DIR}/dependencies/luawrapper/include")
