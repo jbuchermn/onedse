@@ -1,5 +1,6 @@
 #include <iostream>
 #include <memory>
+#include <LuaContext.hpp>
 
 #include "wigner_web/discretization/basis.h"
 #include "wigner_web/discretization/orthogonal_hermite.h"
@@ -12,11 +13,6 @@ namespace wigner_web::discretization{
     Basis::Basis(double _lower, double _upper, int _size, BoundaryConditions _boundary_conditions): 
         lower(_lower), upper(_upper), size(_size), boundary_conditions(_boundary_conditions), metric_cov(0,0), metric_contrav(0,0){}
 
-
-    std::shared_ptr<Basis> Basis::factory(std::string description){
-        return std::make_shared<ScaledOrthogonalChebyshev>(-10.,10.,100);
-    }
-        
     Eigen::MatrixXcd Basis::evaluate(const Eigen::VectorXd& x, int derivative) const{
         Eigen::MatrixXcd values(x.rows(), size);
         for(int i=0; i<x.rows(); i++){

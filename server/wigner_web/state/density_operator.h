@@ -24,7 +24,6 @@ namespace wigner_web::state{
         DensityOperator(std::shared_ptr<const wigner_web::discretization::Basis> _basis);
         DensityOperator(std::shared_ptr<const wigner_web::discretization::Basis> _basis, Eigen::MatrixXcd&& _matrix);
         DensityOperator(DiagonalRepresentation wavefunctions);
-        static std::shared_ptr<DensityOperator> factory(std::string description, std::shared_ptr<const wigner_web::discretization::Basis> basis);
 
         void set_from_wavefunctions(DiagonalRepresentation wavefunctions);
         DiagonalRepresentation diagonalize() const;

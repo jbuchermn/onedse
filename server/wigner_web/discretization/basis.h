@@ -28,7 +28,6 @@ namespace wigner_web::discretization{
         const int size;
 
         Basis(double _lower, double _upper, int _size, BoundaryConditions _boundary_conditions);
-        static std::shared_ptr<Basis> factory(std::string description);
 
         /// Evaluate basis functions at point x
         virtual Eigen::VectorXcd evaluate(double x, int derivative=0) const=0;
