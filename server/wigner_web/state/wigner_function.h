@@ -2,6 +2,7 @@
 #define WIGNER_FUNCTION_H
 
 #include <Eigen/Dense>
+#include <json.hpp>
 
 #include "wigner_web/state/wave_function.h"
 #include "wigner_web/state/density_operator.h"
@@ -32,8 +33,8 @@ namespace wigner_web::state{
         
         WignerFunction& operator/=(const double& scalar){ matrix/=scalar; return *this; }
         WignerFunction& operator*=(const double& scalar){ matrix*=scalar; return *this; }
-        WignerFunction& operator+=(const WignerFunction& other){ matrix-=other.matrix; return *this; }
-        WignerFunction& operator-=(const WignerFunction& other){ matrix+=other.matrix; return *this; }
+        WignerFunction& operator+=(const WignerFunction& other){ matrix+=other.matrix; return *this; }
+        WignerFunction& operator-=(const WignerFunction& other){ matrix-=other.matrix; return *this; }
 
         WignerFunction operator/(const double& scalar) const { return WignerFunction{lower_x, upper_x, lower_p, upper_p, matrix/scalar}; }
         WignerFunction operator*(const double& scalar) const { return WignerFunction{lower_x, upper_x, lower_p, upper_p, matrix*scalar}; }
@@ -43,6 +44,8 @@ namespace wigner_web::state{
         friend WignerFunction operator*(const double& scalar, const WignerFunction& wf){
             return wf*scalar;
         }
+
+        void to_json(nlohmann::json& json) const;
     };
 }
 

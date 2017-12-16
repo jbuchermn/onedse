@@ -5,6 +5,7 @@
 #include <utility>
 #include <float.h>
 #include <Eigen/Dense>
+#include <json.hpp>
 
 #include "wigner_web/state/wave_function.h"
 #include "wigner_web/discretization/basis.h"
@@ -64,6 +65,20 @@ namespace wigner_web::state{
 
     void WaveFunction::set_from_components_contrav(const Eigen::VectorXcd& components){
         vector = components;
+    }
+        
+    void WaveFunction::to_json(nlohmann::json& json, int points) const{
+        Eigen::VectorXd x(points);
+        for(int i=0; i<points; i++) x(i) = basis->lower + 1.*i/points*(basis->upper - basis->lower);
+        Eigen::VectorXcd vals = this->grid(x);
+
+        json["lower"] = basis->lower;
+        json["upper"] = basis->upper;
+        json["data"] = nlohmann::json();
+        for(int i=0; i<vals.rows(); i++){
+            json["data"].push_back(std::vector<double>{vals(i).real(), vals(i).imag()});
+        }
+
     }
 }
 

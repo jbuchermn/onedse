@@ -3,6 +3,7 @@
 #include <utility>
 #include <cmath>
 #include <complex>
+#include <json.hpp>
 
 #include "wigner_web/discretization/basis.h"
 #include "wigner_web/state/wigner_function.h"
@@ -10,6 +11,7 @@
 #include "wigner_web/state/density_operator.h"
 #include "wigner_web/utility/fft.h"
 
+using json = nlohmann::json;
 using Basis = wigner_web::discretization::Basis;
 using WaveFunction = wigner_web::state::WaveFunction;
 using DensityOperator = wigner_web::state::DensityOperator;
@@ -25,9 +27,16 @@ namespace wigner_web::state{
     }
 
     WignerFunction::WignerFunction(const DensityOperator& density_operator, int points){
-        matrix = Eigen::MatrixXd(points, points);
+        bool first=true;
         for(std::pair<double, std::shared_ptr<WaveFunction>> p: density_operator.diagonalize()){
-            (*this) += p.first * WignerFunction{ *(p.second), points };
+            if(first){
+                set_from_wavefunction(*(p.second), points);
+                (*this)*=p.first;
+
+                first=false;
+            }else{
+                (*this) += p.first * WignerFunction{ *(p.second), points };
+            }
         }
     }
         
@@ -56,7 +65,7 @@ namespace wigner_web::state{
             }
             fft(tmp);
             for(int k=0; k<points; k++)
-                matrix(i, k) = std::sqrt(2/M_PI)*tmp(2*k+1).real(); 
+                matrix(i, k) = std::sqrt(2/M_PI)*tmp(2*k).real(); 
         }
     }
 
@@ -77,4 +86,28 @@ namespace wigner_web::state{
     double WignerFunction::get_upper_x() const{ return upper_x; }
     double WignerFunction::get_lower_p() const{ return lower_p; }
     double WignerFunction::get_upper_p() const{ return upper_p; }
+        
+    void WignerFunction::to_json(json& json) const{
+        json["lower_x"] = lower_x;
+        json["upper_x"] = upper_x;
+        json["lower_p"] = lower_p;
+        json["upper_p"] = upper_p;
+
+        std::vector<std::vector<double>> data;
+        for(int i=0; i<matrix.rows(); i++){
+            data.push_back(std::vector<double>());
+            for(int j=0; j<matrix.cols(); j++){
+                data.back().push_back(matrix(i,j));
+            }
+        }
+        json["data"] = data;
+    }
 }
+
+
+
+
+
+
+
+

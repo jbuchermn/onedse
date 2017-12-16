@@ -5,6 +5,7 @@
 #include <functional>
 #include <memory>
 #include <Eigen/Dense>
+#include <json.hpp>
 
 #include "wigner_web/discretization/basis.h"
 
@@ -32,8 +33,8 @@ namespace wigner_web::state{
 
         WaveFunction& operator/=(const std::complex<double>& scalar){ vector/=scalar; return *this; }
         WaveFunction& operator*=(const std::complex<double>& scalar){ vector*=scalar; return *this; }
-        WaveFunction& operator+=(const WaveFunction& other){ vector-=other.vector; return *this; }
-        WaveFunction& operator-=(const WaveFunction& other){ vector+=other.vector; return *this; }
+        WaveFunction& operator+=(const WaveFunction& other){ vector+=other.vector; return *this; }
+        WaveFunction& operator-=(const WaveFunction& other){ vector-=other.vector; return *this; }
 
         WaveFunction operator/(const std::complex<double>& scalar) const { return WaveFunction{basis, vector/scalar}; }
         WaveFunction operator*(const std::complex<double>& scalar) const { return WaveFunction{basis, vector*scalar}; }
@@ -43,6 +44,8 @@ namespace wigner_web::state{
         friend WaveFunction operator*(const std::complex<double>& scalar, const WaveFunction& wf){
             return wf*scalar;
         }
+
+        void to_json(nlohmann::json& json, int points) const;
     };
 }
 

@@ -3,28 +3,27 @@
 #include <iostream>
 #include <fstream>
 
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/path.hpp>
 #include <server_http.hpp>
 
-#include "wigner_web/server/server.h"
+#include "wigner_web/server/session.h"
 
 #define INDEX_PATH "../../webapp/www/index.html"
 
 using namespace std;
 using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
-namespace fs = boost::filesystem;
 
 int main(int argc, char* argv[]){
-    wigner_web::server::Server child;
+    wigner_web::server::Session session;
 
     HttpServer server;
     server.config.port = 8080;
 
-    fs::path index_path = fs::canonical(fs::path(argv[0]).parent_path()/INDEX_PATH);
+    // TODO: Only works when invoked in the same directory
+    std::string index_path = INDEX_PATH;
 
-    server.resource["^/internal$"]["POST"] = [&child](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request){
-        string resp = child.process(request->content.string());
+
+    server.resource["^/internal$"]["POST"] = [&session](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request){
+        string resp = session.process(request->content.string());
         *response << "HTTP/1.1 200 OK\r\n"
                   << "Content-Length: " << resp.length() << "\r\n\r\n"
                   << resp;
@@ -33,7 +32,7 @@ int main(int argc, char* argv[]){
     server.default_resource["GET"] = [&index_path](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request){
 
         auto ifs = make_shared<ifstream>();
-        ifs->open(index_path.string(), ifstream::in | ios::binary | ios::ate);
+        ifs->open(index_path, ifstream::in | ios::binary | ios::ate);
 
         if(*ifs) {
             auto length = ifs->tellg();
@@ -63,7 +62,7 @@ int main(int argc, char* argv[]){
             };
             FileServer::read_and_send(response, ifs);    
         }else{
-            std::string message = "Could not find index.html: " + index_path.string();
+            std::string message = "Could not find index.html: " + index_path;
             *response << "HTTP/1.1 404 NOT FOUND\r\n"
                       << "Content-Length: " << message.length() << "\r\n\r\n"
                       << message;

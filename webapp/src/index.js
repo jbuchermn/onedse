@@ -1,8 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Plot from './plot'
+
+import App from './app';
 
 ReactDOM.render(
-    <Plot />,
+    <App />,
     document.getElementById('react-root')
 );
