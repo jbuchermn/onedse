@@ -24,7 +24,7 @@ namespace wigner_web::state{
         DensityOperator(DiagonalRepresentation wavefunctions);
 
         void set_from_wavefunctions(DiagonalRepresentation wavefunctions);
-        DiagonalRepresentation diagonalize();
+        DiagonalRepresentation diagonalize() const;
     };
 }
 

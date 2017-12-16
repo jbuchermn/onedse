@@ -15,11 +15,18 @@ namespace wigner_web::discretization{
         mutable Eigen::MatrixXcd metric_contrav;
 
     public:
+        enum class BoundaryConditions{
+            None,
+            Dirichlet,
+            Periodic
+        };
+
         const double lower;
         const double upper;
+        const BoundaryConditions boundary_conditions;
         const int size;
 
-        Basis(double _lower, double _upper, int _size);
+        Basis(double _lower, double _upper, int _size, BoundaryConditions _boundary_conditions);
 
         /// Evaluate basis functions at point x
         virtual Eigen::VectorXcd evaluate(double x, int derivative=0) const=0;

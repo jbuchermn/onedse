@@ -2,6 +2,8 @@
 #include <iostream>
 #include <memory>
 #include <functional>
+#include <utility>
+#include <float.h>
 #include <Eigen/Dense>
 
 #include "wigner_web/state/wave_function.h"
@@ -33,6 +35,27 @@ namespace wigner_web::state{
         }
 
         return values;
+    }
+
+    void WaveFunction::plot_to_terminal(int points) const{
+        Eigen::VectorXd x(points);
+        for(int i=0; i<points; i++) x(i) = basis->lower + 1.*i/points*(basis->upper - basis->lower);
+
+        Eigen::VectorXcd vals = this->grid(x);
+        for(auto range: std::vector<std::pair<double, double>>{{DBL_MAX, 1.}, {1., .5}, {.5, .1}, {.1, 1.e-4}, {1.e-4, -1.e-4}, {-1.e-4, -.1}, {-.1, -.5}, {-.5, -1.}, {-1., DBL_MIN}}){
+            for(int i=0; i<vals.rows(); i++){
+                if(vals(i).real() > range.second && vals(i).real()<range.first){
+                    std::cout<<"*";
+                }else{
+                    if(range.second<0 && range.first>0){
+                        std::cout<<"-";
+                    }else{
+                        std::cout<<" ";
+                    }
+                }
+            }
+            std::cout<<std::endl;
+        }
     }
 
     void WaveFunction::set_from_components_cov(const Eigen::VectorXcd& components){

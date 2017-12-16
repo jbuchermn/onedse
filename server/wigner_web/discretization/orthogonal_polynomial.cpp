@@ -7,8 +7,8 @@ namespace wigner_web::discretization{
 
     OrthogonalPolynomial::alglib_exception::alglib_exception(std::string message): std::runtime_error(message){}
 
-    OrthogonalPolynomial::OrthogonalPolynomial(double _lower, double _upper, int _size):
-        Basis(_lower, _upper, _size){}
+    OrthogonalPolynomial::OrthogonalPolynomial(double _lower, double _upper, int _size, Basis::BoundaryConditions boundary_conditions):
+        Basis(_lower, _upper, _size, boundary_conditions){}
 
     Eigen::VectorXcd OrthogonalPolynomial::evaluate(double x, int derivative) const{
         Eigen::VectorXcd values = Eigen::VectorXcd(size);

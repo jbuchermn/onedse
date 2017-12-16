@@ -19,7 +19,7 @@ namespace wigner_web::discretization{
         inline double normsq0() const{ return std::sqrt(M_PI); }
 
     public:
-        OrthogonalHermite(double lower, double upper, int size): OrthogonalPolynomial(lower, upper, size){}
+        OrthogonalHermite(double lower, double upper, int size): OrthogonalPolynomial(lower, upper, size, Basis::BoundaryConditions::None){}
     };
 }
 

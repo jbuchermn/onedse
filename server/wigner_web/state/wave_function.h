@@ -25,6 +25,8 @@ namespace wigner_web::state{
         double norm() const;
         Eigen::VectorXcd grid(const Eigen::VectorXd& x) const;
 
+        void plot_to_terminal(int points=200) const;
+
         void set_from_components_cov(const Eigen::VectorXcd& components);
         void set_from_components_contrav(const Eigen::VectorXcd& components);
 

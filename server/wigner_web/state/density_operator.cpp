@@ -21,7 +21,7 @@ namespace wigner_web::state{
         } 
     }
 
-    DensityOperator::DiagonalRepresentation DensityOperator::diagonalize(){
+    DensityOperator::DiagonalRepresentation DensityOperator::diagonalize() const{
         DiagonalRepresentation result;
 
         // Set up eigenvalue eqn in contravariant indices: rho^{ij}psi_j = lambda g^{ik}psi_k to obtain covariant vectors
