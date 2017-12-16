@@ -2,6 +2,7 @@
 #define WAVE_FUNCTION_H
 
 #include <complex>
+#include <functional>
 #include <memory>
 #include <Eigen/Dense>
 
@@ -18,6 +19,7 @@ namespace wigner_web::state{
 
         WaveFunction(std::shared_ptr<const wigner_web::discretization::Basis> _basis);
         WaveFunction(std::shared_ptr<const wigner_web::discretization::Basis> _basis, Eigen::VectorXcd&& _vector);
+        WaveFunction(std::shared_ptr<const wigner_web::discretization::Basis> _basis, std::function<std::complex<double>(double)> psi, int order);
 
         std::complex<double> operator()(double x) const;
         double norm() const;

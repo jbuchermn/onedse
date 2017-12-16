@@ -5,16 +5,14 @@
 namespace wigner_web::discretization{
     Basis::Basis(double _lower, double _upper, int _size): lower(_lower), upper(_upper), size(_size), metric_cov(0,0), metric_contrav(0,0){}
         
-    void Basis::evaluate(const Eigen::VectorXd& x, Eigen::MatrixXcd& values, Eigen::MatrixXcd& derivatives) const{
-        values = Eigen::MatrixXcd(x.rows(), size);
-        derivatives = Eigen::MatrixXcd(x.rows(), size);
+    Eigen::MatrixXcd Basis::evaluate(const Eigen::VectorXd& x, int derivative) const{
+        Eigen::MatrixXcd values(x.rows(), size);
         for(int i=0; i<x.rows(); i++){
-            Eigen::VectorXcd vals, derivs;
-            evaluate(x(i), vals, derivs);
+            Eigen::VectorXcd vals = evaluate(x(i), derivative);
             values.block(i, 0, 1, size) = vals.transpose();
-            derivatives.block(i, 0, 1, size) = derivs.transpose();
         }
 
+        return values;
     }
 
     const Eigen::MatrixXcd& Basis::get_metric_cov() const{
@@ -22,9 +20,7 @@ namespace wigner_web::discretization{
             Eigen::VectorXd points, weights;
             quadrature(0, points, weights);
 
-            Eigen::MatrixXcd basis_vals, basis_derivs;
-            evaluate(points, basis_vals, basis_derivs);
-
+            Eigen::MatrixXcd basis_vals = evaluate(points);
             metric_cov = basis_vals.adjoint() * weights.asDiagonal() * basis_vals;
         } 
         return metric_cov;
@@ -42,8 +38,7 @@ namespace wigner_web::discretization{
         Eigen::VectorXd points, weights;
         quadrature(order, points, weights);
 
-        Eigen::MatrixXcd basis_vals, basis_derivs;
-        evaluate(points, basis_vals, basis_derivs);
+        Eigen::MatrixXcd basis_vals = evaluate(points);
 
         Eigen::VectorXcd function_vals(points.rows());
         for(int i=0; i<points.rows(); i++){
@@ -57,9 +52,7 @@ namespace wigner_web::discretization{
         Eigen::VectorXd points, weights;
         quadrature(0, points, weights);
 
-        Eigen::MatrixXcd basis_vals, basis_derivs;
-        evaluate(points, basis_vals, basis_derivs);
-
+        Eigen::MatrixXcd basis_derivs = evaluate(points, 1);
         return -1. * basis_derivs.adjoint() * weights.asDiagonal() * basis_derivs;
     }
         
@@ -67,8 +60,7 @@ namespace wigner_web::discretization{
         Eigen::VectorXd points, weights;
         quadrature(order, points, weights);
 
-        Eigen::MatrixXcd basis_vals, basis_derivs;
-        evaluate(points, basis_vals, basis_derivs);
+        Eigen::MatrixXcd basis_vals = evaluate(points);
 
         Eigen::VectorXcd function_vals(points.rows());
         for(int i=0; i<points.rows(); i++){

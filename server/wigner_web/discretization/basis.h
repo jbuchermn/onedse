@@ -22,10 +22,10 @@ namespace wigner_web::discretization{
         Basis(double _lower, double _upper, int _size);
 
         /// Evaluate basis functions at point x
-        virtual void evaluate(double x, Eigen::VectorXcd& values, Eigen::VectorXcd& derivatives) const=0;
+        virtual Eigen::VectorXcd evaluate(double x, int derivative=0) const=0;
 
         // Matrix(i,j) = e_j(x_i)
-        virtual void evaluate(const Eigen::VectorXd& x, Eigen::MatrixXcd& values, Eigen::MatrixXcd& derivatives) const;
+        virtual Eigen::MatrixXcd evaluate(const Eigen::VectorXd& x, int derivative=0) const;
 
         /// Quadrature rule that exactly integrates <e_i|f(x)|e_j> where f has maximal degree order
         virtual void quadrature(int order, Eigen::VectorXd& points, Eigen::VectorXd& weights) const=0;
@@ -36,10 +36,10 @@ namespace wigner_web::discretization{
         /// Inverse of metric_cov
         const Eigen::MatrixXcd& get_metric_contrav() const;
 
-        Eigen::VectorXcd discretize_function_cov(std::function<std::complex<double>(double)> psi, int order=0) const;
+        Eigen::VectorXcd discretize_function_cov(std::function<std::complex<double>(double)> psi, int order) const;
         
         Eigen::MatrixXcd discretize_laplacian_cov() const;
-        Eigen::MatrixXcd discretize_mult_op_cov(std::function<std::complex<double>(double)> V, int order=0) const;
+        Eigen::MatrixXcd discretize_mult_op_cov(std::function<std::complex<double>(double)> V, int order) const;
 
     };
 

@@ -10,23 +10,22 @@ namespace wigner_web::discretization{
     OrthogonalPolynomial::OrthogonalPolynomial(double _lower, double _upper, int _size):
         Basis(_lower, _upper, _size){}
 
-    void OrthogonalPolynomial::evaluate(double x, Eigen::VectorXcd& values, Eigen::VectorXcd& derivatives) const{
-        values = Eigen::VectorXcd(size);
-        derivatives = Eigen::VectorXcd(size);
-        if(size>0){
-            values[0] = value0();
-            derivatives[0] = 0;
+    Eigen::VectorXcd OrthogonalPolynomial::evaluate(double x, int derivative) const{
+        Eigen::VectorXcd values = Eigen::VectorXcd(size);
+
+        Eigen::VectorXcd base_values;
+        if(derivative>0) base_values = evaluate(x, derivative-1);
+
+        values(0) = derivative==0 ? value0() : 0;
+
+        for(int i=1; i<size; i++){
+            values(i) = (a(i)*x + b(i))*values(i-1);
+            if(i>1) values(i) += c(i)*values(i-2);
+
+            if(derivative>0) values(i) += derivative*a(i)*base_values(i-1);
         }
 
-        if(size>1){
-            values[1] = a(1)*x*values[0] + b(1);
-            derivatives[1] = a(1)*values[0];
-        }
-
-        for(int i=2; i<size; i++){
-            values[i] = (a(i)*x + b(i))*values[i-1] + c(i)*values[i-2];
-            derivatives[i] = (a(i)*x + b(i))*derivatives[i-1] + a(i)*values[i-1] + c(i)*derivatives[i-2]; 
-        }
+        return values;
     }
 
     void OrthogonalPolynomial::quadrature(int order, Eigen::VectorXd& points, Eigen::VectorXd& weights) const{

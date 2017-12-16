@@ -9,6 +9,10 @@ using WaveFunction = wigner_web::state::WaveFunction;
 namespace wigner_web::state{
 
     DensityOperator::DensityOperator(std::shared_ptr<const Basis> _basis): basis(_basis), matrix(_basis->size, _basis->size){}
+    DensityOperator::DensityOperator(std::shared_ptr<const Basis> _basis, Eigen::MatrixXcd&& _matrix): basis(_basis), matrix(_matrix){}
+    DensityOperator::DensityOperator(DiagonalRepresentation wavefunctions): basis(wavefunctions[0].second->basis){
+        set_from_wavefunctions(wavefunctions);
+    }
 
     void DensityOperator::set_from_wavefunctions(DiagonalRepresentation wavefunctions){
         matrix = Eigen::MatrixXcd::Zero(basis->size, basis->size);

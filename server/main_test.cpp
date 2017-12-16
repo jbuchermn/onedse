@@ -17,26 +17,29 @@ int main(int argc, char* argv[]){
     auto basis = std::make_shared<OrthogonalHermite>(-5., 5., 100);
 
     for(double x=-5.; x<=5.; x+=0.5){
-        Eigen::VectorXcd vals, derivs;
-        basis->evaluate(x, vals, derivs);
+        Eigen::VectorXcd vals = basis->evaluate(x);
 
         if(std::abs( vals(0) - 1.               ) >1.e-12 ) throw std::runtime_error("H_0("+std::to_string(x)+")");
         if(std::abs( vals(1) - 2.*x             ) >1.e-12 ) throw std::runtime_error("H_1("+std::to_string(x)+")");
         if(std::abs( vals(2) - 4.*x*x + 2.      ) >1.e-12 ) throw std::runtime_error("H_2("+std::to_string(x)+")");
         if(std::abs( vals(3) - 8.*x*x*x + 12.*x ) >1.e-12 ) throw std::runtime_error("H_3("+std::to_string(x)+")");
     }
+    for(double x=-5.; x<=5.; x+=0.5){
+        Eigen::VectorXcd vals = basis->evaluate(x, 2);
+
+        if(std::abs( vals(0) - 0.    ) >1.e-12 ) throw std::runtime_error("H''_0("+std::to_string(x)+")");
+        if(std::abs( vals(1) - 0.    ) >1.e-12 ) throw std::runtime_error("H''_1("+std::to_string(x)+")");
+        if(std::abs( vals(2) - 8.    ) >1.e-12 ) throw std::runtime_error("H''_2("+std::to_string(x)+")");
+        if(std::abs( vals(3) - 48.*x ) >1.e-12 ) throw std::runtime_error("H''_3("+std::to_string(x)+")");
+    }
 
     Eigen::VectorXd grid(10);
     for(int i=0; i<10; i++) grid(i)=i-5.;
 
-    auto wf1 = std::make_shared<WaveFunction>(basis);
-    Eigen::VectorXcd components = basis->discretize_function_cov([](double x){ return std::exp(-x*x); });
-    wf1->set_from_components_cov(components);
+    auto wf1 = std::make_shared<WaveFunction>(basis, [](double x){ return std::exp(-x*x); }, 0);
     (*wf1)/=wf1->norm();
 
-    auto wf2 = std::make_shared<WaveFunction>(basis);
-    components = basis->discretize_function_cov([](double x){ return std::exp(-(x-1.)*(x-1.)); });
-    wf2->set_from_components_cov(components);
+    auto wf2 = std::make_shared<WaveFunction>(basis, [](double x){ return std::exp(-(x-1.)*(x-1.)); }, 0);
     (*wf2)/=wf2->norm();
 
     auto wf3 = std::make_shared<WaveFunction>(((*wf1) + (*wf2))/std::sqrt(2.));
@@ -45,8 +48,7 @@ int main(int argc, char* argv[]){
              <<"WF2"<<std::endl<<wf2->grid(grid)<<std::endl<<"----"<<std::endl
              <<"WF3"<<std::endl<<wf3->grid(grid)<<std::endl<<"----"<<std::endl;
 
-    DensityOperator rho(basis);
-    rho.set_from_wavefunctions({{.5, wf1}, {.5, wf2}});
+    DensityOperator rho({{.5, wf1}, {.5, wf2}});
 
     auto diag = rho.diagonalize();
     for(auto wf: diag){

@@ -20,6 +20,8 @@ namespace wigner_web::state{
         Eigen::MatrixXcd matrix;
 
         DensityOperator(std::shared_ptr<const wigner_web::discretization::Basis> _basis);
+        DensityOperator(std::shared_ptr<const wigner_web::discretization::Basis> _basis, Eigen::MatrixXcd&& _matrix);
+        DensityOperator(DiagonalRepresentation wavefunctions);
 
         void set_from_wavefunctions(DiagonalRepresentation wavefunctions);
         DiagonalRepresentation diagonalize();
