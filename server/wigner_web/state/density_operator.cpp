@@ -1,6 +1,5 @@
 #include <iostream>
 #include <Eigen/Dense>
-#include <json.hpp>
 #include <boost/variant.hpp>
 
 #include "wigner_web/state/density_operator.h"
@@ -12,17 +11,22 @@ using WaveFunction = wigner_web::state::WaveFunction;
 
 namespace wigner_web::state{
 
-    DensityOperator::DensityOperator(std::shared_ptr<const Basis> _basis): basis(_basis), matrix(_basis->size, _basis->size){}
+    DensityOperator::DensityOperator(std::shared_ptr<const Basis> _basis): basis(_basis){
+        matrix = Eigen::MatrixXcd::Zero(basis->size, basis->size);
+    }
     DensityOperator::DensityOperator(std::shared_ptr<const Basis> _basis, Eigen::MatrixXcd&& _matrix): basis(_basis), matrix(_matrix){}
     DensityOperator::DensityOperator(DiagonalRepresentation wavefunctions): basis(wavefunctions[0].second->basis){
         set_from_wavefunctions(wavefunctions);
     }
         
+    void DensityOperator::add_wavefunction(double probability, std::shared_ptr<WaveFunction> wavefunction){
+        matrix += probability * wavefunction->vector * wavefunction->vector.adjoint();
+    }
 
     void DensityOperator::set_from_wavefunctions(DiagonalRepresentation wavefunctions){
         matrix = Eigen::MatrixXcd::Zero(basis->size, basis->size);
         for(auto wf: wavefunctions){
-            matrix += wf.first * wf.second->vector * wf.second->vector.adjoint();
+            add_wavefunction(wf.first, wf.second);
         } 
     }
 
@@ -44,12 +48,4 @@ namespace wigner_web::state{
 
     }
         
-    void DensityOperator::to_json(nlohmann::json& json, int points) const{
-        for(auto p: diagonalize()){
-            nlohmann::json j;
-            j["probability"] = p.first;
-            p.second->to_json(j["wavefunction"], points);
-            json.push_back(j);
-        }
-    }
 }

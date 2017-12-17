@@ -12,6 +12,7 @@
 
 #include "wigner_web/discretization/basis.h"
 #include "wigner_web/state/wave_function.h"
+#include "wigner_web/state/density_operator.h"
 
 namespace wigner_web::system{
     class System{
@@ -26,7 +27,10 @@ namespace wigner_web::system{
          */
         std::shared_ptr<wigner_web::discretization::Basis> create_basis(std::string name, double lower, double upper, int order) const;
         std::shared_ptr<wigner_web::state::WaveFunction> create_wavefunction(std::shared_ptr<wigner_web::discretization::Basis> basis, std::function<std::map<std::string, double>(double)> psi, int order) const;
-        void get_wavefunction(std::shared_ptr<wigner_web::state::WaveFunction> wavefunction, std::string name, int points);
+        std::shared_ptr<wigner_web::state::DensityOperator> create_density_operator(std::shared_ptr<wigner_web::discretization::Basis> basis) const;
+
+        void plot_wavefunction(std::shared_ptr<wigner_web::state::WaveFunction> wavefunction, std::string name, int points);
+        void plot_wigner(std::shared_ptr<wigner_web::state::DensityOperator> density_operator, std::string name, int points);
 
         void execute(std::string code, nlohmann::json& result);
     };
