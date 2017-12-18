@@ -18,7 +18,6 @@ namespace wigner_web::state{
         /// Grid representation: matrix(i, j) = W(x_i, p_j)
         Eigen::MatrixXd matrix;
 
-        WignerFunction(double lower_x_, double upper_x_, double lower_p_, double upper_p_, Eigen::MatrixXd&& matrix_);
         WignerFunction(const wigner_web::state::WaveFunction& wavefunction, int points);
         WignerFunction(const wigner_web::state::DensityOperator& density_operator, int points);
 
@@ -30,20 +29,6 @@ namespace wigner_web::state{
         double get_lower_p() const;
         double get_upper_p() const;
         
-        void operator/=(const double& scalar){ matrix/=scalar; }
-        void operator*=(const double& scalar){ matrix*=scalar; }
-        void operator+=(const WignerFunction& other){ matrix+=other.matrix; }
-        void operator-=(const WignerFunction& other){ matrix-=other.matrix; }
-
-        WignerFunction operator/(const double& scalar) const { return WignerFunction{lower_x, upper_x, lower_p, upper_p, matrix/scalar}; }
-        WignerFunction operator*(const double& scalar) const { return WignerFunction{lower_x, upper_x, lower_p, upper_p, matrix*scalar}; }
-        WignerFunction operator+(const WignerFunction& other) const { return WignerFunction{lower_x, upper_x, lower_p, upper_p, matrix+other.matrix}; }
-        WignerFunction operator-(const WignerFunction& other) const { return WignerFunction{lower_x, upper_x, lower_p, upper_p, matrix-other.matrix}; }
-
-        friend WignerFunction operator*(const double& scalar, const WignerFunction& wf){
-            return wf*scalar;
-        }
-
         void to_json(nlohmann::json& json) const;
     };
 }

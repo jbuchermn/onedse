@@ -20,9 +20,6 @@ using FFT = wigner_web::utility::FFT;
 
 namespace wigner_web::state{
 
-    WignerFunction::WignerFunction(double lower_x_, double upper_x_, double lower_p_, double upper_p_, Eigen::MatrixXd&& matrix_): 
-        lower_x(lower_x_), upper_x(upper_x_), lower_p(lower_p_), upper_p(upper_p_), matrix(matrix_){}
-
     WignerFunction::WignerFunction(const WaveFunction& wavefunction, int points){
         set_from_wavefunction(wavefunction, points);
     }
@@ -32,11 +29,12 @@ namespace wigner_web::state{
         for(std::pair<double, std::shared_ptr<WaveFunction>> p: density_operator.diagonalize()){
             if(first){
                 set_from_wavefunction(*(p.second), points);
-                (*this)*=p.first;
+                matrix*=p.first;
 
                 first=false;
             }else{
-                (*this) += p.first * WignerFunction{ *(p.second), points };
+                WignerFunction tmp{*(p.second), points};
+                matrix += p.first * tmp.matrix;
             }
         }
     }
