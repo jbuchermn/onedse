@@ -2,42 +2,55 @@ cmake_minimum_required (VERSION 3.1)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 project (WebApp)
 
+#
 # Compiler
+#
 set (CMAKE_CXX_STANDARD 17)
 add_compile_options(-Ofast -g -pg)
 
-# Target
-file(GLOB wigner_webd_SRC "wigner_web/**/*.cpp")
-
-# Not the nicest of solutions
-file(GLOB alglib_SRC "dependencies/alglib/alglib/*.cpp")
-include_directories("${CMAKE_SOURCE_DIR}/dependencies/alglib")
-
 # Specify all includes from root
 include_directories("${CMAKE_SOURCE_DIR}")
-add_executable(wigner_webd main.cpp ${wigner_webd_SRC} ${alglib_SRC})
-add_executable(wigner_webd_test main_test.cpp ${wigner_webd_SRC} ${alglib_SRC})
+
+
+#
+# Dependencies
+#
 
 # Boost
 find_package(Boost 1.53.0 COMPONENTS system thread filesystem REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
-target_link_libraries(wigner_webd ${Boost_LIBRARIES})
-target_link_libraries(wigner_webd_test ${Boost_LIBRARIES})
+list(APPEND dependencies_LIBRARIES ${Boost_LIBRARIES})
 
 # FFTW
 find_package(FFTW REQUIRED)
 include_directories(${FFTW_INCLUDE_DIR})
-target_link_libraries(wigner_webd ${FFTW_LIBRARIES})
-target_link_libraries(wigner_webd_test ${FFTW_LIBRARIES})
+list(APPEND dependencies_LIBRARIES ${FFTW_LIBRARIES})
 
 # Lua
 find_package(LUA REQUIRED)
 include_directories(${LUA_INCLUDE_DIR})
-target_link_libraries(wigner_webd ${LUA_LIBRARIES})
-target_link_libraries(wigner_webd_test ${LUA_LIBRARIES})
+list(APPEND dependencies_LIBRARIES ${LUA_LIBRARIES})
+
+# alglib
+find_package(Alglib REQUIRED)
+include_directories(${Alglib_INCLUDE_DIR})
+list(APPEND dependencies_LIBRARIES ${Alglib_LIBRARIES})
 
 # Header libraries
 include_directories("${CMAKE_SOURCE_DIR}/dependencies/Simple-Web-Server")
 include_directories("${CMAKE_SOURCE_DIR}/dependencies/json/src")
 include_directories("${CMAKE_SOURCE_DIR}/dependencies/eigen")
 include_directories("${CMAKE_SOURCE_DIR}/dependencies/luawrapper/include")
+
+#
+# Internal
+#
+add_subdirectory(wigner_web)
+
+#
+# Targets
+#
+add_executable(wigner_webd main.cpp)
+add_executable(wigner_webd_test main_test.cpp)
+target_link_libraries(wigner_webd wigner_web ${dependencies_LIBRARIES})
+target_link_libraries(wigner_webd_test wigner_web ${dependencies_LIBRARIES})

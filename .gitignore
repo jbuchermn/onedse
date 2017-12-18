@@ -1,5 +1,6 @@
 webapp/www
 webapp/node_modules/
-server/dependencies/alglib
+server/dependencies/alglib/**/*
+!server/dependencies/alglib/Makefile
 server/build
 **/.tern-port
