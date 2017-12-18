@@ -21,7 +21,7 @@ namespace wigner_web::map{
 
         void set_from_components_cov(const Eigen::MatrixXcd& components);
 
-        void apply(wigner_web::state::WaveFunction& wavefunction) const;
+        void apply(wigner_web::state::WaveFunction& wavefunction) const override;
         
         void operator/=(const std::complex<double>& scalar){ matrix/=scalar; }
         void operator*=(const std::complex<double>& scalar){ matrix*=scalar; }

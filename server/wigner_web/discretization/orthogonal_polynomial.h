@@ -32,8 +32,8 @@ namespace wigner_web::discretization{
 
         OrthogonalPolynomial(double _lower, double _upper, int _size, Basis::BoundaryConditions boundary_conditions);
 
-        Eigen::VectorXcd evaluate(double x, int derivative=0) const;
-        void quadrature(int order, Eigen::VectorXd& points, Eigen::VectorXd& weights) const;
+        Eigen::VectorXcd evaluate(double x, int derivative=0) const override;
+        void quadrature(int order, Eigen::VectorXd& points, Eigen::VectorXd& weights) const override;
     };
 
 }

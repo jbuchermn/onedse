@@ -37,7 +37,7 @@ namespace wigner_web::propagation{
 
         }
 
-        void step(StateClass& state, double t_start, double t_step){
+        void step(StateClass& state, double t_start, double t_step) override{
             while(vec_k.size() < b.size()) vec_k.push_back(state);
 
             vec_k.back() = state;

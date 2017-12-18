@@ -1,212 +1,242 @@
 [
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/main_test.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/main_test.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/main_test.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/main_test.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/main_test.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/wigner_web/discretization/basis.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/wigner_web/discretization/basis.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/wigner_web/discretization/basis.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/wigner_web/discretization/basis.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/wigner_web/discretization/basis.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/wigner_web/discretization/orthogonal_polynomial.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/wigner_web/discretization/orthogonal_polynomial.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/wigner_web/discretization/orthogonal_polynomial.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/wigner_web/discretization/orthogonal_polynomial.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/wigner_web/discretization/orthogonal_polynomial.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/wigner_web/server/server.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/wigner_web/server/server.cpp",
-  "file": "/Users/jonasbucher/Daten/wigner-web/server/wigner_web/server/server.cpp"
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/wigner_web/discretization/scaled_orthogonal_chebyshev.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/wigner_web/discretization/scaled_orthogonal_chebyshev.cpp",
+  "file": "/Users/jonasbucher/Daten/wigner-web/server/wigner_web/discretization/scaled_orthogonal_chebyshev.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/wigner_web/state/density_operator.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/wigner_web/state/density_operator.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/wigner_web/map/operator_wavefunction.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/wigner_web/map/operator_wavefunction.cpp",
+  "file": "/Users/jonasbucher/Daten/wigner-web/server/wigner_web/map/operator_wavefunction.cpp"
+},
+{
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/wigner_web/server/session.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/wigner_web/server/session.cpp",
+  "file": "/Users/jonasbucher/Daten/wigner-web/server/wigner_web/server/session.cpp"
+},
+{
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/wigner_web/state/density_operator.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/wigner_web/state/density_operator.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/wigner_web/state/density_operator.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/wigner_web/state/wave_function.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/wigner_web/state/wave_function.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/wigner_web/state/wave_function.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/wigner_web/state/wave_function.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/wigner_web/state/wave_function.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/wigner_web/state/wigner_function.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/wigner_web/state/wigner_function.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/wigner_web/state/wigner_function.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/wigner_web/state/wigner_function.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/wigner_web/state/wigner_function.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/wigner_web/utility/fft.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/wigner_web/utility/fft.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/wigner_web/system/system.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/wigner_web/system/system.cpp",
+  "file": "/Users/jonasbucher/Daten/wigner-web/server/wigner_web/system/system.cpp"
+},
+{
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/wigner_web/utility/fft.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/wigner_web/utility/fft.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/wigner_web/utility/fft.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/dependencies/alglib/alglib/alglibinternal.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/alglibinternal.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/dependencies/alglib/alglib/alglibinternal.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/alglibinternal.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/alglibinternal.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/dependencies/alglib/alglib/alglibmisc.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/alglibmisc.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/dependencies/alglib/alglib/alglibmisc.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/alglibmisc.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/alglibmisc.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/dependencies/alglib/alglib/ap.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/ap.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/dependencies/alglib/alglib/ap.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/ap.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/ap.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/dependencies/alglib/alglib/dataanalysis.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/dataanalysis.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/dependencies/alglib/alglib/dataanalysis.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/dataanalysis.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/dataanalysis.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/dependencies/alglib/alglib/diffequations.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/diffequations.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/dependencies/alglib/alglib/diffequations.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/diffequations.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/diffequations.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/dependencies/alglib/alglib/fasttransforms.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/fasttransforms.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/dependencies/alglib/alglib/fasttransforms.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/fasttransforms.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/fasttransforms.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/dependencies/alglib/alglib/integration.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/integration.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/dependencies/alglib/alglib/integration.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/integration.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/integration.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/dependencies/alglib/alglib/interpolation.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/interpolation.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/dependencies/alglib/alglib/interpolation.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/interpolation.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/interpolation.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/dependencies/alglib/alglib/linalg.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/linalg.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/dependencies/alglib/alglib/linalg.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/linalg.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/linalg.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/dependencies/alglib/alglib/optimization.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/optimization.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/dependencies/alglib/alglib/optimization.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/optimization.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/optimization.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/dependencies/alglib/alglib/solvers.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/solvers.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/dependencies/alglib/alglib/solvers.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/solvers.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/solvers.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/dependencies/alglib/alglib/specialfunctions.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/specialfunctions.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/dependencies/alglib/alglib/specialfunctions.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/specialfunctions.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/specialfunctions.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/dependencies/alglib/alglib/statistics.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/statistics.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd_test.dir/dependencies/alglib/alglib/statistics.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/statistics.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/statistics.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/main.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/main.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/main.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/main.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/main.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/wigner_web/discretization/basis.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/wigner_web/discretization/basis.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/wigner_web/discretization/basis.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/wigner_web/discretization/basis.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/wigner_web/discretization/basis.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/wigner_web/discretization/orthogonal_polynomial.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/wigner_web/discretization/orthogonal_polynomial.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/wigner_web/discretization/orthogonal_polynomial.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/wigner_web/discretization/orthogonal_polynomial.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/wigner_web/discretization/orthogonal_polynomial.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/wigner_web/server/server.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/wigner_web/server/server.cpp",
-  "file": "/Users/jonasbucher/Daten/wigner-web/server/wigner_web/server/server.cpp"
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/wigner_web/discretization/scaled_orthogonal_chebyshev.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/wigner_web/discretization/scaled_orthogonal_chebyshev.cpp",
+  "file": "/Users/jonasbucher/Daten/wigner-web/server/wigner_web/discretization/scaled_orthogonal_chebyshev.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/wigner_web/state/density_operator.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/wigner_web/state/density_operator.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/wigner_web/map/operator_wavefunction.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/wigner_web/map/operator_wavefunction.cpp",
+  "file": "/Users/jonasbucher/Daten/wigner-web/server/wigner_web/map/operator_wavefunction.cpp"
+},
+{
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/wigner_web/server/session.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/wigner_web/server/session.cpp",
+  "file": "/Users/jonasbucher/Daten/wigner-web/server/wigner_web/server/session.cpp"
+},
+{
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/wigner_web/state/density_operator.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/wigner_web/state/density_operator.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/wigner_web/state/density_operator.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/wigner_web/state/wave_function.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/wigner_web/state/wave_function.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/wigner_web/state/wave_function.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/wigner_web/state/wave_function.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/wigner_web/state/wave_function.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/wigner_web/state/wigner_function.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/wigner_web/state/wigner_function.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/wigner_web/state/wigner_function.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/wigner_web/state/wigner_function.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/wigner_web/state/wigner_function.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/wigner_web/utility/fft.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/wigner_web/utility/fft.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/wigner_web/system/system.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/wigner_web/system/system.cpp",
+  "file": "/Users/jonasbucher/Daten/wigner-web/server/wigner_web/system/system.cpp"
+},
+{
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/wigner_web/utility/fft.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/wigner_web/utility/fft.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/wigner_web/utility/fft.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/dependencies/alglib/alglib/alglibinternal.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/alglibinternal.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/dependencies/alglib/alglib/alglibinternal.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/alglibinternal.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/alglibinternal.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/dependencies/alglib/alglib/alglibmisc.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/alglibmisc.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/dependencies/alglib/alglib/alglibmisc.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/alglibmisc.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/alglibmisc.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/dependencies/alglib/alglib/ap.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/ap.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/dependencies/alglib/alglib/ap.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/ap.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/ap.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/dependencies/alglib/alglib/dataanalysis.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/dataanalysis.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/dependencies/alglib/alglib/dataanalysis.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/dataanalysis.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/dataanalysis.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/dependencies/alglib/alglib/diffequations.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/diffequations.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/dependencies/alglib/alglib/diffequations.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/diffequations.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/diffequations.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/dependencies/alglib/alglib/fasttransforms.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/fasttransforms.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/dependencies/alglib/alglib/fasttransforms.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/fasttransforms.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/fasttransforms.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/dependencies/alglib/alglib/integration.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/integration.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/dependencies/alglib/alglib/integration.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/integration.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/integration.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/dependencies/alglib/alglib/interpolation.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/interpolation.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/dependencies/alglib/alglib/interpolation.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/interpolation.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/interpolation.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/dependencies/alglib/alglib/linalg.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/linalg.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/dependencies/alglib/alglib/linalg.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/linalg.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/linalg.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/dependencies/alglib/alglib/optimization.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/optimization.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/dependencies/alglib/alglib/optimization.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/optimization.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/optimization.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/dependencies/alglib/alglib/solvers.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/solvers.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/dependencies/alglib/alglib/solvers.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/solvers.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/solvers.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/dependencies/alglib/alglib/specialfunctions.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/specialfunctions.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/dependencies/alglib/alglib/specialfunctions.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/specialfunctions.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/specialfunctions.cpp"
 },
 {
-  "directory": "/tmp/tmpfn8uovxp",
-  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/dependencies/alglib/alglib/statistics.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/statistics.cpp",
+  "directory": "/tmp/tmpyne7iomz",
+  "command": "/usr/local/bin/mpicxx   -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib -I/Users/jonasbucher/Daten/wigner-web/server -I/usr/local/include -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/Simple-Web-Server -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/json/src -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/eigen -I/Users/jonasbucher/Daten/wigner-web/server/dependencies/luawrapper/include    -Ofast -g -pg -std=gnu++1z -o CMakeFiles/wigner_webd.dir/dependencies/alglib/alglib/statistics.cpp.o -c /Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/statistics.cpp",
   "file": "/Users/jonasbucher/Daten/wigner-web/server/dependencies/alglib/alglib/statistics.cpp"
 }
 ]
