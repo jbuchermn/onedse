@@ -12,6 +12,7 @@
 #include "wigner_web/map/operator_wavefunction.h"
 #include "wigner_web/propagation/propagator.h"
 #include "wigner_web/propagation/runge_kutta.h"
+#include "wigner_web/utility/lua_register_complex.h"
 
 using json = nlohmann::json;
 using Basis = wigner_web::discretization::Basis;
@@ -29,6 +30,8 @@ using RungeKutta = wigner_web::propagation::RungeKutta<StateClass>;
 
 namespace wigner_web::system{
     System::System(){
+        wigner_web::utility::lua_register_complex<double>(lua);
+
         lua.registerFunction("create_basis", &System::create_basis);
         lua.registerFunction("create_wavefunction", &System::create_wavefunction);
         lua.registerFunction("create_density_operator", &System::create_density_operator);
