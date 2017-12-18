@@ -1,4 +1,5 @@
 webapp/www
 webapp/node_modules/
+server/dependencies/alglib
 server/build
 **/.tern-port
