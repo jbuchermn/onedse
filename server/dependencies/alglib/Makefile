@@ -12,4 +12,4 @@ libalglib.a: $(OBJS)
 	ar r libalglib.a *.o
 
 clean:
-	rm -f alglib/*.o libalglib.a 
+	rm -f *.o libalglib.a 
