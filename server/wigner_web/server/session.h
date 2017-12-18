@@ -1,5 +1,4 @@
-#ifndef SERVER_H
-#define SERVER_H
+#pragma once
 
 #include <memory>
 #include <string>
@@ -20,5 +19,3 @@ namespace wigner_web::server{
         std::string process(const std::string& request);
     };
 }
-
-#endif

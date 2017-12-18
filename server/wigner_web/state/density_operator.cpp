@@ -7,15 +7,28 @@
 #include "wigner_web/discretization/basis.h"
 
 using Basis = wigner_web::discretization::Basis;
+using State = wigner_web::state::State;
 using WaveFunction = wigner_web::state::WaveFunction;
 
 namespace wigner_web::state{
 
-    DensityOperator::DensityOperator(std::shared_ptr<const Basis> _basis): basis(_basis){
-        matrix = Eigen::MatrixXcd::Zero(basis->size, basis->size);
+    DensityOperator::DensityOperator(std::shared_ptr<const Basis> basis): State(basis), matrix(Eigen::MatrixXcd::Zero(basis->size, basis->size)){}
+    DensityOperator::DensityOperator(std::shared_ptr<const Basis> basis, Eigen::MatrixXcd&& matrix_): State(basis), matrix(std::move(matrix_)) {}
+    DensityOperator::DensityOperator(const DensityOperator& other): State(other.basis), matrix(other.matrix){}
+    DensityOperator::DensityOperator(DensityOperator&& other): State(other.basis), matrix(std::move(other.matrix)){}
+
+    DensityOperator& DensityOperator::operator=(const DensityOperator& other){
+        basis = other.basis;
+        matrix = other.matrix;
+        return *this;
     }
-    DensityOperator::DensityOperator(std::shared_ptr<const Basis> _basis, Eigen::MatrixXcd&& _matrix): basis(_basis), matrix(_matrix){}
-    DensityOperator::DensityOperator(DiagonalRepresentation wavefunctions): basis(wavefunctions[0].second->basis){
+
+    DensityOperator& DensityOperator::operator=(DensityOperator&& other){
+        basis = other.basis;
+        matrix = std::move(other.matrix);
+        return *this;
+    }
+    DensityOperator::DensityOperator(DiagonalRepresentation wavefunctions): State(wavefunctions[0].second->basis){
         set_from_wavefunctions(wavefunctions);
     }
         

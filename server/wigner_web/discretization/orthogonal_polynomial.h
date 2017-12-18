@@ -1,5 +1,4 @@
-#ifndef ORTHOGONAL_POLYNOMIAL_H
-#define ORTHOGONAL_POLYNOMIAL_H
+#pragma once
 
 #include <exception>
 #include <string>
@@ -38,9 +37,3 @@ namespace wigner_web::discretization{
     };
 
 }
-
-
-
-
-
-#endif

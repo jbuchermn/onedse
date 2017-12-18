@@ -1,5 +1,4 @@
-#ifndef ORTHOGONAL_HERMITE_H
-#define ORTHOGONAL_HERMITE_H
+#pragma once
 
 #include <cmath>
 
@@ -22,6 +21,3 @@ namespace wigner_web::discretization{
         OrthogonalHermite(double lower, double upper, int size): OrthogonalPolynomial(lower, upper, size, Basis::BoundaryConditions::None){}
     };
 }
-
-
-#endif

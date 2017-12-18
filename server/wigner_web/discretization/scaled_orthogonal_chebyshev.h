@@ -1,5 +1,4 @@
-#ifndef SCALED_ORTHOGONAL_CHEBYSHEV_H
-#define SCALED_ORTHOGONAL_CHEBYSHEV_H
+#pragma once
 
 #include <cmath>
 
@@ -25,6 +24,3 @@ namespace wigner_web::discretization{
         void quadrature(int order, Eigen::VectorXd& points, Eigen::VectorXd& weights) const;
     };
 }
-
-
-#endif

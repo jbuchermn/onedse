@@ -1,5 +1,4 @@
-#ifndef FFT_H
-#define FFT_H
+#pragma once
 
 #include <Eigen/Dense>
 #include <fftw3.h>
@@ -18,5 +17,3 @@ namespace wigner_web::utility{
         Eigen::VectorXcd& operator()(Eigen::VectorXcd& vector);
     };
 }
-
-#endif

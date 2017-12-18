@@ -1,26 +1,32 @@
-#ifndef WAVE_FUNCTION_H
-#define WAVE_FUNCTION_H
+#pragma once
 
 #include <complex>
 #include <functional>
 #include <memory>
+#include <iomanip>
 #include <Eigen/Dense>
 #include <json.hpp>
 
+#include "wigner_web/state/state.h"
 #include "wigner_web/discretization/basis.h"
 
 namespace wigner_web::state{
 
-    class WaveFunction{
+    class WaveFunction: public wigner_web::state::State{
     public:
-        const std::shared_ptr<const wigner_web::discretization::Basis> basis;
 
         /// Representation with contravariant indices
         Eigen::VectorXcd vector;
 
-        WaveFunction(std::shared_ptr<const wigner_web::discretization::Basis> _basis);
-        WaveFunction(std::shared_ptr<const wigner_web::discretization::Basis> _basis, Eigen::VectorXcd&& _vector);
-        WaveFunction(std::shared_ptr<const wigner_web::discretization::Basis> _basis, std::function<std::complex<double>(double)> psi, int order);
+        WaveFunction(std::shared_ptr<const wigner_web::discretization::Basis> basis);
+        WaveFunction(std::shared_ptr<const wigner_web::discretization::Basis> basis, Eigen::VectorXcd&& vector_);
+        WaveFunction(const WaveFunction& other);
+        WaveFunction(WaveFunction&& other);
+        WaveFunction& operator=(const WaveFunction& other);
+        WaveFunction& operator=(WaveFunction&& other);
+        
+        WaveFunction(std::shared_ptr<const wigner_web::discretization::Basis> basis, std::function<std::complex<double>(double)> psi, int order);
+
 
         std::complex<double> operator()(double x) const;
         double norm() const;
@@ -31,10 +37,10 @@ namespace wigner_web::state{
         void set_from_components_cov(const Eigen::VectorXcd& components);
         void set_from_components_contrav(const Eigen::VectorXcd& components);
 
-        WaveFunction& operator/=(const std::complex<double>& scalar){ vector/=scalar; return *this; }
-        WaveFunction& operator*=(const std::complex<double>& scalar){ vector*=scalar; return *this; }
-        WaveFunction& operator+=(const WaveFunction& other){ vector+=other.vector; return *this; }
-        WaveFunction& operator-=(const WaveFunction& other){ vector-=other.vector; return *this; }
+        void operator/=(const std::complex<double>& scalar){ vector/=scalar; }
+        void operator*=(const std::complex<double>& scalar){ vector*=scalar; }
+        void operator+=(const WaveFunction& other){ vector+=other.vector; }
+        void operator-=(const WaveFunction& other){ vector-=other.vector; }
 
         WaveFunction operator/(const std::complex<double>& scalar) const { return WaveFunction{basis, vector/scalar}; }
         WaveFunction operator*(const std::complex<double>& scalar) const { return WaveFunction{basis, vector*scalar}; }
@@ -48,7 +54,3 @@ namespace wigner_web::state{
         void to_json(nlohmann::json& json, int points) const;
     };
 }
-
-
-
-#endif

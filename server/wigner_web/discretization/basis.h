@@ -1,5 +1,4 @@
-#ifndef BASIS_H
-#define BASIS_H
+#pragma once
 
 #include <memory>
 #include <functional>
@@ -45,12 +44,8 @@ namespace wigner_web::discretization{
         const Eigen::MatrixXcd& get_metric_contrav() const;
 
         Eigen::VectorXcd discretize_function_cov(std::function<std::complex<double>(double)> psi, int order) const;
-        
-        Eigen::MatrixXcd discretize_laplacian_cov() const;
-        Eigen::MatrixXcd discretize_mult_op_cov(std::function<std::complex<double>(double)> V, int order) const;
+        Eigen::MatrixXcd discretize_op_cov(int left_derivative, int right_derivative, std::function<std::complex<double>(double)> V, int order) const;
 
     };
 
 }
-
-#endif

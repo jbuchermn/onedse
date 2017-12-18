@@ -9,6 +9,9 @@
 #include "wigner_web/state/wave_function.h"
 #include "wigner_web/state/density_operator.h"
 #include "wigner_web/state/wigner_function.h"
+#include "wigner_web/map/operator_wavefunction.h"
+#include "wigner_web/propagation/propagator.h"
+#include "wigner_web/propagation/runge_kutta.h"
 
 using json = nlohmann::json;
 using Basis = wigner_web::discretization::Basis;
@@ -16,20 +19,45 @@ using ScaledOrthogonalChebyshev = wigner_web::discretization::ScaledOrthogonalCh
 using WaveFunction = wigner_web::state::WaveFunction;
 using DensityOperator = wigner_web::state::DensityOperator;
 using WignerFunction = wigner_web::state::WignerFunction;
+using OperatorWaveFunction = wigner_web::map::OperatorWaveFunction;
+
+template<class StateClass>
+using Propagator = wigner_web::propagation::Propagator<StateClass>;
+
+template<class StateClass>
+using RungeKutta = wigner_web::propagation::RungeKutta<StateClass>;
 
 namespace wigner_web::system{
     System::System(){
         lua.registerFunction("create_basis", &System::create_basis);
         lua.registerFunction("create_wavefunction", &System::create_wavefunction);
         lua.registerFunction("create_density_operator", &System::create_density_operator);
+        lua.registerFunction("create_operator_wavefunction", &System::create_operator_wavefunction);
+        lua.registerFunction("create_wavefunction_propagator", &System::create_wavefunction_propagator);
 
         lua.registerFunction("plot_wavefunction", &System::plot_wavefunction);
         lua.registerFunction("plot_wigner", &System::plot_wigner);
 
-        lua.registerFunction("diagonalize", &DensityOperator::diagonalize);
         lua.registerFunction("add_wavefunction", &DensityOperator::add_wavefunction);
-        lua.registerFunction("evaluate", &WaveFunction::operator());
         lua.registerFunction("norm", &WaveFunction::norm);
+
+        // Polymorphic functions need to be registered for every implementation
+        // Template functions need to be registered for every instantiation
+        lua.registerFunction("step", &RungeKutta<WaveFunction>::step);
+        lua.registerFunction("step", &RungeKutta<DensityOperator>::step);
+
+        lua.registerFunction("add", &WaveFunction::operator+=);
+        lua.registerFunction("add", &DensityOperator::operator+=);
+        lua.registerFunction("add", &OperatorWaveFunction::operator+=);
+        lua.registerFunction("subtract", &WaveFunction::operator-=);
+        lua.registerFunction("subtract", &DensityOperator::operator-=);
+        lua.registerFunction("subtract", &OperatorWaveFunction::operator-=);
+        lua.registerFunction("multiply", &WaveFunction::operator*=);
+        lua.registerFunction("multiply", &DensityOperator::operator*=);
+        lua.registerFunction("multiply", &OperatorWaveFunction::operator*=);
+        lua.registerFunction("divide", &WaveFunction::operator/=);
+        lua.registerFunction("divide", &DensityOperator::operator/=);
+        lua.registerFunction("divide", &OperatorWaveFunction::operator/=);
 
         lua.writeVariable("root", this);
     }
@@ -57,20 +85,23 @@ namespace wigner_web::system{
         return std::make_shared<ScaledOrthogonalChebyshev>(lower, upper, order);
     }
 
-    std::shared_ptr<WaveFunction> System::create_wavefunction(std::shared_ptr<Basis> basis, std::function<std::map<std::string, double>(double)> psi, int order) const{
-        auto psi_complex = [&psi](double x){
-            auto v = psi(x);
-            return std::complex<double>{ v["re"], v["im"] };
-        };
-        
-        return std::make_shared<WaveFunction>(basis, psi_complex, order);
+    std::shared_ptr<WaveFunction> System::create_wavefunction(std::shared_ptr<Basis> basis, std::function<std::complex<double>(double)> psi, int order) const{
+        return std::make_shared<WaveFunction>(basis, psi, order);
     }
 
 
-    std::shared_ptr<wigner_web::state::DensityOperator> System::create_density_operator(std::shared_ptr<wigner_web::discretization::Basis> basis) const{
+    std::shared_ptr<DensityOperator> System::create_density_operator(std::shared_ptr<Basis> basis) const{
         return std::make_shared<DensityOperator>(basis);
     }
-
+        
+    std::shared_ptr<OperatorWaveFunction> System::create_operator_wavefunction(std::shared_ptr<Basis> basis, int left_derivative, int right_derivative, std::function<std::complex<double>(double)> V, int order) const{
+        return std::make_shared<OperatorWaveFunction>(basis, left_derivative, right_derivative, V, order);
+    }
+        
+    std::shared_ptr<Propagator<WaveFunction>> System::create_wavefunction_propagator(std::string name, std::shared_ptr<OperatorWaveFunction> map) const{
+        return std::make_shared<RungeKutta<WaveFunction>>("RK4", map);
+    }
+    
     void System::plot_wavefunction(std::shared_ptr<WaveFunction> wavefunction, std::string name, int points){
         json plot;
         plot["title"] = name;

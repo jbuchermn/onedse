@@ -9,15 +9,36 @@
 
 #include "wigner_web/state/wave_function.h"
 #include "wigner_web/discretization/basis.h"
+#include "wigner_web/state/State.h"
 
+using State = wigner_web::state::State;
 using Basis = wigner_web::discretization::Basis;
 
 namespace wigner_web::state{
 
-    WaveFunction::WaveFunction(std::shared_ptr<const Basis> _basis): basis(_basis){}
-    WaveFunction::WaveFunction(std::shared_ptr<const Basis> _basis, Eigen::VectorXcd&& _vector): basis(_basis), vector(_vector){}
-    WaveFunction::WaveFunction(std::shared_ptr<const Basis> _basis, std::function<std::complex<double>(double)> psi, int order): basis(_basis){
+    WaveFunction::WaveFunction(std::shared_ptr<const Basis> basis): State(basis), vector(Eigen::VectorXcd::Zero(basis->size)){}
+    WaveFunction::WaveFunction(std::shared_ptr<const Basis> basis, Eigen::VectorXcd&& vector_): State(basis), vector(std::move(vector_)) {}
+    WaveFunction::WaveFunction(const WaveFunction& other): State(other.basis), vector(other.vector){}
+    WaveFunction::WaveFunction(WaveFunction&& other): State(other.basis), vector(std::move(other.vector)){}
+
+    WaveFunction& WaveFunction::operator=(const WaveFunction& other){
+        basis = other.basis;
+        vector = other.vector;
+        return *this;
+    }
+
+    WaveFunction& WaveFunction::operator=(WaveFunction&& other){
+        basis = other.basis;
+        vector = std::move(other.vector);
+        return *this;
+    }
+
+    WaveFunction::WaveFunction(std::shared_ptr<const Basis> basis_, std::function<std::complex<double>(double)> psi, int order): wigner_web::state::State(basis_){
         vector = basis->get_metric_contrav()*basis->discretize_function_cov(psi, order);
+
+        // Normalize when setting by std::function
+        double n = norm();
+        if(n>1.e-12) (*this)/=n;
     }
 
     std::complex<double> WaveFunction::operator()(double x) const{

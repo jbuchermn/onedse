@@ -56,26 +56,19 @@ namespace wigner_web::discretization{
         return basis_vals.adjoint() * weights.asDiagonal() * function_vals;
     }
     
-    Eigen::MatrixXcd Basis::discretize_laplacian_cov() const{
-        Eigen::VectorXd points, weights;
-        quadrature(0, points, weights);
-
-        Eigen::MatrixXcd basis_derivs = evaluate(points, 1);
-        return -1. * basis_derivs.adjoint() * weights.asDiagonal() * basis_derivs;
-    }
-        
-    Eigen::MatrixXcd Basis::discretize_mult_op_cov(std::function<std::complex<double>(double)> V, int order) const{
+    Eigen::MatrixXcd Basis::discretize_op_cov(int left_derivative, int right_derivative, std::function<std::complex<double>(double)> V, int order) const{
         Eigen::VectorXd points, weights;
         quadrature(order, points, weights);
 
-        Eigen::MatrixXcd basis_vals = evaluate(points);
+        Eigen::MatrixXcd left_basis_vals = evaluate(points, left_derivative);
+        Eigen::MatrixXcd right_basis_vals = evaluate(points, right_derivative);
 
         Eigen::VectorXcd function_vals(points.rows());
         for(int i=0; i<points.rows(); i++){
             function_vals(i) = V(points(i));
         }
 
-        return basis_vals.adjoint() * weights.asDiagonal() * function_vals.asDiagonal() * basis_vals;
+        return left_basis_vals.adjoint() * weights.asDiagonal() * function_vals.asDiagonal() * right_basis_vals;
     }
 
 }

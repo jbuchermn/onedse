@@ -1,5 +1,4 @@
-#ifndef WIGNER_FUNCTION_H
-#define WIGNER_FUNCTION_H
+#pragma once
 
 #include <Eigen/Dense>
 #include <json.hpp>
@@ -31,10 +30,10 @@ namespace wigner_web::state{
         double get_lower_p() const;
         double get_upper_p() const;
         
-        WignerFunction& operator/=(const double& scalar){ matrix/=scalar; return *this; }
-        WignerFunction& operator*=(const double& scalar){ matrix*=scalar; return *this; }
-        WignerFunction& operator+=(const WignerFunction& other){ matrix+=other.matrix; return *this; }
-        WignerFunction& operator-=(const WignerFunction& other){ matrix-=other.matrix; return *this; }
+        void operator/=(const double& scalar){ matrix/=scalar; }
+        void operator*=(const double& scalar){ matrix*=scalar; }
+        void operator+=(const WignerFunction& other){ matrix+=other.matrix; }
+        void operator-=(const WignerFunction& other){ matrix-=other.matrix; }
 
         WignerFunction operator/(const double& scalar) const { return WignerFunction{lower_x, upper_x, lower_p, upper_p, matrix/scalar}; }
         WignerFunction operator*(const double& scalar) const { return WignerFunction{lower_x, upper_x, lower_p, upper_p, matrix*scalar}; }
@@ -48,5 +47,3 @@ namespace wigner_web::state{
         void to_json(nlohmann::json& json) const;
     };
 }
-
-#endif
