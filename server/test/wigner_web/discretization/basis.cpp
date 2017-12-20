@@ -64,5 +64,5 @@ TEST(basis, eigenvalue_equation){
     Eigen::VectorXcd check_cov = mat_cov*basis->get_metric_contrav()*vec_cov;
 
     double error = check_cov.dot(basis->get_metric_contrav()*check_cov).real();
-    EXPECT_TRUE(error<1.e-9);
+    EXPECT_NEAR(error, 0, 1.e-12);
 }

@@ -6,7 +6,7 @@
 
 using OrthogonalChebyshev = wigner_web::discretization::OrthogonalChebyshev;
 
-TEST(scaled_orthogonal_chebyshev, value){
+TEST(orthogonal_chebyshev, value){
     OrthogonalChebyshev chebyshev(4);
     for(double x=-10.; x<=10.; x+=.5){
         Eigen::VectorXcd vals = chebyshev.evaluate(x);
@@ -20,7 +20,7 @@ TEST(scaled_orthogonal_chebyshev, value){
     }
 }
 
-TEST(scaled_orthogonal_chebyshev, first_derivative){
+TEST(orthogonal_chebyshev, first_derivative){
     OrthogonalChebyshev chebyshev(4);
     for(double x=-10.; x<=10.; x+=.5){
         Eigen::VectorXcd vals = chebyshev.evaluate(x, 1);
@@ -34,7 +34,7 @@ TEST(scaled_orthogonal_chebyshev, first_derivative){
     }
 }
 
-TEST(scaled_orthogonal_chebyshev, second_derivative){
+TEST(orthogonal_chebyshev, second_derivative){
     OrthogonalChebyshev chebyshev(4);
     for(double x=-10.; x<=10.; x+=.5){
         Eigen::VectorXcd vals = chebyshev.evaluate(x,2);
@@ -48,7 +48,7 @@ TEST(scaled_orthogonal_chebyshev, second_derivative){
     }
 }
 
-TEST(scaled_orthogonal_chebyshev, overlap){
+TEST(orthogonal_chebyshev, overlap){
     OrthogonalChebyshev chebyshev(10);
     Eigen::MatrixXcd overlap = chebyshev.get_metric_cov();
     Eigen::MatrixXcd check = Eigen::MatrixXcd::Zero(10, 10);
