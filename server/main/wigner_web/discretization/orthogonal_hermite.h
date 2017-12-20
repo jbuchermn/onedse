@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cmath>
+#include <float.h>
 
 #include "wigner_web/discretization/orthogonal_polynomial.h"
 
@@ -18,6 +19,6 @@ namespace wigner_web::discretization{
         inline double normsq0() const override{ return std::sqrt(M_PI); }
 
     public:
-        OrthogonalHermite(double lower, double upper, int size): OrthogonalPolynomial(lower, upper, size, Basis::BoundaryConditions::None){}
+        OrthogonalHermite(int size): OrthogonalPolynomial(DBL_MIN/2., DBL_MAX/2., size, Basis::BoundaryConditions::None){}
     };
 }

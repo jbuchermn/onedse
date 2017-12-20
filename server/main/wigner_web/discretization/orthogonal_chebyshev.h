@@ -9,7 +9,7 @@ namespace wigner_web::discretization{
     /**
      * Chebyshev polynomials are defined over [-1,1]
      */
-    class ScaledOrthogonalChebyshev: public OrthogonalPolynomial{
+    class OrthogonalChebyshev: public OrthogonalPolynomial{
     protected:
         inline double a(int n) const override{ return n==1 ? 1. : 2.; }
         inline double b(int n) const override{ return 0.; }
@@ -18,9 +18,6 @@ namespace wigner_web::discretization{
         inline double normsq0() const override{ return M_PI/2.*(upper-lower); }
 
     public:
-        ScaledOrthogonalChebyshev(double lower, double upper, int size): OrthogonalPolynomial(lower, upper, size, Basis::BoundaryConditions::None){}
-
-        Eigen::VectorXcd evaluate(double x, int derivative=0) const override;
-        void quadrature(int order, Eigen::VectorXd& points, Eigen::VectorXd& weights) const override;
+        OrthogonalChebyshev(int size): OrthogonalPolynomial(-1., 1., size, Basis::BoundaryConditions::None){}
     };
 }

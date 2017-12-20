@@ -5,7 +5,8 @@
 
 #include "wigner_web/system/system.h"
 #include "wigner_web/discretization/basis.h"
-#include "wigner_web/discretization/scaled_orthogonal_chebyshev.h"
+#include "wigner_web/discretization/scaled_basis.h"
+#include "wigner_web/discretization/orthogonal_chebyshev.h"
 #include "wigner_web/state/wave_function.h"
 #include "wigner_web/state/density_operator.h"
 #include "wigner_web/state/wigner_function.h"
@@ -16,7 +17,8 @@
 
 using json = nlohmann::json;
 using Basis = wigner_web::discretization::Basis;
-using ScaledOrthogonalChebyshev = wigner_web::discretization::ScaledOrthogonalChebyshev;
+using ScaledBasis = wigner_web::discretization::ScaledBasis;
+using OrthogonalChebyshev = wigner_web::discretization::OrthogonalChebyshev;
 using WaveFunction = wigner_web::state::WaveFunction;
 using DensityOperator = wigner_web::state::DensityOperator;
 using WignerFunction = wigner_web::state::WignerFunction;
@@ -85,7 +87,7 @@ namespace wigner_web::system{
 
 
     std::shared_ptr<Basis> System::create_basis(std::string name, double lower, double upper, int order) const{
-        return std::make_shared<ScaledOrthogonalChebyshev>(lower, upper, order);
+        return std::make_shared<ScaledBasis>(std::make_shared<OrthogonalChebyshev>(order), lower, upper);
     }
 
     std::shared_ptr<WaveFunction> System::create_wavefunction(std::shared_ptr<Basis> basis, std::function<std::complex<double>(double)> psi, int order) const{

@@ -3,11 +3,6 @@
 #include <LuaContext.hpp>
 
 #include "wigner_web/discretization/basis.h"
-#include "wigner_web/discretization/orthogonal_hermite.h"
-#include "wigner_web/discretization/scaled_orthogonal_chebyshev.h"
-
-using OrthogonalHermite = wigner_web::discretization::OrthogonalHermite;
-using ScaledOrthogonalChebyshev = wigner_web::discretization::ScaledOrthogonalChebyshev;
 
 namespace wigner_web::discretization{
     Basis::Basis(double _lower, double _upper, int _size, BoundaryConditions _boundary_conditions): 

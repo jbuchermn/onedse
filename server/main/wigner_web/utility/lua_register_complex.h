@@ -1,6 +1,8 @@
+#include <LuaContext.hpp>
 #include <complex>
 
 namespace wigner_web::utility{
+
     template<typename NumberType>
     void lua_register_complex(LuaContext& lua){
         lua.writeFunction("complex", [](NumberType re, NumberType im){ return std::complex<NumberType>{ re, im }; });
