@@ -20,7 +20,7 @@ namespace wigner_web::discretization{
         scaled_lower(scaled_upper_), scaled_upper(scaled_upper_) {}
 
     Eigen::VectorXcd ScaledBasis::evaluate(double x, int derivative) const{
-        return std::pow(jacobian(), derivative - .5) * unscaled->evaluate(unscale(x), derivative);
+        return std::pow(jacobian(), -derivative - .5) * unscaled->evaluate(unscale(x), derivative);
     }
 
     void ScaledBasis::quadrature(int order, Eigen::VectorXd& points, Eigen::VectorXd& weights) const{

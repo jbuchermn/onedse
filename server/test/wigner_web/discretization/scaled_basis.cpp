@@ -27,7 +27,7 @@ TEST(scaled_basis, first_derivative){
     std::shared_ptr<Basis> basis_scaled = std::make_shared<ScaledBasis>(basis, jacobian*basis->lower, jacobian*basis->upper);
     Eigen::MatrixXcd overlap_scaled = basis_scaled->discretize_op_cov(1, 1, [](double x){ return 1.; }, 0);
 
-    EXPECT_NEAR((overlap*std::pow(jacobian, 2) - overlap_scaled).norm(), 0., 1.e-8);
+    EXPECT_NEAR((overlap*std::pow(jacobian, -2) - overlap_scaled).norm(), 0., 1.e-8);
 
 }
 
@@ -40,7 +40,7 @@ TEST(scaled_basis, second_derivative){
     std::shared_ptr<Basis> basis_scaled = std::make_shared<ScaledBasis>(basis, jacobian*basis->lower, jacobian*basis->upper);
     Eigen::MatrixXcd overlap_scaled = basis_scaled->discretize_op_cov(2, 2, [](double x){ return 1.; }, 0);
 
-    EXPECT_NEAR((overlap*std::pow(jacobian, 4) - overlap_scaled).norm(), 0., 1.e-2);
+    EXPECT_NEAR((overlap*std::pow(jacobian, -4) - overlap_scaled).norm(), 0., 1.e-2);
 }
 
 TEST(scaled_basis, integrate_weight){

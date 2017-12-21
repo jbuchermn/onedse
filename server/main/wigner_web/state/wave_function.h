@@ -27,9 +27,9 @@ namespace wigner_web::state{
         
         WaveFunction(std::shared_ptr<const wigner_web::discretization::Basis> basis, std::function<std::complex<double>(double)> psi, int order);
 
+        double norm() const override;
 
         std::complex<double> operator()(double x) const;
-        double norm() const;
         Eigen::VectorXcd grid(const Eigen::VectorXd& x) const;
 
         void plot_to_terminal(int points=200) const;

@@ -27,6 +27,8 @@ namespace wigner_web::state{
         DensityOperator& operator=(DensityOperator&& other);
 
         DensityOperator(DiagonalRepresentation wavefunctions);
+        
+        double norm() const override;
 
         void add_wavefunction(double probability, std::shared_ptr<wigner_web::state::WaveFunction> wavefunction);
         void set_from_wavefunctions(DiagonalRepresentation wavefunctions);

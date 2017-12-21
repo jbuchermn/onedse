@@ -11,7 +11,7 @@ namespace wigner_web::discretization{
         Basis(_lower, _upper, _size, boundary_conditions){}
 
     Eigen::VectorXcd OrthogonalPolynomial::evaluate(double x, int derivative) const{
-        Eigen::VectorXcd values = Eigen::VectorXcd(size);
+        Eigen::VectorXcd values(size);
 
         Eigen::VectorXcd base_values;
         if(derivative>0) base_values = evaluate(x, derivative-1);

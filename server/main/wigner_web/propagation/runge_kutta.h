@@ -31,6 +31,8 @@ namespace wigner_web::propagation{
                 };
                 b = {1./6., 1./3., 1./3., 1./6};
                 c = {0., 0.5, 0.5, 1.};
+
+                this->consistency_order = 4;
             }else{
                 throw std::runtime_error("Unknown Runge-Kutta method '"+method+"'");
             }

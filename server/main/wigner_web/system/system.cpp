@@ -7,18 +7,21 @@
 #include "wigner_web/discretization/basis.h"
 #include "wigner_web/discretization/scaled_basis.h"
 #include "wigner_web/discretization/orthogonal_chebyshev.h"
+#include "wigner_web/discretization/orthogonal_legendre.h"
 #include "wigner_web/state/wave_function.h"
 #include "wigner_web/state/density_operator.h"
 #include "wigner_web/state/wigner_function.h"
 #include "wigner_web/map/operator_wavefunction.h"
 #include "wigner_web/propagation/propagator.h"
 #include "wigner_web/propagation/runge_kutta.h"
+#include "wigner_web/propagation/diagonal_propagator.h"
 #include "wigner_web/utility/lua_register_complex.h"
 
 using json = nlohmann::json;
 using Basis = wigner_web::discretization::Basis;
 using ScaledBasis = wigner_web::discretization::ScaledBasis;
 using OrthogonalChebyshev = wigner_web::discretization::OrthogonalChebyshev;
+using OrthogonalLegendre = wigner_web::discretization::OrthogonalLegendre;
 using WaveFunction = wigner_web::state::WaveFunction;
 using DensityOperator = wigner_web::state::DensityOperator;
 using WignerFunction = wigner_web::state::WignerFunction;
@@ -29,6 +32,8 @@ using Propagator = wigner_web::propagation::Propagator<StateClass>;
 
 template<class StateClass>
 using RungeKutta = wigner_web::propagation::RungeKutta<StateClass>;
+
+using DiagonalPropagator = wigner_web::propagation::DiagonalPropagator;
 
 namespace wigner_web::system{
     System::System(){
@@ -46,14 +51,14 @@ namespace wigner_web::system{
         lua.registerFunction("add_wavefunction", &DensityOperator::add_wavefunction);
         lua.registerFunction("norm", &WaveFunction::norm);
 
-        // Polymorphic functions need to be registered for every implementation
-        // Template functions need to be registered for every instantiation
-        lua.registerFunction("step", &RungeKutta<WaveFunction>::step);
-        lua.registerFunction("step", &RungeKutta<DensityOperator>::step);
+        lua.registerFunction<void (DiagonalPropagator::*)(std::shared_ptr<WaveFunction>, double, double)>("step", [](DiagonalPropagator& prop, std::shared_ptr<WaveFunction> wf, double t_start, double t_step){
+                prop.step(*wf, t_start, t_step);
+        });
+
 
         lua.registerFunction("add", &WaveFunction::operator+=);
         lua.registerFunction("add", &DensityOperator::operator+=);
-        lua.registerFunction("add", &OperatorWaveFunction::operator+=);
+        lua.registerFunction<void (OperatorWaveFunction::*)(std::shared_ptr<OperatorWaveFunction>)>("add", [](OperatorWaveFunction& op, std::shared_ptr<OperatorWaveFunction> op2){ op+= *op2; });
         lua.registerFunction("subtract", &WaveFunction::operator-=);
         lua.registerFunction("subtract", &DensityOperator::operator-=);
         lua.registerFunction("subtract", &OperatorWaveFunction::operator-=);
@@ -87,7 +92,7 @@ namespace wigner_web::system{
 
 
     std::shared_ptr<Basis> System::create_basis(std::string name, double lower, double upper, int order) const{
-        return std::make_shared<ScaledBasis>(std::make_shared<OrthogonalChebyshev>(order), lower, upper);
+        return std::make_shared<ScaledBasis>(std::make_shared<OrthogonalLegendre>(order), lower, upper);
     }
 
     std::shared_ptr<WaveFunction> System::create_wavefunction(std::shared_ptr<Basis> basis, std::function<std::complex<double>(double)> psi, int order) const{
@@ -103,8 +108,8 @@ namespace wigner_web::system{
         return std::make_shared<OperatorWaveFunction>(basis, left_derivative, right_derivative, V, order);
     }
         
-    std::shared_ptr<Propagator<WaveFunction>> System::create_wavefunction_propagator(std::string name, std::shared_ptr<OperatorWaveFunction> map) const{
-        return std::make_shared<RungeKutta<WaveFunction>>("RK4", map);
+    std::shared_ptr<DiagonalPropagator> System::create_wavefunction_propagator(std::string name, std::shared_ptr<OperatorWaveFunction> map) const{
+        return std::make_shared<DiagonalPropagator>(map);
     }
     
     void System::plot_wavefunction(std::shared_ptr<WaveFunction> wavefunction, std::string name, int points){

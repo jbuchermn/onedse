@@ -31,6 +31,11 @@ namespace wigner_web::state{
     DensityOperator::DensityOperator(DiagonalRepresentation wavefunctions): State(wavefunctions[0].second->basis){
         set_from_wavefunctions(wavefunctions);
     }
+
+
+    double DensityOperator::norm() const{
+        return (matrix.conjugate() * basis->get_metric_cov() * matrix * basis->get_metric_cov()).trace().real();
+    }
         
     void DensityOperator::add_wavefunction(double probability, std::shared_ptr<WaveFunction> wavefunction){
         matrix += probability * wavefunction->vector * wavefunction->vector.adjoint();
