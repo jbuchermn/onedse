@@ -9,6 +9,7 @@ namespace wigner_web::state{
     public:
         std::shared_ptr<const wigner_web::discretization::Basis> basis;
 
+        State(): basis(0){}
         State(std::shared_ptr<const wigner_web::discretization::Basis> basis_): basis(basis_){}
 
         virtual double norm() const=0;

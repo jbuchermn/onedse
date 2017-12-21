@@ -63,15 +63,7 @@ TEST(basis, eigenvalue_equation){
     Eigen::MatrixXcd mat_cov = basis->discretize_op_cov(1, 1, [](double x){ return 1.; }, 0) // -d^2/dx^2
                                 + basis->discretize_op_cov(0, 0, [](double x){ return 2*a*(2*a*x*x - 1.); }, 2); // + 2a(2ax^2 - 1)
 
-    for(double x=-1.; x<=1.; x+=0.05){
-        std::cout<<x<<"\t"<<basis->evaluate(x, 2).dot(basis->get_metric_contrav()*vec_cov)<<std::endl;
-    }
-
     Eigen::VectorXcd check_cov = mat_cov*basis->get_metric_contrav()*vec_cov;
-    
-    for(double x=-1.; x<=1.; x+=0.05){
-        std::cout<<x<<"\t"<<basis->evaluate(x).dot(basis->get_metric_contrav()*check_cov)<<std::endl;
-    }
 
     double error = check_cov.dot(basis->get_metric_contrav()*check_cov).real();
     EXPECT_NEAR(error, 0, 1.e-9);

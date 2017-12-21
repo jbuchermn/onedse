@@ -9,7 +9,7 @@
 
 #include "wigner_web/state/wave_function.h"
 #include "wigner_web/discretization/basis.h"
-#include "wigner_web/state/State.h"
+#include "wigner_web/state/state.h"
 
 using State = wigner_web::state::State;
 using Basis = wigner_web::discretization::Basis;
@@ -17,21 +17,7 @@ using Basis = wigner_web::discretization::Basis;
 namespace wigner_web::state{
 
     WaveFunction::WaveFunction(std::shared_ptr<const Basis> basis): State(basis), vector(Eigen::VectorXcd::Zero(basis->size)){}
-    WaveFunction::WaveFunction(std::shared_ptr<const Basis> basis, Eigen::VectorXcd&& vector_): State(basis), vector(std::move(vector_)) {}
-    WaveFunction::WaveFunction(const WaveFunction& other): State(other.basis), vector(other.vector){}
-    WaveFunction::WaveFunction(WaveFunction&& other): State(other.basis), vector(std::move(other.vector)){}
-
-    WaveFunction& WaveFunction::operator=(const WaveFunction& other){
-        basis = other.basis;
-        vector = other.vector;
-        return *this;
-    }
-
-    WaveFunction& WaveFunction::operator=(WaveFunction&& other){
-        basis = other.basis;
-        vector = std::move(other.vector);
-        return *this;
-    }
+    WaveFunction::WaveFunction(std::shared_ptr<const Basis> basis, const Eigen::VectorXcd& vector_): State(basis), vector(vector_) {}
 
     WaveFunction::WaveFunction(std::shared_ptr<const Basis> basis_, std::function<std::complex<double>(double)> psi, int order): wigner_web::state::State(basis_){
         vector = basis->get_metric_contrav()*basis->discretize_function_cov(psi, order);
@@ -47,7 +33,11 @@ namespace wigner_web::state{
     }
 
     double WaveFunction::norm() const{
-        return std::sqrt( vector.dot(basis->get_metric_cov()*vector).real() );
+        return std::sqrt(dot(*this).real());
+    }
+        
+    std::complex<double> WaveFunction::dot(const WaveFunction& other) const{
+        return vector.dot(basis->get_metric_cov()*other.vector);
     }
         
     Eigen::VectorXcd WaveFunction::grid(const Eigen::VectorXd& x) const{

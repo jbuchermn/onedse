@@ -55,20 +55,20 @@ namespace wigner_web::system{
                 prop.step(*wf, t_start, t_step);
         });
 
-
-        lua.registerFunction("add", &WaveFunction::operator+=);
-        lua.registerFunction("add", &DensityOperator::operator+=);
-        lua.registerFunction<void (OperatorWaveFunction::*)(std::shared_ptr<OperatorWaveFunction>)>("add", [](OperatorWaveFunction& op, std::shared_ptr<OperatorWaveFunction> op2){ op+= *op2; });
-        lua.registerFunction("subtract", &WaveFunction::operator-=);
-        lua.registerFunction("subtract", &DensityOperator::operator-=);
-        lua.registerFunction("subtract", &OperatorWaveFunction::operator-=);
-        lua.registerFunction("multiply", &WaveFunction::operator*=);
-        lua.registerFunction("multiply", &DensityOperator::operator*=);
-        lua.registerFunction("multiply", &OperatorWaveFunction::operator*=);
-        lua.registerFunction("divide", &WaveFunction::operator/=);
-        lua.registerFunction("divide", &DensityOperator::operator/=);
-        lua.registerFunction("divide", &OperatorWaveFunction::operator/=);
-
+        //
+        // lua.registerFunction("add", &WaveFunction::operator+=);
+        // lua.registerFunction("add", &DensityOperator::operator+=);
+        // lua.registerFunction<void (OperatorWaveFunction::*)(std::shared_ptr<OperatorWaveFunction>)>("add", [](OperatorWaveFunction& op, std::shared_ptr<OperatorWaveFunction> op2){ op+= *op2; });
+        // lua.registerFunction("subtract", &WaveFunction::operator-=);
+        // lua.registerFunction("subtract", &DensityOperator::operator-=);
+        // lua.registerFunction("subtract", &OperatorWaveFunction::operator-=);
+        // lua.registerFunction("multiply", &WaveFunction::operator*=);
+        // lua.registerFunction("multiply", &DensityOperator::operator*=);
+        // lua.registerFunction("multiply", &OperatorWaveFunction::operator*=);
+        // lua.registerFunction("divide", &WaveFunction::operator/=);
+        // lua.registerFunction("divide", &DensityOperator::operator/=);
+        // lua.registerFunction("divide", &OperatorWaveFunction::operator/=);
+        //
         lua.writeVariable("root", this);
     }
 

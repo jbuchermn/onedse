@@ -2,7 +2,6 @@
 #include <memory>
 #include <utility>
 #include <cmath>
-#include <complex>
 #include <json.hpp>
 
 
@@ -20,6 +19,8 @@ using FFT = wigner_web::utility::FFT;
 
 namespace wigner_web::state{
 
+    WignerFunction::WignerFunction(double lower_x_, double upper_x_, double lower_p_, double upper_p_, const Eigen::MatrixXd& matrix_): lower_x(lower_x_), upper_x(upper_x_), lower_p(lower_p_), upper_p(upper_p_), matrix(matrix_){}
+    
     WignerFunction::WignerFunction(const WaveFunction& wavefunction, int points){
         set_from_wavefunction(wavefunction, points);
     }
@@ -33,17 +34,16 @@ namespace wigner_web::state{
 
                 first=false;
             }else{
-                WignerFunction tmp{*(p.second), points};
-                matrix += p.first * tmp.matrix;
+                *this += p.first*WignerFunction{*(p.second), points};
             }
         }
     }
         
     void WignerFunction::set_from_wavefunction(const WaveFunction& wavefunction, int points){
-        lower_x = wavefunction.basis->lower;
         upper_x = wavefunction.basis->upper;
-        lower_p = -(upper_x-lower_x)/2.;
-        upper_p = -lower_p;
+        lower_x = wavefunction.basis->lower;
+        upper_p = M_PI/(upper_x-lower_x) * points;
+        lower_p = -upper_p;
 
         Eigen::VectorXd x_grid(points);
         for(int i=0; i<points; i++) x_grid(i) = lower_x + 1.*i/points*(upper_x-lower_x);
@@ -63,12 +63,15 @@ namespace wigner_web::state{
                 }
             }
             fft(tmp);
-            for(int k=0; k<points; k++)
-                matrix(i, k) = std::sqrt(2/M_PI)*tmp(2*k).real(); 
+            for(int k=0; k<points; k++) matrix(i, k) = tmp(2*k).real(); 
         }
+
+        // Normalization
+        matrix *= 2./M_PI * std::sqrt(points) * (upper_x-lower_x)/points;
     }
 
     void WignerFunction::plot_to_terminal() const{
+        std::cout<<"x\\in["<<lower_x<<","<<upper_x<<"], p\\in["<<lower_p<<","<<upper_p<<"]"<<std::endl;
         for(int i=0; i<matrix.rows(); i++){
             for(int j=0; j<matrix.cols(); j++){
                 if(matrix(i,j)<-1.) std::cout<<"O";
@@ -79,6 +82,17 @@ namespace wigner_web::state{
             }
             std::cout<<std::endl;
         }
+    }
+        
+    double WignerFunction::norm() const{
+        double result = 0.;
+        for(int i=0; i<matrix.rows(); i++){
+            for(int j=0; j<matrix.cols(); j++){
+                result += matrix(i,j);
+            }
+        }
+
+        return result/(upper_x-lower_x)/(upper_p-lower_p);
     }
 
     double WignerFunction::get_lower_x() const{ return lower_x; }

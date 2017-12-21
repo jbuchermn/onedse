@@ -12,6 +12,9 @@ namespace wigner_web::map{
 
     OperatorWaveFunction::OperatorWaveFunction(std::shared_ptr<const wigner_web::discretization::Basis> basis):
         Operator<WaveFunction>(basis), matrix(Eigen::MatrixXcd::Zero(basis->size, basis->size)) {}
+    
+    OperatorWaveFunction::OperatorWaveFunction(std::shared_ptr<const Basis> basis, const Eigen::MatrixXcd& matrix_): 
+        Operator<WaveFunction>(basis), matrix(matrix_){}
 
     OperatorWaveFunction::OperatorWaveFunction(std::shared_ptr<const Basis> basis, int left_derivative, int right_derivative, std::function<std::complex<double>(double)> V, int order):
         Operator<WaveFunction>(basis){
@@ -24,8 +27,6 @@ namespace wigner_web::map{
         matrix = basis->get_metric_contrav()*components;
     }
         
-    OperatorWaveFunction::OperatorWaveFunction(std::shared_ptr<const Basis> basis, Eigen::MatrixXcd&& matrix_): 
-        Operator<WaveFunction>(basis), matrix(matrix_){}
 
     void OperatorWaveFunction::apply(WaveFunction& wavefunction) const{
         wavefunction.vector = matrix*wavefunction.vector;

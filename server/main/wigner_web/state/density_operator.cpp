@@ -13,28 +13,15 @@ using WaveFunction = wigner_web::state::WaveFunction;
 namespace wigner_web::state{
 
     DensityOperator::DensityOperator(std::shared_ptr<const Basis> basis): State(basis), matrix(Eigen::MatrixXcd::Zero(basis->size, basis->size)){}
-    DensityOperator::DensityOperator(std::shared_ptr<const Basis> basis, Eigen::MatrixXcd&& matrix_): State(basis), matrix(std::move(matrix_)) {}
-    DensityOperator::DensityOperator(const DensityOperator& other): State(other.basis), matrix(other.matrix){}
-    DensityOperator::DensityOperator(DensityOperator&& other): State(other.basis), matrix(std::move(other.matrix)){}
-
-    DensityOperator& DensityOperator::operator=(const DensityOperator& other){
-        basis = other.basis;
-        matrix = other.matrix;
-        return *this;
-    }
-
-    DensityOperator& DensityOperator::operator=(DensityOperator&& other){
-        basis = other.basis;
-        matrix = std::move(other.matrix);
-        return *this;
-    }
+    DensityOperator::DensityOperator(std::shared_ptr<const Basis> basis, const Eigen::MatrixXcd& matrix_): State(basis), matrix(matrix_) {}
+    
     DensityOperator::DensityOperator(DiagonalRepresentation wavefunctions): State(wavefunctions[0].second->basis){
         set_from_wavefunctions(wavefunctions);
     }
 
 
     double DensityOperator::norm() const{
-        return (matrix.conjugate() * basis->get_metric_cov() * matrix * basis->get_metric_cov()).trace().real();
+        return std::sqrt( (matrix.conjugate() * basis->get_metric_cov() * matrix * basis->get_metric_cov()).trace().real() );
     }
         
     void DensityOperator::add_wavefunction(double probability, std::shared_ptr<WaveFunction> wavefunction){

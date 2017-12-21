@@ -17,21 +17,21 @@ namespace wigner_web::map{
         
         OperatorWaveFunction(std::shared_ptr<const wigner_web::discretization::Basis> basis);
         OperatorWaveFunction(std::shared_ptr<const wigner_web::discretization::Basis> basis, int left_derivative, int right_derivative, std::function<std::complex<double>(double)> V, int order);
-        OperatorWaveFunction(std::shared_ptr<const wigner_web::discretization::Basis> basis, Eigen::MatrixXcd&& matrix);
+        OperatorWaveFunction(std::shared_ptr<const wigner_web::discretization::Basis> basis, const Eigen::MatrixXcd& matrix);
 
         void set_from_components_cov(const Eigen::MatrixXcd& components);
 
         void apply(wigner_web::state::WaveFunction& wavefunction) const override;
         
-        void operator/=(const std::complex<double>& scalar){ matrix/=scalar; }
-        void operator*=(const std::complex<double>& scalar){ matrix*=scalar; }
-        void operator+=(const OperatorWaveFunction& other){ matrix+=other.matrix; }
-        void operator-=(const OperatorWaveFunction& other){ matrix-=other.matrix; }
+        OperatorWaveFunction& operator/=(const std::complex<double>& scalar){ matrix/=scalar;       return *this; }
+        OperatorWaveFunction& operator*=(const std::complex<double>& scalar){ matrix*=scalar;       return *this; }
+        OperatorWaveFunction& operator+=(const OperatorWaveFunction& other) { matrix+=other.matrix; return *this; }
+        OperatorWaveFunction& operator-=(const OperatorWaveFunction& other) { matrix-=other.matrix; return *this; }
 
         OperatorWaveFunction operator/(const std::complex<double>& scalar) const { return OperatorWaveFunction{basis, matrix/scalar}; }
         OperatorWaveFunction operator*(const std::complex<double>& scalar) const { return OperatorWaveFunction{basis, matrix*scalar}; }
-        OperatorWaveFunction operator+(const OperatorWaveFunction& other) const { return OperatorWaveFunction{basis, matrix+other.matrix}; }
-        OperatorWaveFunction operator-(const OperatorWaveFunction& other) const { return OperatorWaveFunction{basis, matrix-other.matrix}; }
+        OperatorWaveFunction operator+(const OperatorWaveFunction& other) const  { return OperatorWaveFunction{basis, matrix+other.matrix}; }
+        OperatorWaveFunction operator-(const OperatorWaveFunction& other) const  { return OperatorWaveFunction{basis, matrix-other.matrix}; }
 
         friend OperatorWaveFunction operator*(const std::complex<double>& scalar, const OperatorWaveFunction& op){
             return op*scalar;
