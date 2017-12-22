@@ -2,12 +2,12 @@
 #include <LuaContext.hpp>
 
 
-#include "wigner_web/utility/lua_register_complex.h"
+#include "wigner_web/utility/lua_expose.h"
 
 
 TEST(lua_complex, read_write){
     LuaContext lua;
-    wigner_web::utility::lua_register_complex<double>(lua);
+    wigner_web::utility::lua_expose_complex<double>(lua);
 
     std::complex<double> tmp;
     lua.writeVariable("a", tmp);

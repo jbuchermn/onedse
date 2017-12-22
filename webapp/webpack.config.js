@@ -23,6 +23,10 @@ var config = {
                 /* Required by Plotly */
                 test: /\.js$/,
                 loader: 'ify-loader'
+            },
+            {
+                test: /\.css$/,
+                use: [ 'style-loader', 'css-loader' ]
             }
         ]
     }

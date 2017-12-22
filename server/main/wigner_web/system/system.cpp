@@ -15,7 +15,7 @@
 #include "wigner_web/propagation/propagator.h"
 #include "wigner_web/propagation/runge_kutta.h"
 #include "wigner_web/propagation/diagonal_propagator.h"
-#include "wigner_web/utility/lua_register_complex.h"
+#include "wigner_web/utility/lua_expose.h"
 
 using json = nlohmann::json;
 using Basis = wigner_web::discretization::Basis;
@@ -37,7 +37,16 @@ using DiagonalPropagator = wigner_web::propagation::DiagonalPropagator;
 
 namespace wigner_web::system{
     System::System(){
-        wigner_web::utility::lua_register_complex<double>(lua);
+        wigner_web::utility::lua_expose_complex<double>(lua);
+
+        wigner_web::utility::lua_expose_linear_space_operators<WaveFunction,         std::complex<double>>(lua);
+        wigner_web::utility::lua_expose_linear_space_operators<OperatorWaveFunction, std::complex<double>>(lua);
+        wigner_web::utility::lua_expose_linear_space_operators<DensityOperator,      std::complex<double>>(lua);
+        wigner_web::utility::lua_expose_linear_space_operators<WignerFunction,       double              >(lua);
+        
+        lua.registerFunction("norm", &DensityOperator::norm);
+        lua.registerFunction("norm", &WaveFunction::norm);
+        lua.registerFunction("norm", &WignerFunction::norm);
 
         lua.registerFunction("create_basis", &System::create_basis);
         lua.registerFunction("create_wavefunction", &System::create_wavefunction);
@@ -49,26 +58,11 @@ namespace wigner_web::system{
         lua.registerFunction("plot_wigner", &System::plot_wigner);
 
         lua.registerFunction("add_wavefunction", &DensityOperator::add_wavefunction);
-        lua.registerFunction("norm", &WaveFunction::norm);
-
         lua.registerFunction<void (DiagonalPropagator::*)(std::shared_ptr<WaveFunction>, double, double)>("step", [](DiagonalPropagator& prop, std::shared_ptr<WaveFunction> wf, double t_start, double t_step){
                 prop.step(*wf, t_start, t_step);
         });
 
-        //
-        // lua.registerFunction("add", &WaveFunction::operator+=);
-        // lua.registerFunction("add", &DensityOperator::operator+=);
-        // lua.registerFunction<void (OperatorWaveFunction::*)(std::shared_ptr<OperatorWaveFunction>)>("add", [](OperatorWaveFunction& op, std::shared_ptr<OperatorWaveFunction> op2){ op+= *op2; });
-        // lua.registerFunction("subtract", &WaveFunction::operator-=);
-        // lua.registerFunction("subtract", &DensityOperator::operator-=);
-        // lua.registerFunction("subtract", &OperatorWaveFunction::operator-=);
-        // lua.registerFunction("multiply", &WaveFunction::operator*=);
-        // lua.registerFunction("multiply", &DensityOperator::operator*=);
-        // lua.registerFunction("multiply", &OperatorWaveFunction::operator*=);
-        // lua.registerFunction("divide", &WaveFunction::operator/=);
-        // lua.registerFunction("divide", &DensityOperator::operator/=);
-        // lua.registerFunction("divide", &OperatorWaveFunction::operator/=);
-        //
+
         lua.writeVariable("root", this);
     }
 

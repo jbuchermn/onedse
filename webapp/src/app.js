@@ -11,7 +11,8 @@ export default class App extends React.Component{
         super(props, context);
         this.state = {
             stdout: "",
-            plots: []
+            plots: [],
+            working: false
         };
 
         this.server = new Server();
@@ -20,23 +21,27 @@ export default class App extends React.Component{
     }
 
     execute(lua){
+        this.setState({ working: true });
         this.server.call(lua).then(res=>{
+            this.setState({ working: false });
             this.setState({ plots: (res.data && res.data.plots) ? res.data.plots : [] });
             this.setState({ stdout: (res.data && res.data.stdout) ? res.data.stdout : "" });
             this.setState({ error: res.error ? res.error : "" });
+        }).catch(err=>{
+            this.setState({ working: false, error: JSON.stringify(err), stdout: '', plots: [] });
         });
     }
 
     render(){
         return (
-            <div>
-                <h1>Wigner</h1>
-                <LuaEditor execute={this.execute} />
+            <div style={styles.container}>
+                <h1 style={styles.heading} align="center">1D Schrödinger QM in Wigner picture</h1>
+                <LuaEditor execute={this.execute} working={this.state.working} />
                 <Message msg={this.state.error} />
                 <Message msg={this.state.stdout} />
                 {this.state.plots.map(plot=>(
                     <div>
-                        <h1>{plot.title}</h1>
+                        <h1 align="center">{plot.title}</h1>
                         {plot.wigner && <WignerPlot wigner={plot.wigner} />}
                         {plot.wavefunction && <WavefunctionPlot wavefunction={plot.wavefunction} />}
                     </div>
@@ -45,3 +50,15 @@ export default class App extends React.Component{
         );
     }
 }
+
+const styles = {
+    heading: {
+        marginTop: '50px',
+        marginBottom: '40px'
+    },
+    container: {
+        maxWidth: '1000px',
+        margin: '0 auto',
+        padding: '1em',
+    }
+};

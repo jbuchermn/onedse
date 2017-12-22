@@ -13,6 +13,7 @@ export default class WavefunctionPlot extends React.Component{
 
             let re = this.props.wavefunction.data.map(d=>d[0]);
             let im = this.props.wavefunction.data.map(d=>d[1]);
+            let normsq = this.props.wavefunction.data.map(d=>(d[0]*d[0] + d[1]*d[1]));
 
             data = [{
                 type: 'scatter',
@@ -24,6 +25,11 @@ export default class WavefunctionPlot extends React.Component{
                 x,
                 y: im,
                 name: 'Im'
+            },{
+                type: 'scatter',
+                x,
+                y: normsq,
+                name: 'Norm^2'
             }];
         }
         return <Plot data={data} />;
