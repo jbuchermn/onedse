@@ -16,7 +16,12 @@ namespace wigner_web::state{
         double upper_p;
 
     public:
-        /// Grid representation: matrix(i, j) = W(x_i, p_j)
+        /** 
+         * Grid representation: matrix(i, j) = W(x_i, p_j), for 
+         *  x_i = lower_x + (upper_x-lower_x)/points * i,
+         *  p_i = lower_p + (upper_p-lower_p)/points * i,
+         * i. e. p\in[lower_p, upper_p), x\in[lower_x, upper_x)
+         */
         Eigen::MatrixXd matrix;
         
         WignerFunction(double lower_x_, double upper_x_, double lower_p_, double upper_p_, const Eigen::MatrixXd& matrix_);

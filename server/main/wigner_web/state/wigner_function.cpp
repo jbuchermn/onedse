@@ -42,8 +42,9 @@ namespace wigner_web::state{
     void WignerFunction::set_from_wavefunction(const WaveFunction& wavefunction, int points){
         upper_x = wavefunction.basis->upper;
         lower_x = wavefunction.basis->lower;
-        upper_p = M_PI/(upper_x-lower_x) * points;
-        lower_p = -upper_p;
+
+        upper_p =  .5*M_PI/(upper_x-lower_x) * points;
+        lower_p = -.5*M_PI/(upper_x-lower_x) * points;
 
         Eigen::VectorXd x_grid(points);
         for(int i=0; i<points; i++) x_grid(i) = lower_x + 1.*i/points*(upper_x-lower_x);
@@ -67,7 +68,7 @@ namespace wigner_web::state{
         }
 
         // Normalization
-        matrix *= 2./M_PI * std::sqrt(points) * (upper_x-lower_x)/points;
+        matrix *= std::sqrt(2)/M_PI * std::sqrt(points) * (upper_x-lower_x)/points;
     }
 
     void WignerFunction::plot_to_terminal() const{
@@ -92,7 +93,7 @@ namespace wigner_web::state{
             }
         }
 
-        return result/(upper_x-lower_x)/(upper_p-lower_p);
+        return result*(upper_x-lower_x)*(upper_p-lower_p)/matrix.rows()/matrix.cols();
     }
 
     double WignerFunction::get_lower_x() const{ return lower_x; }

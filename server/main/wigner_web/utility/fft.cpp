@@ -20,7 +20,7 @@ namespace wigner_web::utility{
 
     Eigen::VectorXcd& FFT::operator()(Eigen::VectorXcd& vector){
         for(int k=0; k<vector.rows(); k++){
-            // Momenta are sorted p_0,...p_(N/2),p_(-N/2),...p_(-1)
+            // Momenta are sorted p_0,...p_(N/2-1),p_(-N/2),...p_(-1)
             int idx = !forward ? (k+vector.rows()/2)%vector.rows() : k;
             in[idx][0] = vector(k).real();
             in[idx][1] = vector(k).imag();
@@ -29,7 +29,7 @@ namespace wigner_web::utility{
         fftw_execute(plan);
 
         for(int k=0; k<vector.rows(); k++){
-            // Momenta are sorted p_0,...p_(N/2),p_(-N/2),...p_(-1)
+            // Momenta are sorted p_0,...p_(N/2-1),p_(-N/2),...p_(-1)
             int idx = forward ? (k+vector.rows()/2)%vector.rows() : k;
             vector(idx) = std::complex<double>(out[k][0], out[k][1]);
         }
