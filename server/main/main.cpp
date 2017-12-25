@@ -7,10 +7,11 @@
 using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
 
 #include "wigner_web/server/session.h"
+#include "wigner_web/utility/files.h"
+
 using Session = wigner_web::server::Session;
+using files = wigner_web::utility::files;
 
-
-#define INDEX_PATH "../../webapp/www/index.html"
 
 int main(int argc, char* argv[]){
     Session session;
@@ -18,8 +19,8 @@ int main(int argc, char* argv[]){
     HttpServer server;
     server.config.port = 8080;
 
-    // TODO: Only works when invoked in the same directory
-    std::string index_path = INDEX_PATH;
+    files::arg0 = std::string(argv[0]);
+    std::string index_path = files::index_html();
 
 
     server.resource["^/internal$"]["POST"] = [&session](std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request){

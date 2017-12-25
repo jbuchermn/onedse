@@ -1,3 +1,4 @@
+lua/**/*
 webapp/www
 webapp/node_modules/
 server/dependencies/alglib/**/*

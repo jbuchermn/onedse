@@ -16,6 +16,9 @@ include_directories(${CMAKE_SOURCE_DIR}/main)
 # Dependencies
 #
 
+# std::experimental::filesystem
+list(APPEND dependencies_LIBRARIES "stdc++fs")
+
 # Boost
 find_package(Boost 1.53.0 COMPONENTS system thread filesystem REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
