@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <Eigen/Dense>
+#include <iostream>
 
 #include "wigner_web/discretization/orthogonal_hermite.h"
 
@@ -10,10 +11,10 @@ TEST(orthogonal_hermite, value){
     for(double x=-10.; x<=10.; x+=.5){
         Eigen::VectorXcd vals = hermite.evaluate(x);
         Eigen::VectorXcd check(4);
-        check << 1.,
-                 2.*x,
-                 4.*x*x - 2.,
-                 8.*x*x*x - 12.*x;
+        check << (1.              )*std::exp(-x*x/2.)  ,
+                 (2.*x            )*std::exp(-x*x/2.)  ,
+                 (4.*x*x - 2.     )*std::exp(-x*x/2.)  ,
+                 (8.*x*x*x - 12.*x)*std::exp(-x*x/2.)  ;
 
         EXPECT_TRUE((vals-check).norm()<1.e-12);
     }
@@ -24,10 +25,10 @@ TEST(orthogonal_hermite, first_derivative){
     for(double x=-10.; x<=10.; x+=.5){
         Eigen::VectorXcd vals = hermite.evaluate(x, 1);
         Eigen::VectorXcd check(4);
-        check << 0.,
-                 2.,
-                 8.*x,
-                 24.*x*x - 12.;
+        check <<( (1.              )*(-x)*std::exp(-x*x/2.) + (0.           )*std::exp(-x*x/2.) ),
+                ( (2.*x            )*(-x)*std::exp(-x*x/2.) + (2.           )*std::exp(-x*x/2.) ),
+                ( (4.*x*x - 2.     )*(-x)*std::exp(-x*x/2.) + (8.*x         )*std::exp(-x*x/2.) ),
+                ( (8.*x*x*x - 12.*x)*(-x)*std::exp(-x*x/2.) + (24.*x*x - 12.)*std::exp(-x*x/2.) );
 
         EXPECT_TRUE((vals-check).norm()<1.e-12);
     }
@@ -38,10 +39,10 @@ TEST(orthogonal_hermite, second_derivative){
     for(double x=-10.; x<=10.; x+=.5){
         Eigen::VectorXcd vals = hermite.evaluate(x, 2);
         Eigen::VectorXcd check(4);
-        check << 0.,
-                 0.,
-                 8.,
-                 48.*x;
+        check <<( (1.              )*(x*x - 1.)*std::exp(-x*x/2.) + 2.*(0.           )*(-x)*std::exp(-x*x/2.) + (0.   )*std::exp(-x*x/2.)),
+                ( (2.*x            )*(x*x - 1.)*std::exp(-x*x/2.) + 2.*(2.           )*(-x)*std::exp(-x*x/2.) + (0.   )*std::exp(-x*x/2.)),
+                ( (4.*x*x - 2.     )*(x*x - 1.)*std::exp(-x*x/2.) + 2.*(8.*x         )*(-x)*std::exp(-x*x/2.) + (8.   )*std::exp(-x*x/2.)),
+                ( (8.*x*x*x - 12.*x)*(x*x - 1.)*std::exp(-x*x/2.) + 2.*(24.*x*x - 12.)*(-x)*std::exp(-x*x/2.) + (48.*x)*std::exp(-x*x/2.));
 
         EXPECT_TRUE((vals-check).norm()<1.e-12);
     }

@@ -1,20 +1,22 @@
 #include <Eigen/Dense>
 #include <alglib/integration.h>
+#include <boost/math/special_functions/binomial.hpp>
 
 #include "wigner_web/discretization/orthogonal_polynomial.h"
 
 namespace wigner_web::discretization{
 
-    OrthogonalPolynomial::alglib_exception::alglib_exception(std::string message): std::runtime_error(message){}
+    OrthogonalPolynomial::alglib_error::alglib_error(std::string message): std::runtime_error(message){}
+    OrthogonalPolynomial::unsupported_derivative_error::unsupported_derivative_error(int derivative): std::runtime_error("Derivative not supported: "+std::to_string(derivative)){}
 
     OrthogonalPolynomial::OrthogonalPolynomial(double _lower, double _upper, int _size, Basis::BoundaryConditions boundary_conditions):
         Basis(_lower, _upper, _size, boundary_conditions){}
 
-    Eigen::VectorXcd OrthogonalPolynomial::evaluate(double x, int derivative) const{
+    Eigen::VectorXcd OrthogonalPolynomial::evaluate_polynomials(double x, int derivative) const{
         Eigen::VectorXcd values(size);
 
         Eigen::VectorXcd base_values;
-        if(derivative>0) base_values = evaluate(x, derivative-1);
+        if(derivative>0) base_values = evaluate_polynomials(x, derivative-1);
 
         values(0) = derivative==0 ? value0() : 0;
 
@@ -26,6 +28,14 @@ namespace wigner_web::discretization{
         }
 
         return values;
+    }
+
+    Eigen::VectorXcd OrthogonalPolynomial::evaluate(double x, int derivative) const{
+        Eigen::VectorXcd res = Eigen::VectorXcd::Zero(size); 
+        for(int i=0; i<=derivative; i++){
+            res += boost::math::binomial_coefficient<double>(derivative, i)*evaluate_sqrtweight(x, i)*evaluate_polynomials(x, derivative-i);
+        }
+        return res;
     }
 
     void OrthogonalPolynomial::quadrature(int order, Eigen::VectorXd& points, Eigen::VectorXd& weights) const{
@@ -54,13 +64,13 @@ namespace wigner_web::discretization{
         case  1: 
             break; // success
         case -3:
-            throw alglib_exception("QuadratureRule: internal eigenproblem solver hasn't converged");
+            throw alglib_error("QuadratureRule: internal eigenproblem solver hasn't converged");
         case -2:
-            throw alglib_exception("QuadratureRule: Beta[i]<=0");
+            throw alglib_error("QuadratureRule: Beta[i]<=0");
         case -1: 
-            throw alglib_exception("QuadratureRule: incorrect N was passed");
+            throw alglib_error("QuadratureRule: incorrect N was passed");
         default: 
-            throw alglib_exception("QuadratureRule: error value info = "+std::to_string(info));
+            throw alglib_error("QuadratureRule: error value info = "+std::to_string(info));
         }
 
         // transfer to std::vector
@@ -70,6 +80,11 @@ namespace wigner_web::discretization{
             points(i)=xq[i];
             weights(i)=wq[i];
         };
+
+        // We want to integrate against basis functions polynomial times sqrt(weight)
+        for(int i=0; i<order; i++){
+            weights(i)/=std::pow(evaluate_sqrtweight(points(i)), 2.);
+        }
 
     }
 

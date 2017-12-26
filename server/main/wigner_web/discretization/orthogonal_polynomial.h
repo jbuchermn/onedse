@@ -2,6 +2,7 @@
 
 #include <exception>
 #include <string>
+#include <complex>
 #include <Eigen/Dense>
 
 #include "wigner_web/discretization/basis.h"
@@ -22,11 +23,19 @@ namespace wigner_web::discretization{
         virtual double c(int n) const=0;
         virtual double value0() const=0;
         virtual double normsq0() const=0;
+        virtual double evaluate_sqrtweight(double x, int derviative=0) const=0;
+
+        Eigen::VectorXcd evaluate_polynomials(double x, int derivative=0) const;
 
     public:
-        class alglib_exception: public std::runtime_error{
+        class alglib_error: public std::runtime_error{
         public:
-            alglib_exception(std::string message);
+            alglib_error(std::string message);
+        };
+
+        class unsupported_derivative_error: public std::runtime_error{
+        public:
+            unsupported_derivative_error(int derivative);
         };
 
 
