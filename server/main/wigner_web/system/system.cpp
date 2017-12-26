@@ -11,7 +11,7 @@
 #include "wigner_web/state/wave_function.h"
 #include "wigner_web/state/density_operator.h"
 #include "wigner_web/state/wigner_function.h"
-#include "wigner_web/map/operator_wavefunction.h"
+#include "wigner_web/map/map_wavefunction.h"
 #include "wigner_web/propagation/propagator.h"
 #include "wigner_web/propagation/runge_kutta.h"
 #include "wigner_web/propagation/diagonal_propagator.h"
@@ -25,7 +25,7 @@ using OrthogonalLegendre = wigner_web::discretization::OrthogonalLegendre;
 using WaveFunction = wigner_web::state::WaveFunction;
 using DensityOperator = wigner_web::state::DensityOperator;
 using WignerFunction = wigner_web::state::WignerFunction;
-using OperatorWaveFunction = wigner_web::map::OperatorWaveFunction;
+using MapWaveFunction = wigner_web::map::MapWaveFunction;
 
 template<class StateClass>
 using Propagator = wigner_web::propagation::Propagator<StateClass>;
@@ -40,7 +40,7 @@ namespace wigner_web::system{
         wigner_web::utility::lua_expose_complex<double>(lua);
 
         wigner_web::utility::lua_expose_linear_space_operators<WaveFunction,         std::complex<double>>(lua);
-        wigner_web::utility::lua_expose_linear_space_operators<OperatorWaveFunction, std::complex<double>>(lua);
+        wigner_web::utility::lua_expose_linear_space_operators<MapWaveFunction, std::complex<double>>(lua);
         wigner_web::utility::lua_expose_linear_space_operators<DensityOperator,      std::complex<double>>(lua);
         wigner_web::utility::lua_expose_linear_space_operators<WignerFunction,       double              >(lua);
         
@@ -98,11 +98,11 @@ namespace wigner_web::system{
         return std::make_shared<DensityOperator>(basis);
     }
         
-    std::shared_ptr<OperatorWaveFunction> System::create_operator_wavefunction(std::shared_ptr<Basis> basis, int left_derivative, int right_derivative, std::function<std::complex<double>(double)> V, int order) const{
-        return std::make_shared<OperatorWaveFunction>(basis, left_derivative, right_derivative, V, order);
+    std::shared_ptr<MapWaveFunction> System::create_operator_wavefunction(std::shared_ptr<Basis> basis, int left_derivative, int right_derivative, std::function<std::complex<double>(double)> V, int order) const{
+        return std::make_shared<MapWaveFunction>(basis, left_derivative, right_derivative, V, order);
     }
         
-    std::shared_ptr<DiagonalPropagator> System::create_wavefunction_propagator(std::string name, std::shared_ptr<OperatorWaveFunction> map) const{
+    std::shared_ptr<DiagonalPropagator> System::create_wavefunction_propagator(std::string name, std::shared_ptr<MapWaveFunction> map) const{
         return std::make_shared<DiagonalPropagator>(map);
     }
     

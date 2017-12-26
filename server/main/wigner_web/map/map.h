@@ -9,13 +9,13 @@
 namespace wigner_web::map{
     
     template <class StateClass>
-    class Operator{
+    class Map{
         BOOST_STATIC_ASSERT(boost::is_base_of<wigner_web::state::State, StateClass>::value);
 
     public:
         std::shared_ptr<const wigner_web::discretization::Basis> basis;
 
-        Operator(std::shared_ptr<const wigner_web::discretization::Basis> basis_): basis(basis_){}
+        Map(std::shared_ptr<const wigner_web::discretization::Basis> basis_): basis(basis_){}
 
         virtual void set_time(double time){  }
         virtual void apply(StateClass& vector) const=0;

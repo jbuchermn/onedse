@@ -4,6 +4,8 @@
 #include <exception>
 #include <boost/type_traits.hpp>
 
+#include "wigner_web/map/map.h"
+
 namespace wigner_web::propagation{
     template <class StateClass>
     class Propagator{
@@ -13,7 +15,7 @@ namespace wigner_web::propagation{
         int consistency_order;
         double safety_factor;
 
-        std::shared_ptr<wigner_web::map::Operator<StateClass>> map;
+        std::shared_ptr<wigner_web::map::Map<StateClass>> map;
 
     public:
         class propagation_error: public std::runtime_error{
@@ -22,7 +24,7 @@ namespace wigner_web::propagation{
         };
 
 
-        Propagator(std::shared_ptr<wigner_web::map::Operator<StateClass>> map_): map(map_), consistency_order(1), safety_factor(.6) {}
+        Propagator(std::shared_ptr<wigner_web::map::Map<StateClass>> map_): map(map_), consistency_order(1), safety_factor(.6) {}
 
         virtual void step(StateClass& state, double t_start, double t_step)=0;
 

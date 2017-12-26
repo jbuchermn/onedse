@@ -6,17 +6,17 @@
 #include "wigner_web/state/wave_function.h"
 #include "wigner_web/propagation/diagonal_propagator.h"
 #include "wigner_web/propagation/propagator.h"
-#include "wigner_web/map/operator_wavefunction.h"
+#include "wigner_web/map/map_wavefunction.h"
 
 template <class StateClass>
 using Propagator = wigner_web::propagation::Propagator<StateClass>;
 
 using WaveFunction = wigner_web::state::WaveFunction;
-using OperatorWaveFunction = wigner_web::map::OperatorWaveFunction;
+using MapWaveFunction = wigner_web::map::MapWaveFunction;
 
 namespace wigner_web::propagation{
 
-    DiagonalPropagator::DiagonalPropagator(std::shared_ptr<OperatorWaveFunction> map): Propagator<WaveFunction>(map){
+    DiagonalPropagator::DiagonalPropagator(std::shared_ptr<MapWaveFunction> map): Propagator<WaveFunction>(map){
         Eigen::ComplexEigenSolver<Eigen::MatrixXcd> solver(map->matrix);
         eigenvalues = std::move(solver.eigenvalues());
         trafo_from_diagonal = std::move(solver.eigenvectors());

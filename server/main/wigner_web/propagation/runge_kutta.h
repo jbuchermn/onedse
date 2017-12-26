@@ -5,7 +5,7 @@
 #include <string>
 #include <exception>
 
-#include "wigner_web/map/operator.h"
+#include "wigner_web/map/map.h"
 #include "wigner_web/propagation/propagator.h"
 
 namespace wigner_web::propagation{
@@ -20,7 +20,7 @@ namespace wigner_web::propagation{
 
         std::vector<StateClass> vec_k;
     public:
-        RungeKutta(std::string method, std::shared_ptr<wigner_web::map::Operator<StateClass>> map): wigner_web::propagation::Propagator<StateClass>(map){
+        RungeKutta(std::string method, std::shared_ptr<wigner_web::map::Map<StateClass>> map): wigner_web::propagation::Propagator<StateClass>(map){
 
             if(method == "RK4"){
                 a = {
