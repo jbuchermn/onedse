@@ -12,16 +12,24 @@ using WaveFunction = wigner_web::state::WaveFunction;
 
 namespace wigner_web::state{
 
-    DensityOperator::DensityOperator(std::shared_ptr<const Basis> basis): State(basis), matrix(Eigen::MatrixXcd::Zero(basis->size, basis->size)){}
-    DensityOperator::DensityOperator(std::shared_ptr<const Basis> basis, const Eigen::MatrixXcd& matrix_): State(basis), matrix(matrix_) {}
+    DensityOperator::DensityOperator(std::shared_ptr<const Basis> basis): State(basis), matrix(Eigen::MatrixXcd::Zero(basis->size, basis->size)), vector(matrix.data(), basis->size*basis->size){}
+
+    DensityOperator::DensityOperator(std::shared_ptr<const Basis> basis, const Eigen::MatrixXcd& matrix_): State(basis), matrix(matrix_), vector(matrix.data(), basis->size*basis->size) {}
     
-    DensityOperator::DensityOperator(DiagonalRepresentation wavefunctions): State(wavefunctions[0].second->basis){
+    DensityOperator::DensityOperator(DiagonalRepresentation wavefunctions): State(wavefunctions[0].second->basis), matrix(Eigen::MatrixXcd::Zero(basis->size, basis->size)), vector(matrix.data(), basis->size*basis->size){
         set_from_wavefunctions(wavefunctions);
+    }
+        
+    DensityOperator::DensityOperator(std::shared_ptr<WaveFunction> wf): State(wf->basis), matrix(Eigen::MatrixXcd::Zero(basis->size, basis->size)), vector(matrix.data(), basis->size*basis->size){
+        set_from_wavefunctions(DiagonalRepresentation{{1., wf}});
     }
 
 
     double DensityOperator::norm() const{
-        return std::sqrt( (matrix.conjugate() * basis->get_metric_cov() * matrix * basis->get_metric_cov()).trace().real() );
+        double trace = (matrix.conjugate() * basis->get_metric_cov() * matrix * basis->get_metric_cov()).trace().real();
+
+        // Zero operator might get us left with trace = -2.e-18, producing nan in the norm.
+        return trace > 0. ? std::sqrt(trace) : 0.;
     }
         
     void DensityOperator::add_wavefunction(double probability, std::shared_ptr<WaveFunction> wavefunction){
@@ -41,7 +49,7 @@ namespace wigner_web::state{
         // Set up eigenvalue eqn in contravariant indices: rho^{ij}psi_j = lambda g^{ik}psi_k to obtain covariant vectors
         Eigen::GeneralizedSelfAdjointEigenSolver<Eigen::MatrixXcd> solver(matrix, basis->get_metric_contrav());
         for(int i=0; i<solver.eigenvalues().rows(); i++){
-            if(std::abs(solver.eigenvalues()(i))<1.e-12) continue;
+            if(std::abs(solver.eigenvalues()(i))<1.e-6) continue;
 
             Eigen::VectorXcd components = solver.eigenvectors().block(0, i, solver.eigenvectors().rows(), 1);
             auto wf = std::make_shared<WaveFunction>(basis);

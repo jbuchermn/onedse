@@ -48,9 +48,9 @@ TEST(orthogonal_legendre, second_derivative){
 }
 
 TEST(orthogonal_legendre, overlap){
-    OrthogonalLegendre legendre(5);
+    OrthogonalLegendre legendre(20);
     Eigen::MatrixXcd overlap = legendre.get_metric_cov();
-    Eigen::MatrixXcd check = Eigen::MatrixXcd::Zero(5, 5);
+    Eigen::MatrixXcd check = Eigen::MatrixXcd::Zero(20, 20);
 
     for(int i=0; i<check.rows(); i++) check(i, i) = 2./(2.*i+1);
 

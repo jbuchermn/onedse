@@ -20,4 +20,14 @@ namespace wigner_web::utility{
         lua.registerFunction<void (VectorClass::*)(ScalarType)>("mul", [](VectorClass& self, ScalarType scalar){ self *= scalar; }); 
         lua.registerFunction<void (VectorClass::*)(ScalarType)>("div", [](VectorClass& self, ScalarType scalar){ self /= scalar; }); 
     }
+
+    template<class T, class BaseClass, typename ... Types>
+    void lua_expose_constructor(LuaContext& lua, std::string name){
+        lua.writeFunction(name, [](Types ... args) -> std::shared_ptr<BaseClass>{ return std::make_shared<T>(args...); });
+    }
+
+    template<class T, class BaseClass, class ParentClass, typename ... Types>
+    void lua_expose_constructor_as_member(LuaContext& lua, std::string name){
+        lua.registerFunction<std::shared_ptr<BaseClass> (ParentClass::*)(Types ...)>(name, [](ParentClass& self, Types ... args){ return std::make_shared<T>(self, args...); });
+    }
 }

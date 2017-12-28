@@ -19,10 +19,14 @@ namespace wigner_web::state{
         /// Representation with contravariant indices rho^{ij}
         Eigen::MatrixXcd matrix;
 
+        /// Representation of the matrix rho^{ij} = v^{i + N*j}
+        Eigen::Map<Eigen::VectorXcd> vector;
+
         DensityOperator(std::shared_ptr<const wigner_web::discretization::Basis> basis);
         DensityOperator(std::shared_ptr<const wigner_web::discretization::Basis> basis, const Eigen::MatrixXcd& matrix_);
 
         DensityOperator(DiagonalRepresentation wavefunctions);
+        DensityOperator(std::shared_ptr<WaveFunction> wf);
         
         /// \sqrt(tr \rho^\dagger\rho)
         double norm() const override;

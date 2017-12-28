@@ -20,7 +20,9 @@ namespace wigner_web::map{
         MapWaveFunction(std::shared_ptr<const wigner_web::discretization::Basis> basis, const Eigen::MatrixXcd& matrix);
 
         void set_from_components_cov(const Eigen::MatrixXcd& components);
+        void add(int left_derivative, int right_derivative, std::function<std::complex<double>(double)> V, int order);
 
+        const Eigen::MatrixXcd& matrix_representation() const override;
         void apply(wigner_web::state::WaveFunction& wavefunction) const override;
         
         MapWaveFunction& operator/=(const std::complex<double>& scalar){ matrix/=scalar;       return *this; }

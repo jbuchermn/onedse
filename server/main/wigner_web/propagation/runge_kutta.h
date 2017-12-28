@@ -20,7 +20,7 @@ namespace wigner_web::propagation{
 
         std::vector<StateClass> vec_k;
     public:
-        RungeKutta(std::string method, std::shared_ptr<wigner_web::map::Map<StateClass>> map): wigner_web::propagation::Propagator<StateClass>(map){
+        RungeKutta(std::shared_ptr<wigner_web::map::Map<StateClass>> map, std::string method): wigner_web::propagation::Propagator<StateClass>(map){
 
             if(method == "RK4"){
                 a = {

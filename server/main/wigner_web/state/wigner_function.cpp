@@ -26,16 +26,16 @@ namespace wigner_web::state{
     }
 
     WignerFunction::WignerFunction(const DensityOperator& density_operator, int points){
-        bool first=true;
-        for(std::pair<double, std::shared_ptr<WaveFunction>> p: density_operator.diagonalize()){
-            if(first){
-                set_from_wavefunction(*(p.second), points);
-                matrix*=p.first;
+        upper_x = density_operator.basis->upper;
+        lower_x = density_operator.basis->lower;
 
-                first=false;
-            }else{
-                *this += p.first*WignerFunction{*(p.second), points};
-            }
+        upper_p =  .5*M_PI/(upper_x-lower_x) * points;
+        lower_p = -.5*M_PI/(upper_x-lower_x) * points;
+        
+        matrix = Eigen::MatrixXd::Zero(points, points);
+
+        for(std::pair<double, std::shared_ptr<WaveFunction>> p: density_operator.diagonalize()){
+            *this += p.first*WignerFunction{*(p.second), points};
         }
     }
         
@@ -45,12 +45,13 @@ namespace wigner_web::state{
 
         upper_p =  .5*M_PI/(upper_x-lower_x) * points;
         lower_p = -.5*M_PI/(upper_x-lower_x) * points;
+        
+        matrix = Eigen::MatrixXd::Zero(points, points);
 
         Eigen::VectorXd x_grid(points);
         for(int i=0; i<points; i++) x_grid(i) = lower_x + 1.*i/points*(upper_x-lower_x);
         Eigen::VectorXcd psi = wavefunction.grid(x_grid);
 
-        matrix = Eigen::MatrixXd(points, points);
         FFT fft(2*points, true);
 
         for(int i=0; i<points; i++){

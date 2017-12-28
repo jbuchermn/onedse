@@ -22,6 +22,14 @@ namespace wigner_web::map{
         Eigen::MatrixXcd components = basis->discretize_op_cov(left_derivative, right_derivative, V, order);
         set_from_components_cov(components);
     }
+
+    const Eigen::MatrixXcd& MapWaveFunction::matrix_representation() const{
+        return matrix;
+    }
+        
+    void MapWaveFunction::add(int left_derivative, int right_derivative, std::function<std::complex<double>(double)> V, int order){
+        *this += MapWaveFunction { basis, left_derivative, right_derivative, V, order };
+    }
         
     void MapWaveFunction::set_from_components_cov(const Eigen::MatrixXcd& components){
         matrix = basis->get_metric_contrav()*components;

@@ -1,7 +1,9 @@
 #pragma once
 
+#include <iostream>
 #include <string>
 #include <exception>
+#include <numeric>
 #include <boost/type_traits.hpp>
 
 #include "wigner_web/map/map.h"
@@ -23,6 +25,21 @@ namespace wigner_web::propagation{
             propagation_error(std::string msg): runtime_error(msg){}
         };
 
+        class StepSizeHistogram{
+            std::vector<double> steps;
+
+        public:
+            void add(double step){ steps.push_back(step); }
+            double avg(){ return std::accumulate(steps.begin(), steps.end(), 0.) / steps.size(); }
+            double std_dev(){ 
+                double mean = avg();
+                std::vector<double> diff(steps.size());
+                std::transform(steps.begin(), steps.end(), diff.begin(), [mean](double x) { return x - mean; });
+                double sq_sum = std::inner_product(diff.begin(), diff.end(), diff.begin(), 0.0);
+                return std::sqrt(sq_sum / steps.size());
+            }
+        };
+
 
         Propagator(std::shared_ptr<wigner_web::map::Map<StateClass>> map_): map(map_), consistency_order(1), safety_factor(.6) {}
 
@@ -39,20 +56,19 @@ namespace wigner_web::propagation{
 
         virtual double next_step(double t_step, double error, double epsilon=1.e-9){
             if(error == 0.) return 2.*t_step;
-            return t_step * std::pow(safety_factor*epsilon/error, 1./(consistency_order+1) );
+            return t_step * safety_factor * std::pow(epsilon/error, 1./(consistency_order+1) );
         }
 
-        void propagate(StateClass& state, double t_start, double t_final){
-            double t_step = t_final - t_start;
-            propagate(state, t_start, t_final, t_step, 1.e-9);
-        }
-
-        virtual void propagate(StateClass& state, double t_start, double t_final, double& t_step, double epsilon=1.e-9){
+        virtual StepSizeHistogram propagate(StateClass& state, double t_start, double t_final, double epsilon=1.e-9){
+            double t_step = 1.e-7;
             double t = t_start;
             StateClass previous = state;
 
+            StepSizeHistogram result;
+
             while(t<t_final){
                 t_step = std::min(t_step, t_final-t);
+                result.add(t_step);
 
                 previous = state;
                 double error = step_measure_error(state, t, t_step);
@@ -66,6 +82,16 @@ namespace wigner_web::propagation{
 
                 if(t_step<1.e-14) throw propagation_error("Step size too small: "+std::to_string(t_step));
             }
+
+            return result;
+        }
+
+        virtual void propagate_const_step(StateClass& state, double t_start, double t_final, double t_step){
+            double t=0.;
+            for(; t<t_final; t+=t_step){
+                step(state, t, t_step);
+            }
+            step(state, t, t_final - t);
         }
 
         int get_consistency_order() const{ return consistency_order; }

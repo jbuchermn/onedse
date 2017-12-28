@@ -30,19 +30,19 @@ TEST(basis, discretize_polynomial){
 TEST(basis, discretize_gaussian){
 
     /*
-     * Hermites: TODO
+     * Hermites
      */
-    // {
-    //     double a = 1.;
-    //     std::shared_ptr<Basis> basis = std::make_shared<OrthogonalHermite>(10);
-    //     Eigen::VectorXcd cov = basis->discretize_function_cov([a](double x){ return std::exp(-a*x*x); }, 10);
-    //
-    //     for(double x=-10.; x<=10.; x+=.5){
-    //         std::complex<double> val = cov.conjugate().dot(basis->get_metric_contrav()*basis->evaluate(x));
-    //         EXPECT_NEAR(val.real(), std::exp(-a*x*x), 1.e-12);
-    //         EXPECT_NEAR(val.imag(), 0, 1.e-12);
-    //     }
-    // }
+    {
+        double a = 1.;
+        std::shared_ptr<Basis> basis = std::make_shared<OrthogonalHermite>(100);
+        Eigen::VectorXcd cov = basis->discretize_function_cov([a](double x){ return std::exp(-a*x*x); }, 10);
+
+        for(double x=-10.; x<=10.; x+=.5){
+            std::complex<double> val = cov.conjugate().dot(basis->get_metric_contrav()*basis->evaluate(x));
+            EXPECT_NEAR(val.real(), std::exp(-a*x*x), 1.e-12);
+            EXPECT_NEAR(val.imag(), 0, 1.e-12);
+        }
+    }
     
     /*
      * Legendres

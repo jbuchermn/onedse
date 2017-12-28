@@ -49,9 +49,9 @@ TEST(orthogonal_chebyshev, second_derivative){
 }
 
 TEST(orthogonal_chebyshev, overlap){
-    OrthogonalChebyshev chebyshev(10);
+    OrthogonalChebyshev chebyshev(20);
     Eigen::MatrixXcd overlap = chebyshev.get_metric_cov();
-    Eigen::MatrixXcd check = Eigen::MatrixXcd::Zero(10, 10);
+    Eigen::MatrixXcd check = Eigen::MatrixXcd::Zero(20, 20);
 
     check(0, 0) = M_PI;
     for(int i=1; i<check.rows(); i++) check(i, i) = M_PI/2.;
