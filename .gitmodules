@@ -1,15 +1,9 @@
-[submodule "Simple-Web-Server"]
-	path = Simple-Web-Server
-	url = https://github.com/eidheim/Simple-Web-Server
-[submodule "json"]
-	path = json
-	url = ./server/dependencies/json/
 [submodule "server/dependencies/Simple-Web-Server"]
-	path = server/dependencies/Simple-Web-Server
+	path = cpp/dependencies/Simple-Web-Server
 	url = https://github.com/eidheim/Simple-Web-Server
 [submodule "server/dependencies/json"]
-	path = server/dependencies/json
+	path = cpp/dependencies/json
 	url = https://github.com/nlohmann/json
 [submodule "server/dependencies/luawrapper"]
-	path = server/dependencies/luawrapper
+	path = cpp/dependencies/luawrapper
 	url = https://github.com/ahupowerdns/luawrapper

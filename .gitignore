@@ -1,8 +1,7 @@
-lua/**/*
-webapp/www
-webapp/node_modules/
-server/dependencies/alglib/**/*
-server/dependencies/eigen/**/*
-!server/dependencies/alglib/Makefile
-server/build
+js/www
+js/node_modules/
+cpp/dependencies/alglib/**/*
+cpp/dependencies/eigen/**/*
+!cpp/dependencies/alglib/Makefile
+cpp/build
 **/.tern-port
