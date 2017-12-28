@@ -22,13 +22,15 @@ namespace core::lua{
     class System{
         LuaContext lua;
 
-        mutable nlohmann::json result;
+        std::string prints;
+        nlohmann::json result;
     public:
         System();
 
         /**
          * Lua API
          */
+        void print(std::string data);
         void plot_wavefunction(std::shared_ptr<core::state::WaveFunction> wavefunction, std::string name, int points);
         void plot_wigner(std::shared_ptr<core::state::DensityOperator> density_operator, std::string name, int points);
 

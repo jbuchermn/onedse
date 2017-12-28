@@ -145,23 +145,28 @@ namespace core::lua{
         lua.registerFunction("wigner", &System::plot_wigner);
 
         lua.writeVariable("plot", this);
+
+        /*
+         * Print
+         */
+        lua.registerFunction("stdout", &System::print);
+        lua.executeCode(R"(
+            print = function(...)
+                for _, val in ipairs({...}) do
+                    plot:stdout(tostring(val))
+                end
+                plot:stdout("\n")
+            end
+        )");
     }
 
     void System::execute(std::string code, json& result){
         this->result = json();
+        this->prints = "";
 
-        lua.executeCode(R"(
-            __stdout__ = ""
-            print = function(...)
-                for arg, val in ipairs({...}) do
-                    __stdout__ = __stdout__ .. tostring(val) .. " " 
-                end
-                __stdout__ = __stdout__ .. "\n"
-            end
-        )");
         lua.executeCode(code);
-        this->result["stdout"] = lua.readVariable<std::string>("__stdout__");
 
+        this->result["stdout"] = this->prints;
         result = std::move(this->result);
     }
 
@@ -182,5 +187,10 @@ namespace core::lua{
         wigner.to_json(plot["wigner"]);
 
         result["plots"].push_back(plot);
+    }
+
+    void System::print(std::string data){
+        std::cout<<data;
+        prints += data;
     }
 }
