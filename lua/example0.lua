@@ -17,15 +17,16 @@ function plt(wf, time)
  end
 
 ham  =   basis:map_wavefunction(1, 1, function(x) return complex(1,   0) end, 0)
-ham:add( basis:map_wavefunction(0, 0, function(x) return complex(x*x, 0) end, 0))
-
+ham:add(0, 0, function(x) return complex(x*x, 0) end, 0)
 ham:mul(complex(0, -1))
+
 prop = ham:rk_propagator("RK4")
 
 plt(wf, 0.)
-for t=1,31 do
-	prop:propagate(wf, 0.1*(t-1), 0.1*t, 1.e-5, 0.)
-	plt(wf, 0.1*t)
+for t=1,310 do
+	prop:propagate(wf, 0.01*(t-1), 0.01*t, 0.)
+    print("time=" .. t)
+	plt(wf, 0.01*t)
 end
 
   

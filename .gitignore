@@ -1,5 +1,7 @@
 js/www
 js/node_modules/
+lua/**/*
+!lua/**/*.lua
 cpp/dependencies/alglib/**/*
 cpp/dependencies/eigen/**/*
 !cpp/dependencies/alglib/Makefile
