@@ -65,7 +65,7 @@ namespace core::state{
                 }
             }
             fft(tmp);
-            for(int k=0; k<points; k++) matrix(i, k) = tmp(2*k).real(); 
+            for(int k=0; k<points; k++) matrix(i, k) = tmp(2*points-2-2*k).real(); 
         }
 
         // Normalization
