@@ -30,6 +30,7 @@ namespace core::state{
         
         /// \sqrt(tr \rho^\dagger\rho)
         double norm() const override;
+        void validate() const override;
 
         void add_wavefunction(double probability, std::shared_ptr<core::state::WaveFunction> wavefunction);
         void set_from_wavefunctions(DiagonalRepresentation wavefunctions);

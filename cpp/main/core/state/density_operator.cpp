@@ -1,5 +1,7 @@
 #include <iostream>
 #include <Eigen/Dense>
+#include <stdexcept>
+#include <math.h>
 #include <boost/variant.hpp>
 
 #include "core/state/density_operator.h"
@@ -30,6 +32,10 @@ namespace core::state{
 
         // Zero operator might get us left with trace = -2.e-18, producing nan in the norm.
         return trace > 0. ? std::sqrt(trace) : 0.;
+    }
+    
+    void DensityOperator::validate() const{
+        if(matrix.hasNaN()) throw std::out_of_range("Density operator contains NaN");
     }
         
     void DensityOperator::add_wavefunction(double probability, std::shared_ptr<WaveFunction> wavefunction){

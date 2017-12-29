@@ -2,6 +2,8 @@
 #include <memory>
 #include <utility>
 #include <cmath>
+#include <stdexcept>
+#include <math.h>
 #include <json.hpp>
 
 
@@ -70,6 +72,11 @@ namespace core::state{
 
         // Normalization
         matrix *= std::sqrt(2)/M_PI * std::sqrt(points) * (upper_x-lower_x)/points;
+    }
+
+
+    void WignerFunction::validate() const{
+        if(matrix.hasNaN()) throw std::out_of_range("Wigner functions contains NaN");
     }
 
     void WignerFunction::plot_to_terminal() const{

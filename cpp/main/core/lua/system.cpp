@@ -78,6 +78,9 @@ namespace core::lua{
         lua.registerFunction("norm", &DensityOperator::norm);
         lua.registerFunction("norm", &WaveFunction::norm);
         lua.registerFunction("norm", &WignerFunction::norm);
+        lua.registerFunction("validate", &DensityOperator::validate);
+        lua.registerFunction("validate", &WaveFunction::validate);
+        lua.registerFunction("validate", &WignerFunction::validate);
 
         /*
          * DensityOperator
@@ -121,6 +124,7 @@ namespace core::lua{
                     self.step(*state, t_start, t_step);
                 }
         );
+
         lua.registerFunction<void (Propagator<WaveFunction>::*)(std::shared_ptr<WaveFunction>, double, double, double)>("propagate", 
                 [](Propagator<WaveFunction>& self, std::shared_ptr<WaveFunction> state, double t_start, double t_final, double epsilon){
                     if(epsilon>0.)
@@ -135,6 +139,17 @@ namespace core::lua{
                         self.propagate(*state, t_start, t_final, epsilon);
                     else
                         self.propagate(*state, t_start, t_final);
+                }
+        );
+        
+        lua.registerFunction<void (Propagator<WaveFunction>::*)(std::shared_ptr<WaveFunction>, double, double, double)>("propagate_const_step", 
+                [](Propagator<WaveFunction>& self, std::shared_ptr<WaveFunction> state, double t_start, double t_final, double t_step){
+                    self.propagate_const_step(*state, t_start, t_final, t_step);
+                }
+        );
+        lua.registerFunction<void (Propagator<DensityOperator>::*)(std::shared_ptr<DensityOperator>, double, double, double)>("propagate_const_step", 
+                [](Propagator<DensityOperator>& self, std::shared_ptr<DensityOperator> state, double t_start, double t_final, double t_step){
+                    self.propagate_const_step(*state, t_start, t_final, t_step);
                 }
         );
 
@@ -162,11 +177,17 @@ namespace core::lua{
 
     void System::execute(std::string code, json& result){
         this->result = json();
-        this->prints = "";
+        this->print_stdout = "";
+        this->print_stderr = "";
 
-        lua.executeCode(code);
+        try{
+            lua.executeCode(code);
+        }catch(const std::exception& ex){
+            print_exception(ex);
+        }
 
-        this->result["stdout"] = this->prints;
+        this->result["stdout"] = this->print_stdout;
+        this->result["stderr"] = this->print_stderr;
         result = std::move(this->result);
     }
 
@@ -191,6 +212,16 @@ namespace core::lua{
 
     void System::print(std::string data){
         std::cout<<data;
-        prints += data;
+        print_stdout += data;
+    }
+
+    void System::print_exception(const std::exception& e, int level){
+        std::cerr << std::string(2*level, ' ') << "exception: " << e.what() << std::endl;
+        print_stderr += std::string(2*level, ' ') + "exception: " + e.what() + "\n";
+        try {
+            std::rethrow_if_nested(e);
+        } catch(const std::exception& e) {
+            print_exception(e, level+1);
+        } catch(...) {}
     }
 }

@@ -4,8 +4,12 @@
 #include <functional>
 #include <utility>
 #include <float.h>
+#include <cmath>
+#include <stdexcept>
 #include <Eigen/Dense>
 #include <json.hpp>
+
+#include <boost/math/special_functions/fpclassify.hpp>
 
 #include "core/state/wave_function.h"
 #include "core/discretization/basis.h"
@@ -40,6 +44,10 @@ namespace core::state{
         return vector.dot(basis->get_metric_cov()*other.vector);
     }
         
+    void WaveFunction::validate() const{
+        if(vector.hasNaN()) throw std::out_of_range("Wavefunction has NaN values");
+    }
+
     Eigen::VectorXcd WaveFunction::grid(const Eigen::VectorXd& x) const{
         Eigen::VectorXcd values(x.rows());
         for(int i=0; i<x.rows(); i++){

@@ -25,6 +25,7 @@ namespace core::state{
 
         double norm() const override;
         std::complex<double> dot(const WaveFunction& other) const;
+        void validate() const override;
 
         std::complex<double> operator()(double x) const;
         Eigen::VectorXcd grid(const Eigen::VectorXd& x) const;

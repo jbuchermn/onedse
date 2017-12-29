@@ -12,6 +12,8 @@ if(len(sys.argv) < 2):
 working_dir = sys.argv[1] + "/"
 
 data = json.load(open(working_dir + "data.json"))
+if 'plots' not in data:
+    exit(0)
 
 """
 Sort plots by basename

@@ -39,6 +39,7 @@ namespace core::state{
 
         /// \int dxdp W(x, p)
         double norm() const override;
+        void validate() const override;
         
         WignerFunction& operator/=(const double& scalar)        { matrix/=scalar;       return *this; }
         WignerFunction& operator*=(const double& scalar)        { matrix*=scalar;       return *this; }

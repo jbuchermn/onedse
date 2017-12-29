@@ -3,6 +3,7 @@ basis = scaled_basis(orthogonal_legendre(100), -10., 10.)
 
 wf = basis:wavefunction(function(x) return complex(math.exp(-(x-5.)*(x-5.)/2.), 0) end, 0)
 
+
 function plt(wf, time)
 	plot:wavefunction(wf, "Wave Function/" .. time, 200)
 
@@ -22,11 +23,11 @@ ham:mul(complex(0, -1))
 
 prop = ham:rk_propagator("RK4")
 
-plt(wf, 0.)
-for t=1,31 do
-	prop:propagate(wf, 0.1*(t-1), 0.1*t, 0.)
-    print("time=" .. 0.1*t)
-	plt(wf, 0.1*t)
-end
+--plt(wf, 0.)
+--for t=1,31 do
+--	prop:propagate(wf, 0.1*(t-1), 0.1*t, 0.)
+--    print("time=" .. 0.1*t)
+--	plt(wf, 0.1*t)
+--end
 
   

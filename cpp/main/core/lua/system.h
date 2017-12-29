@@ -3,6 +3,7 @@
 #include <memory>
 #include <map>
 #include <utility>
+#include <exception>
 #include <vector>
 #include <string>
 #include <boost/variant.hpp>
@@ -22,7 +23,8 @@ namespace core::lua{
     class System{
         LuaContext lua;
 
-        std::string prints;
+        std::string print_stdout;
+        std::string print_stderr;
         nlohmann::json result;
     public:
         System();
@@ -31,6 +33,7 @@ namespace core::lua{
          * Lua API
          */
         void print(std::string data);
+        void print_exception(const std::exception& e, int level=0);
         void plot_wavefunction(std::shared_ptr<core::state::WaveFunction> wavefunction, std::string name, int points);
         void plot_wigner(std::shared_ptr<core::state::DensityOperator> density_operator, std::string name, int points);
 

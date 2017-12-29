@@ -67,21 +67,12 @@ namespace server::session{
             if(!req.count("command")) throw process_error("No command given!");
 
             if(req["command"] == "execute"){
-                if(!req.count("lua")) throw process_error("No code given!");
-                try{
-                    save_lua(req["lua"]);
-                    system.execute(req["lua"], resp["data"]);
-                }catch(const LuaContext::ExecutionErrorException& ex){
-                    throw process_error(std::string("Exception in Lua code: ")+ex.what());
-                }catch(const LuaContext::SyntaxErrorException& ex){
-                    throw process_error(std::string("Syntax error in Lua code: ")+ex.what());
-                }catch(const LuaContext::WrongTypeException& ex){
-                    throw process_error(std::string("Wrong type in Lua code: ")+ex.what());
-                }
-
-
+                save_lua(req["lua"]);
+                system.execute(req["lua"], resp["data"]);
             }else if(req["command"] == "get"){
                 resp["data"]["lua"] = read_lua();
+            }else{
+                throw process_error(std::string("Unknown command: ") + req.at("command").get<std::string>());
             }
         }catch(process_error& ex){
             resp["error"] = ex.what();
