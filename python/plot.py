@@ -11,7 +11,13 @@ if(len(sys.argv) < 2):
 
 working_dir = sys.argv[1] + "/"
 
-data = json.load(open(working_dir + "data.json"))
+data = None
+try:
+    data = json.load(open(working_dir + "data.json"))
+except Exception:
+    print("Could not read data")
+    exit(1)
+
 if 'plots' not in data:
     exit(0)
 
@@ -81,9 +87,10 @@ def plot_wavefunction(plots):
         plt.title('%s: %f - %f' % (plots['title'], first_time, last_time))
 
         Writer = anim.writers['ffmpeg']
-        writer = Writer(fps=15, metadata=dict(artist='onedse'), bitrate=1800)
+        writer = Writer(fps=5, metadata=dict(artist='onedse'), bitrate=1800)
         ani = anim.FuncAnimation(fig, animate, np.arange(0, len(plots['plots']) - 1), init_func=init, interval=1, blit=True)
         ani.save(working_dir + plots['title'] + '.mp4', writer=writer)
+        plt.close(fig)
 
 
 def plot_wigner(plots):
@@ -129,6 +136,7 @@ def plot_wigner(plots):
         Writer = anim.writers['ffmpeg']
         writer = Writer(fps=15, metadata=dict(artist='onedse'), bitrate=1800)
         ani.save(working_dir + plots['title'] + '.mp4', writer=writer)
+        plt.close(fig)
 
 
 """

@@ -48,7 +48,7 @@ TEST(diagonal_propagator, wavefunction_harmonic_gaussian){
     EXPECT_NEAR((wf-wf_check).norm(), 0., 1.e-5);
 }
 
-#ifndef _EXCLUDE_EXPENSIVE_TESTS_
+#ifdef _INCLUDE_EXPENSIVE_TESTS_
 
 TEST(diagonal_propagator, density_operator_harmonic_gaussian){ 
     std::shared_ptr<Basis> basis = std::make_shared<ScaledBasis>(std::make_shared<OrthogonalLegendre>(35), -7., 7.); 

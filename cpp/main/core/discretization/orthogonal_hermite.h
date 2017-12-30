@@ -32,6 +32,6 @@ namespace core::discretization{
         }
 
     public:
-        OrthogonalHermite(int size): OrthogonalPolynomial(DBL_MIN/2., DBL_MAX/2., size, Basis::BoundaryConditions::None){}
+        OrthogonalHermite(int size): OrthogonalPolynomial(-DBL_MAX, DBL_MAX, size, Basis::BoundaryConditions::None){}
     };
 }

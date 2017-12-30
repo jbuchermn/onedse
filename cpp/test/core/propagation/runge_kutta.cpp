@@ -54,7 +54,7 @@ TEST(runge_kutta, wavefunction_harmonic_gaussian){
     EXPECT_TRUE(hist.avg()>1.e-5);
 }
 
-#ifndef _EXCLUDE_EXPENSIVE_TESTS_
+#ifdef _INCLUDE_EXPENSIVE_TESTS_
 
 TEST(runge_kutta, density_operator_harmonic_gaussian){ 
     std::shared_ptr<Basis> basis = std::make_shared<ScaledBasis>(std::make_shared<OrthogonalLegendre>(70), -7., 7.); 

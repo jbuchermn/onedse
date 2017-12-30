@@ -48,7 +48,7 @@ namespace core::map{
                 for(int jl=0; jl<N; jl++){
                     for(int ir=0; ir<N; ir++){
                         for(int jr=0; jr<N; jr++){
-                            matrix(il + N*jr, jl + N*ir) = left_matrix(il, jl)*right_matrix(ir, jr);
+                            matrix(il + N*jr, jl + N*ir) += left_matrix(il, jl)*right_matrix(ir, jr);
                         }
                     }
                 }
@@ -135,10 +135,29 @@ namespace core::map{
         (*this) += MapDensityOperator{basis, {term}};
     }
 
-    void MapDensityOperator::add_from_components(const Eigen::MatrixXcd& left_components_cov, const Eigen::MatrixXcd& right_components_cov){
+    void MapDensityOperator::add_from_components_both(const Eigen::MatrixXcd& left_components_cov, const Eigen::MatrixXcd& right_components_cov){
         Term term(basis);
         term.set_left_from_components_cov(left_components_cov);
         term.set_right_from_components_cov(right_components_cov);
+        (*this) += MapDensityOperator{basis, {term}};
+    }
+
+    void MapDensityOperator::add_from_wavefunction_left(const MapWaveFunction& op){
+        Term term(basis);
+        term.set_left_from_components_cov(basis->get_metric_cov()*op.matrix);
+        (*this) += MapDensityOperator{basis, {term}};
+    }
+
+    void MapDensityOperator::add_from_wavefunction_right(const MapWaveFunction& op){
+        Term term(basis);
+        term.set_right_from_components_cov(basis->get_metric_cov()*op.matrix);
+        (*this) += MapDensityOperator{basis, {term}};
+    }
+
+    void MapDensityOperator::add_from_wavefunction_both(const MapWaveFunction& left, const MapWaveFunction& right){
+        Term term(basis);
+        term.set_left_from_components_cov(basis->get_metric_cov()*left.matrix);
+        term.set_right_from_components_cov(basis->get_metric_cov()*right.matrix);
         (*this) += MapDensityOperator{basis, {term}};
     }
         
@@ -150,11 +169,11 @@ namespace core::map{
         add_from_components_right(basis->discretize_op_cov(left_derivative, right_derivative, V, order));
     }
 
-    void MapDensityOperator::add(int left_left_derivative,  int left_right_derivative,  std::function<std::complex<double>(double)> left_V,  int left_order,
+    void MapDensityOperator::add_both(int left_left_derivative,  int left_right_derivative,  std::function<std::complex<double>(double)> left_V,  int left_order,
                                  int right_left_derivative, int right_right_derivative, std::function<std::complex<double>(double)> right_V, int right_order){
 
-        add_from_components(basis->discretize_op_cov(left_left_derivative,  left_right_derivative,  left_V,  left_order), 
-                            basis->discretize_op_cov(right_left_derivative, right_right_derivative, right_V, right_order));
+        add_from_components_both(basis->discretize_op_cov(left_left_derivative,  left_right_derivative,  left_V,  left_order), 
+                                 basis->discretize_op_cov(right_left_derivative, right_right_derivative, right_V, right_order));
     }
 
     MapDensityOperator& MapDensityOperator::operator+=(const MapDensityOperator& other){

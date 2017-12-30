@@ -1,5 +1,7 @@
 #include <iostream>
 #include <memory>
+#include <exception>
+#include <float.h>
 #include <LuaContext.hpp>
 
 #include "core/discretization/basis.h"
@@ -16,6 +18,32 @@ namespace core::discretization{
         }
 
         return values;
+    }
+        
+    std::pair<double, double> Basis::plot_boundaries() const{
+        double l = lower;
+        double u = upper;
+        if(u==DBL_MAX && l==-DBL_MAX){
+            Eigen::VectorXd points, weights;
+            quadrature(0, points, weights);
+            double min = DBL_MAX/2.;
+            double max = DBL_MIN/2.;
+            for(int i=0; i<points.rows(); i++){
+                min = std::min(min, points(i));
+                max = std::max(max, points(i));
+            }
+
+            u = (min+max)/2. + (max-min);
+            l = (min+max)/2. - (max-min);
+
+        }else if(u!=DBL_MAX && l!=-DBL_MAX){
+            l += 0.001;
+            u -= 0.001;
+        }else{
+            throw std::runtime_error("Unsupported boundaries");
+        }
+
+        return std::pair<double, double> { l, u };
     }
 
     const Eigen::MatrixXcd& Basis::get_metric_cov() const{

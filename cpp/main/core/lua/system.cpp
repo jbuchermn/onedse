@@ -56,7 +56,7 @@ namespace core::lua{
         expose_constructor<ScaledBasis,         Basis, std::shared_ptr<Basis>, double, double>(lua, "scaled_basis");
 
         expose_constructor_as_member<WaveFunction,       WaveFunction,       std::shared_ptr<Basis>, std::function<std::complex<double>(double)>, int>(lua, "wavefunction");
-        expose_constructor_as_member<MapWaveFunction,    MapWaveFunction,    std::shared_ptr<Basis>, int, int, std::function<std::complex<double>(double)>, int>(lua, "map_wavefunction");
+        expose_constructor_as_member<MapWaveFunction,    MapWaveFunction,    std::shared_ptr<Basis>>(lua, "map_wavefunction");
         expose_constructor_as_member<DensityOperator,    DensityOperator,    std::shared_ptr<Basis>>(lua, "density_operator");
         expose_constructor_as_member<DensityOperator,    DensityOperator,    std::shared_ptr<WaveFunction>>(lua, "density_operator");
         expose_constructor_as_member<MapDensityOperator, MapDensityOperator, std::shared_ptr<Basis>>(lua, "map_density_operator");
@@ -82,6 +82,8 @@ namespace core::lua{
         lua.registerFunction("validate", &WaveFunction::validate);
         lua.registerFunction("validate", &WignerFunction::validate);
 
+        lua.registerFunction("trace", &DensityOperator::trace);
+
         /*
          * DensityOperator
          */
@@ -101,14 +103,23 @@ namespace core::lua{
         /*
          * MapWaveFunction
          */
-        lua.registerFunction("add", &MapWaveFunction::add);
+        lua.registerFunction("add_term", &MapWaveFunction::add_term);
 
         /*
          * MapDensityOperator
          */
         lua.registerFunction("add_left", &MapDensityOperator::add_left);
         lua.registerFunction("add_right", &MapDensityOperator::add_right);
-        lua.registerFunction("add", &MapDensityOperator::add);
+        lua.registerFunction("add_both", &MapDensityOperator::add_both);
+
+        lua.registerFunction<void (MapDensityOperator::*)(std::shared_ptr<MapWaveFunction>)>("add_from_wavefunction_left", 
+                [](MapDensityOperator& self, std::shared_ptr<MapWaveFunction> wf){ self.add_from_wavefunction_left(*wf); });
+
+        lua.registerFunction<void (MapDensityOperator::*)(std::shared_ptr<MapWaveFunction>)>("add_from_wavefunction_right", 
+                [](MapDensityOperator& self, std::shared_ptr<MapWaveFunction> wf){ self.add_from_wavefunction_right(*wf); });
+
+        lua.registerFunction<void (MapDensityOperator::*)(std::shared_ptr<MapWaveFunction>, std::shared_ptr<MapWaveFunction>)>("add_from_wavefunction_both", 
+                [](MapDensityOperator& self, std::shared_ptr<MapWaveFunction> left, std::shared_ptr<MapWaveFunction> right){ self.add_from_wavefunction_both(*left, *right); });
 
 
         /*

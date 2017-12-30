@@ -47,7 +47,7 @@ TEST(wigner_function, gaussian){
             EXPECT_NEAR(wigner1.matrix(i,j), expected(i, wigner1.matrix.rows(), wigner1.get_lower_x(), wigner1.get_upper_x(), j, wigner1.matrix.cols(), wigner1.get_lower_p(), wigner1.get_upper_p()), 1.e-9);
         }
     }
-    
+
     for(int i=0; i<wigner2.matrix.rows(); i++){
         for(int j=0; j<wigner2.matrix.cols(); j++){
             EXPECT_NEAR(wigner2.matrix(i,j), expected(i, wigner2.matrix.rows(), wigner2.get_lower_x(), wigner2.get_upper_x(), j, wigner2.matrix.cols(), wigner2.get_lower_p(), wigner2.get_upper_p()), 1.e-9);

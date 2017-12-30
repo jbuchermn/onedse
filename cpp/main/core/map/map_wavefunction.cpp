@@ -27,7 +27,7 @@ namespace core::map{
         return matrix;
     }
         
-    void MapWaveFunction::add(int left_derivative, int right_derivative, std::function<std::complex<double>(double)> V, int order){
+    void MapWaveFunction::add_term(int left_derivative, int right_derivative, std::function<std::complex<double>(double)> V, int order){
         *this += MapWaveFunction { basis, left_derivative, right_derivative, V, order };
     }
         

@@ -87,7 +87,7 @@ namespace core::propagation{
         }
 
         virtual void propagate_const_step(StateClass& state, double t_start, double t_final, double t_step){
-            double t=0.;
+            double t=t_start;
             for(; t<t_final; t+=t_step){
                 step(state, t, t_step);
             }

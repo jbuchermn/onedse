@@ -13,6 +13,7 @@ export default class Server{
             body: JSON.stringify({ command, lua })
         })
             .then( res => res.text() )
+            .then( res => { console.log(res); return res; } )
             .then( res => JSON.parse(res) );
     }
 }

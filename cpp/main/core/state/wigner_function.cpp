@@ -28,8 +28,9 @@ namespace core::state{
     }
 
     WignerFunction::WignerFunction(const DensityOperator& density_operator, int points){
-        upper_x = density_operator.basis->upper;
-        lower_x = density_operator.basis->lower;
+        auto b = density_operator.basis->plot_boundaries();
+        lower_x = b.first;
+        upper_x = b.second;
 
         upper_p =  .5*M_PI/(upper_x-lower_x) * points;
         lower_p = -.5*M_PI/(upper_x-lower_x) * points;
@@ -42,8 +43,9 @@ namespace core::state{
     }
         
     void WignerFunction::set_from_wavefunction(const WaveFunction& wavefunction, int points){
-        upper_x = wavefunction.basis->upper;
-        lower_x = wavefunction.basis->lower;
+        auto b = wavefunction.basis->plot_boundaries();
+        lower_x = b.first;
+        upper_x = b.second;
 
         upper_p =  .5*M_PI/(upper_x-lower_x) * points;
         lower_p = -.5*M_PI/(upper_x-lower_x) * points;
@@ -67,7 +69,7 @@ namespace core::state{
                 }
             }
             fft(tmp);
-            for(int k=0; k<points; k++) matrix(i, k) = tmp(2*points-2-2*k).real(); 
+            for(int k=0; k<points; k++) matrix(i, k) = tmp( (2*points-2*k) % (2*points) ).real(); 
         }
 
         // Normalization

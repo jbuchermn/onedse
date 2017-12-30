@@ -59,7 +59,9 @@ namespace core::state{
 
     void WaveFunction::plot_to_terminal(int points) const{
         Eigen::VectorXd x(points);
-        for(int i=0; i<points; i++) x(i) = basis->lower + 1.*i/points*(basis->upper - basis->lower);
+
+        auto [lower, upper] = basis->plot_boundaries();
+        for(int i=0; i<points; i++) x(i) = lower + 1.*i/points*(upper - lower);
 
         Eigen::VectorXcd vals = this->grid(x);
         for(auto range: std::vector<std::pair<double, double>>{{DBL_MAX, 1.}, {1., .5}, {.5, .1}, {.1, 1.e-4}, {1.e-4, -1.e-4}, {-1.e-4, -.1}, {-.1, -.5}, {-.5, -1.}, {-1., DBL_MIN}}){
@@ -88,11 +90,13 @@ namespace core::state{
         
     void WaveFunction::to_json(nlohmann::json& json, int points) const{
         Eigen::VectorXd x(points);
-        for(int i=0; i<points; i++) x(i) = basis->lower + 1.*i/points*(basis->upper - basis->lower);
+
+        auto [lower, upper] = basis->plot_boundaries();
+        for(int i=0; i<points; i++) x(i) = lower + 1.*i/points*(upper - lower);
         Eigen::VectorXcd vals = this->grid(x);
 
-        json["lower"] = basis->lower;
-        json["upper"] = basis->upper;
+        json["lower"] = lower;
+        json["upper"] = upper;
         json["data"] = nlohmann::json();
         for(int i=0; i<vals.rows(); i++){
             json["data"].push_back(std::vector<double>{vals(i).real(), vals(i).imag()});

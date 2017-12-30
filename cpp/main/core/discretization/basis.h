@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <functional>
+#include <utility>
 
 #include <Eigen/Dense>
 
@@ -27,6 +28,9 @@ namespace core::discretization{
         const int size;
 
         Basis(double _lower, double _upper, int _size, BoundaryConditions _boundary_conditions);
+
+        // Find boundaries for plots or Wigner functions (i. e. do not include lower or upper, and pick sth useful for (DBL_MIN, DBL_MAX))
+        std::pair<double, double> plot_boundaries() const;
 
         /// Evaluate basis functions at point x
         virtual Eigen::VectorXcd evaluate(double x, int derivative=0) const=0;

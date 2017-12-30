@@ -22,8 +22,8 @@ TEST(map_density_operator, matrix){
     MapDensityOperator map(basis);
     map.add_left(1, 1, [](double x){ return 1.; }, 0);
     map.add_right(0, 0, [](double x){ return x*x*x*x; }, 4);
-    map.add(1, 1, [](double x){ return x; }, 1, 
-            0, 1, [](double x){ return std::sqrt(x); }, 2);
+    map.add_both(1, 1, [](double x){ return x; }, 1, 
+                 0, 1, [](double x){ return std::sqrt(x); }, 2);
 
     map.apply(rho_check);
 

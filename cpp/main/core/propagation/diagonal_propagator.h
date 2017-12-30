@@ -3,6 +3,8 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include <sstream>
+#include <iomanip>
 #include <Eigen/Dense>
 
 #include "core/propagation/propagator.h"
@@ -21,8 +23,12 @@ namespace core::propagation{
             trafo_from_diagonal = std::move(solver.eigenvectors());
             trafo_to_diagonal = trafo_from_diagonal.inverse();
 
-            if((trafo_from_diagonal * eigenvalues.asDiagonal() * trafo_to_diagonal - map->matrix_representation()).norm()/map->matrix_representation().norm() > 1.e-12) throw std::runtime_error("Diagonalization failed");
-
+            double error = (trafo_from_diagonal * eigenvalues.asDiagonal() * trafo_to_diagonal - map->matrix_representation()).norm()/map->matrix_representation().norm();
+            if(error>1.e-9){
+                std::ostringstream error_str;
+                error_str << std::setprecision(15) << error;
+                throw std::runtime_error("Diagonalization failed: "+error_str.str());
+            }
         }
 
         void step(StateClass& state, double t_start, double t_step) override{

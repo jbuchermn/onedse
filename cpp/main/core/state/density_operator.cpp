@@ -1,5 +1,8 @@
 #include <iostream>
 #include <Eigen/Dense>
+#include <sstream>
+#include <iomanip>
+#include <exception>
 #include <stdexcept>
 #include <math.h>
 #include <boost/variant.hpp>
@@ -38,6 +41,10 @@ namespace core::state{
         if(matrix.hasNaN()) throw std::out_of_range("Density operator contains NaN");
     }
         
+    std::complex<double> DensityOperator::trace() const{
+        return (matrix * basis->get_metric_cov()).trace();
+    }
+        
     void DensityOperator::add_wavefunction(double probability, std::shared_ptr<WaveFunction> wavefunction){
         matrix += probability * wavefunction->vector * wavefunction->vector.adjoint();
     }
@@ -54,7 +61,7 @@ namespace core::state{
 
         // Set up eigenvalue eqn in contravariant indices: rho^{ij}psi_j = lambda g^{ik}psi_k to obtain covariant vectors
         Eigen::GeneralizedSelfAdjointEigenSolver<Eigen::MatrixXcd> solver(matrix, basis->get_metric_contrav());
-        for(int i=0; i<solver.eigenvalues().rows(); i++){
+        for(int i=solver.eigenvalues().rows()-1; i>=0; i--){
             if(std::abs(solver.eigenvalues()(i))<1.e-6) continue;
 
             Eigen::VectorXcd components = solver.eigenvectors().block(0, i, solver.eigenvectors().rows(), 1);

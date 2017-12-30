@@ -32,6 +32,8 @@ namespace core::state{
         double norm() const override;
         void validate() const override;
 
+        std::complex<double> trace() const;
+
         void add_wavefunction(double probability, std::shared_ptr<core::state::WaveFunction> wavefunction);
         void set_from_wavefunctions(DiagonalRepresentation wavefunctions);
         DiagonalRepresentation diagonalize() const;

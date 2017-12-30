@@ -20,7 +20,7 @@ namespace core::map{
         MapWaveFunction(std::shared_ptr<const core::discretization::Basis> basis, const Eigen::MatrixXcd& matrix);
 
         void set_from_components_cov(const Eigen::MatrixXcd& components);
-        void add(int left_derivative, int right_derivative, std::function<std::complex<double>(double)> V, int order);
+        void add_term(int left_derivative, int right_derivative, std::function<std::complex<double>(double)> V, int order);
 
         const Eigen::MatrixXcd& matrix_representation() const override;
         void apply(core::state::WaveFunction& wavefunction) const override;

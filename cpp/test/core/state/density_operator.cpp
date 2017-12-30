@@ -22,12 +22,10 @@ TEST(density_operator, trace_one){
     DensityOperator rho{{{.63, wf1}, {.37, wf2}}};
     DensityOperator rho_pure{{{1., wf1}}};
 
-    std::complex<double> trace = (basis->get_metric_cov() * rho.matrix).trace();
-    std::complex<double> trace_pure = (basis->get_metric_cov() * rho_pure.matrix).trace();
-    EXPECT_NEAR(trace.real(), 1., 1.e-12);
-    EXPECT_NEAR(trace.imag(), 0., 1.e-12);
-    EXPECT_NEAR(trace_pure.real(), 1., 1.e-12);
-    EXPECT_NEAR(trace_pure.imag(), 0., 1.e-12);
+    EXPECT_NEAR(rho.trace().real(), 1., 1.e-12);
+    EXPECT_NEAR(rho_pure.trace().real(), 1., 1.e-12);
+    EXPECT_NEAR(rho.trace().imag(), 0., 1.e-12);
+    EXPECT_NEAR(rho_pure.trace().imag(), 0., 1.e-12);
 }
 
 TEST(density_operator, norm){

@@ -22,7 +22,6 @@ export default class LuaEditor extends React.Component{
                     value={this.state.lua}
                     options={{ mode: 'lua', theme: 'material', lineNumbers: true }}
                     onBeforeChange={(editor, data, value) => this.setState({lua: value})}
-                    onChange={(editor, value) => {console.log('controlled', {value});}}
                 />
                 <button style={styles.button} onClick={()=>this.props.execute(this.state.lua)}>{this.props.working ? '...' : 'Run'}</button>
             </div>
@@ -40,8 +39,8 @@ const styles = {
         textDecoration: 'none',
         display: 'inline-block',
         fontSize: '16px',
-        margin: '4px 0',
+        margin: '16px 0',
         cursor: 'pointer',
-        width: '100%'
+        width: '100%',
     }
 };

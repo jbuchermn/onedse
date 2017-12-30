@@ -6,6 +6,7 @@
 
 #include "core/discretization/basis.h"
 #include "core/map/map.h"
+#include "core/map/map_wavefunction.h"
 #include "core/state/density_operator.h"
 
 namespace core::map{
@@ -57,12 +58,16 @@ namespace core::map{
 
         void add_from_components_left(const Eigen::MatrixXcd& components_cov);
         void add_from_components_right(const Eigen::MatrixXcd& components_cov);
-        void add_from_components(const Eigen::MatrixXcd& left_components_cov, const Eigen::MatrixXcd& right_components_cov);
+        void add_from_components_both(const Eigen::MatrixXcd& left_components_cov, const Eigen::MatrixXcd& right_components_cov);
+
+        void add_from_wavefunction_left(const MapWaveFunction& op);
+        void add_from_wavefunction_right(const MapWaveFunction& op);
+        void add_from_wavefunction_both(const MapWaveFunction& left, const MapWaveFunction& right);
 
         void add_left(int left_derivative, int right_derivative, std::function<std::complex<double>(double)> V, int order);
         void add_right(int left_derivative, int right_derivative, std::function<std::complex<double>(double)> V, int order);
-        void add(int left_left_derivative,  int left_right_derivative,  std::function<std::complex<double>(double)> left_V,  int left_order,
-                 int right_left_derivative, int right_right_derivative, std::function<std::complex<double>(double)> right_V, int right_order);
+        void add_both(int left_left_derivative,  int left_right_derivative,  std::function<std::complex<double>(double)> left_V,  int left_order,
+                      int right_left_derivative, int right_right_derivative, std::function<std::complex<double>(double)> right_V, int right_order);
 
         void apply(core::state::DensityOperator& density_operator) const override;
         

@@ -30,8 +30,8 @@ export default class App extends React.Component{
 
             this.setState({ working: false });
             this.setState({ plots: (res.data && res.data.plots) ? res.data.plots : [] });
-            this.setState({ stdout: (res.data && res.data.stdout) ? res.data.stdout : "" });
-            this.setState({ stderr: (res.data && res.data.stderr) ? res.data.stderr : "" });
+            this.setState({ stdout: res.data ? res.data.stdout : "" });
+            this.setState({ stderr: res.data ? res.data.stderr : "" });
         }).catch(err=>{
             this.setState({ working: false, error: JSON.stringify(err), stdout: '', plots: [] });
         });
@@ -62,8 +62,7 @@ export default class App extends React.Component{
             <div style={styles.container}>
                 <h1 style={styles.heading} align="center">1D Schrödinger QM in Wigner picture</h1>
                 <LuaEditor call={this.call} execute={this.execute} working={this.state.working} />
-                {this.state.stderr && this.state.stderr != "" && <Message msg={this.state.stderr} />}
-                {this.state.stdout && this.state.stdout != "" && <Message msg={this.state.stdout} />}
+                <Message stdout={this.state.stdout} stderr={this.state.stderr} />
                 {plots.map(plot=>(
                     <div>
                         <h1 align="center">{plot.title}</h1>
