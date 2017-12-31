@@ -6,6 +6,7 @@
 #include "core/discretization/basis.h"
 #include "core/discretization/scaled_basis.h"
 #include "core/discretization/orthogonal_legendre.h"
+#include "core/discretization/orthogonal_hermite.h"
 #include "core/state/wave_function.h"
 #include "core/state/wigner_function.h"
 #include "core/map/map_wavefunction.h"
@@ -20,6 +21,7 @@ using WaveFunction = core::state::WaveFunction;
 using WignerFunction = core::state::WignerFunction;
 using DensityOperator = core::state::DensityOperator;
 using OrthogonalLegendre = core::discretization::OrthogonalLegendre;
+using OrthogonalHermite = core::discretization::OrthogonalHermite;
 using MapWaveFunction = core::map::MapWaveFunction;
 using MapDensityOperator = core::map::MapDensityOperator;
 
@@ -54,10 +56,9 @@ TEST(runge_kutta, wavefunction_harmonic_gaussian){
     EXPECT_TRUE(hist.avg()>1.e-5);
 }
 
-#ifdef _INCLUDE_EXPENSIVE_TESTS_
 
 TEST(runge_kutta, density_operator_harmonic_gaussian){ 
-    std::shared_ptr<Basis> basis = std::make_shared<ScaledBasis>(std::make_shared<OrthogonalLegendre>(70), -7., 7.); 
+    std::shared_ptr<Basis> basis = std::make_shared<OrthogonalHermite>(30); 
     std::shared_ptr<MapDensityOperator> op = std::make_shared<MapDensityOperator>(basis);
 
     op->add_left(1, 1, [](double x){ return 1.; }, 0);
@@ -69,8 +70,8 @@ TEST(runge_kutta, density_operator_harmonic_gaussian){
     std::shared_ptr<WaveFunction> wf = std::make_shared<WaveFunction>(basis, [](double x){ return exp(-(x-2.)*(x-2.)/2.); }, 0);
     std::shared_ptr<WaveFunction> wf_check = std::make_shared<WaveFunction>(basis, [](double x){ return std::complex<double>{0., -exp(-(x+2.)*(x+2.)/2.) }; }, 0);
 
-    DensityOperator rho{{{1., wf}}};
-    DensityOperator rho_check{{{1., wf_check}}};
+    DensityOperator rho{ wf };
+    DensityOperator rho_check{ wf_check };
 
     RungeKutta<DensityOperator> prop(op, "RK4");
 
@@ -81,11 +82,9 @@ TEST(runge_kutta, density_operator_harmonic_gaussian){
     prop.propagate_const_step(rho, 0., t_final, t_step);
 
     {WignerFunction wigner{ rho, 128 }; wigner.plot_to_terminal();}
-
     EXPECT_NEAR((rho-rho_check).norm(), 0., 1.e-5);
 }
 
-#endif
 
 TEST(runge_kutta, consistency){
     std::shared_ptr<Basis> basis = std::make_shared<ScaledBasis>(std::make_shared<OrthogonalLegendre>(70), -10., 10.);

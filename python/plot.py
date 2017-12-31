@@ -4,6 +4,8 @@ import json
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as anim
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+
 
 if(len(sys.argv) < 2):
     print("Usage: plot.py result/folder")
@@ -55,22 +57,16 @@ def plot_wavefunction(plots):
 
         return fig, line_re, line_im, line_sq
 
-    if(len(plots['plots']) < 2):
+    if(len(plots['plots']) == 1):
         x, y_re, y_im, y_sq = get_data(0)
         fig, l1, l2, l3 = plot(x, y_re, y_im, y_sq)
-        plt.savefig(working_dir + plots['plots'][0]['title'].replace("/", "_") + '.pdf')
         plt.title(plots['plots'][0]['title'])
+        plt.savefig(working_dir + plots['plots'][0]['title'].replace("/", "_") + '.pdf')
         plt.close(fig)
 
     else:
         x, y_re, y_im, y_sq = get_data(0)
         fig, line_re, line_im, line_sq = plot(x, y_re, y_im, y_sq)
-
-        def init():
-            line_re.set_ydata(np.ma.array(x, mask=True))
-            line_im.set_ydata(np.ma.array(x, mask=True))
-            line_sq.set_ydata(np.ma.array(x, mask=True))
-            return line_re, line_im, line_sq
 
         def animate(i):
             _, y_re, y_im, y_sq = get_data(i)
@@ -80,6 +76,8 @@ def plot_wavefunction(plots):
 
             return line_re, line_im, line_sq
 
+        ani = anim.FuncAnimation(fig, animate, np.arange(0, len(plots['plots']) - 1), interval=1)
+
         first_title = plots['plots'][0]['title']
         last_title = plots['plots'][-1]['title']
         first_time = float(first_title.split("/")[1])
@@ -88,7 +86,6 @@ def plot_wavefunction(plots):
 
         Writer = anim.writers['ffmpeg']
         writer = Writer(fps=5, metadata=dict(artist='onedse'), bitrate=1800)
-        ani = anim.FuncAnimation(fig, animate, np.arange(0, len(plots['plots']) - 1), init_func=init, interval=1, blit=True)
         ani.save(working_dir + plots['title'] + '.mp4', writer=writer)
         plt.close(fig)
 
@@ -97,41 +94,49 @@ def plot_wigner(plots):
     print("Plotting Wigner function \"%s\"..." % plots['title'])
 
     def get_data(i):
-        x = np.linspace(plots['plots'][i]['wigner']['lower_x'], plots['plots'][i]['wigner']['upper_x'], len(plots['plots'][i]['wigner']['data']), endpoint=False)
-        p = np.linspace(plots['plots'][i]['wigner']['lower_p'], plots['plots'][i]['wigner']['upper_p'], len(plots['plots'][i]['wigner']['data'][0]), endpoint=False)
-        X, P = np.meshgrid(x, p)
         Z = np.array(plots['plots'][i]['wigner']['data'])
         Z = np.transpose(Z)
 
+        X = (plots['plots'][i]['wigner']['lower_x'], plots['plots'][i]['wigner']['upper_x'])
+        P = (plots['plots'][i]['wigner']['lower_p'], plots['plots'][i]['wigner']['upper_p'])
+
         return X, P, Z
 
-    if(len(plots['plots']) < 2):
-        X, P, Z = get_data(0)
+    def plot(X, P, Z):
         fig = plt.figure()
-        plt.contourf(X, P, Z)
-        plt.axes().set_aspect('equal', 'datalim')
-        plt.title(plots['plots'][0]['title'])
+        ax = fig.add_subplot(111)
 
+        div = make_axes_locatable(ax)
+        cax = div.append_axes('right', '5%', '5%')
+
+        # W(p,x) is always in [-1/pi, 1/pi]
+        im = ax.imshow(Z, origin='lower', cmap=plt.cm.seismic, aspect='equal', extent=[*X, *P], vmin=-1.1 / np.pi, vmax=1.1 / np.pi, interpolation='bicubic')
+        cb = fig.colorbar(im, cax=cax)
+
+        return fig, ax, im, cb
+
+    if(len(plots['plots']) == 1):
+        X, P, Z = get_data(0)
+        fig, ax, im, cb = plot(X, P, Z)
+        ax.set_title(plots['plots'][0]['title'])
         plt.savefig(working_dir + plots['plots'][0]['title'].replace("/", "_") + '.pdf')
         plt.close(fig)
 
     else:
-        ims = []
-        fig = plt.figure()
-        for i in range(len(plots['plots'])):
-            X, P, Z = get_data(i)
-            cont = plt.contourf(X, P, Z)
-            ims += [cont.collections]
+        X, P, Z = get_data(0)
+        fig, ax, im, cb = plot(X, P, Z)
 
-        ani = anim.ArtistAnimation(fig, ims, interval=1, blit=True)
+        def animate(i):
+            X, P, Z = get_data(i)
+            im.set_data(Z)
+
+        ani = anim.FuncAnimation(fig, animate, np.arange(0, len(plots['plots']) - 1), interval=1)
 
         first_title = plots['plots'][0]['title']
         last_title = plots['plots'][-1]['title']
         first_time = float(first_title.split("/")[1])
         last_time = float(last_title.split("/")[1])
-
-        plt.axes().set_aspect('equal', 'datalim')
-        plt.title('%s: %f - %f' % (plots['title'], first_time, last_time))
+        ax.set_title('%s: %f - %f' % (plots['title'], first_time, last_time))
 
         Writer = anim.writers['ffmpeg']
         writer = Writer(fps=15, metadata=dict(artist='onedse'), bitrate=1800)

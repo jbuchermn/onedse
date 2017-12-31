@@ -5,6 +5,7 @@
 #include "core/discretization/basis.h"
 #include "core/discretization/scaled_basis.h"
 #include "core/discretization/orthogonal_legendre.h"
+#include "core/discretization/orthogonal_hermite.h"
 #include "core/state/wave_function.h"
 #include "core/state/density_operator.h"
 #include "core/state/wigner_function.h"
@@ -18,6 +19,7 @@ using ScaledBasis = core::discretization::ScaledBasis;
 using WaveFunction = core::state::WaveFunction;
 using DensityOperator = core::state::DensityOperator;
 using OrthogonalLegendre = core::discretization::OrthogonalLegendre;
+using OrthogonalHermite = core::discretization::OrthogonalHermite;
 using MapWaveFunction = core::map::MapWaveFunction;
 using MapDensityOperator = core::map::MapDensityOperator;
 using WignerFunction = core::state::WignerFunction;
@@ -48,10 +50,9 @@ TEST(diagonal_propagator, wavefunction_harmonic_gaussian){
     EXPECT_NEAR((wf-wf_check).norm(), 0., 1.e-5);
 }
 
-#ifdef _INCLUDE_EXPENSIVE_TESTS_
 
 TEST(diagonal_propagator, density_operator_harmonic_gaussian){ 
-    std::shared_ptr<Basis> basis = std::make_shared<ScaledBasis>(std::make_shared<OrthogonalLegendre>(35), -7., 7.); 
+    std::shared_ptr<Basis> basis = std::make_shared<OrthogonalHermite>(30); 
     std::shared_ptr<MapDensityOperator> op = std::make_shared<MapDensityOperator>(basis);
     op->add_left(1, 1, [](double x){ return 1.; }, 0); 
     op->add_left(0, 0, [](double x){ return x*x; }, 2);
@@ -76,5 +77,4 @@ TEST(diagonal_propagator, density_operator_harmonic_gaussian){
     EXPECT_NEAR((rho-rho_check).norm(), 0., 1.e-5);
 }
 
-#endif
 
