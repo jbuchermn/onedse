@@ -1,4 +1,4 @@
-CXX = g++-7
+CXX = g++
 
 SRCS=$(wildcard alglib/*.cpp)
 OBJS=$(SRCS:.cpp=.o)
