@@ -30,7 +30,7 @@ include_directories(${FFTW_INCLUDE_DIR})
 list(APPEND dependencies_LIBRARIES ${FFTW_LIBRARIES})
 
 # Lua
-find_package(LUA REQUIRED)
+find_package(Lua REQUIRED)
 include_directories(${LUA_INCLUDE_DIR})
 list(APPEND dependencies_LIBRARIES ${LUA_LIBRARIES})
 

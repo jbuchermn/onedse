@@ -1,5 +1,3 @@
-CXX = g++
-
 SRCS=$(wildcard alglib/*.cpp)
 OBJS=$(SRCS:.cpp=.o)
 

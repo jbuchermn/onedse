@@ -7,9 +7,6 @@ mv cpp/src alglib/alglib
 rm -rf cpp
 rm -f alglib-3.12.0.cpp.gpl.tgz
 
-#Make alglib
-cd alglib && make && cd ..
-
 #Get Eigen
 wget http://bitbucket.org/eigen/eigen/get/3.3.4.tar.gz
 tar -xvf 3.3.4.tar.gz
