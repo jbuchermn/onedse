@@ -1,7 +1,7 @@
 # One-dimensional quantum mechanics with Wigner functions
-## employing Schrodinger picture Liouville-von Neumann equation of motion
-### to visualize purely quantum mechanical effects such as tunnelling, as well as macroscopic effects such as decoherence (aka measurement)
-#### powered by C++ and Lua (and JavaScript / Python)
+### Employing Schrodinger picture Liouville-von Neumann equation of motion
+### To visualize purely quantum mechanical effects such as tunnelling, as well as macroscopic effects such as decoherence (aka measurement)
+### Powered by C++ and Lua (and JavaScript / Python)
 
 Setup
 
