@@ -86,6 +86,7 @@ namespace core::map{
         }else if(right_matrix.rows()!=0){
             right_matrix*=scalar;
         }    
+        return *this;
     }
         
     MapDensityOperator::MapDensityOperator(std::shared_ptr<const Basis> basis): Map<DensityOperator>(basis) {}
@@ -121,6 +122,7 @@ namespace core::map{
         for(auto& term: terms){
             term *= scalar;
         }
+        return *this;
     }
         
     void MapDensityOperator::add_from_components_left(const Eigen::MatrixXcd& components_cov){
@@ -184,5 +186,6 @@ namespace core::map{
             terms.push_back(other_term);
 DoneWithOtherTerm:;
         }
+        return *this;
     }
 }

@@ -7,3 +7,4 @@ cpp/dependencies/eigen/**/*
 !cpp/dependencies/alglib/Makefile
 cpp/build
 **/.tern-port
+**/.DS_Store
