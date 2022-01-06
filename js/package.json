@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {},
   "author": "jbuchermn",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "babel": "^6.23.0",
     "babel-core": "^6.26.3",
@@ -24,7 +24,7 @@
     "webpack-cli": "^3.3.11"
   },
   "dependencies": {
-    "codemirror": "^5.33.0",
+    "codemirror": "^5.65.0",
     "plotly.js": "^1.31.2",
     "react": "^16.2.0",
     "react-codemirror2": "^3.0.7",
