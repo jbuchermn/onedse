@@ -34,7 +34,7 @@ namespace core::grid{
         double cell_p = (w.get_upper_p()-w.get_lower_p())/np;
 
         auto kernel = [](double sigma, double cell){
-            int half = std::max(0, int(std::ceil(4.*sigma/cell)));
+            int half = std::max(0, int(std::ceil(3.*sigma/cell)));
             Eigen::VectorXd k(2*half+1);
             for(int i=-half; i<=half; i++) k(i+half) = sigma>0. ? std::exp(-.5*std::pow(i*cell/sigma, 2.)) : 1.;
             return Eigen::VectorXd(k/k.sum());

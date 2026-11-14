@@ -24,7 +24,7 @@ local runs = {
     { name = "free (g = 0)", g = 0 },
 }
 
-local frames, t_final = 80, 20
+local frames, t_final = 200, 20
 for _, run in ipairs(runs) do
     local sys = g:schroedinger()
     sys:set_nonlinearity(run.g)

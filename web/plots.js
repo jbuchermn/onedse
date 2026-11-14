@@ -303,44 +303,59 @@ function lerpRgb(a, b, t) {
 }
 function rgbCss(c) { return `rgb(${c[0] | 0},${c[1] | 0},${c[2] | 0})`; }
 
+// Panels showing the same region of phase space (e.g. quantum next to classical) zoom
+// together, otherwise they could not be compared at a glance.
+const sharedZoom = new Map();
+export function resetSharedState() { sharedZoom.clear(); }
+
 /// Wigner function W(x, p): diverging scale, neutral at zero, symmetric limits
 function renderWigner(ctx, w, h, panel, frame, theme) {
     const { data, nx, np, lower_x, upper_x, lower_p, upper_p } = frame;
-    if (frame.amax === undefined) frame.amax = maxAbs(data);
+    const k = frame.scale ?? 1;          // 8 bit frames: value = data * scale
+    if (frame.amax === undefined) frame.amax = maxAbs(data) * k;
     const amax = grow(panel.state, 'amax', frame.amax) || 1;
+    const cellX = (upper_x - lower_x) / nx, cellP = (upper_p - lower_p) / np;
 
     // Zoom to the part of phase space that is occupied at any time (the view only ever grows)
     if (!frame.extent) {
         let xa = nx, xb = -1, pext = 0;
-        const threshold = 0.05 * frame.amax;
+        const threshold = 0.05 * frame.amax / k;
         for (let ix = 0; ix < nx; ix++) {
             for (let ip = 0; ip < np; ip++) {
                 if (Math.abs(data[ix * np + ip]) > threshold) {
                     if (ix < xa) xa = ix;
                     if (ix > xb) xb = ix;
-                    pext = Math.max(pext, Math.abs(ip - np / 2));
+                    pext = Math.max(pext, Math.abs(lower_p + ip * cellP));
                 }
             }
         }
-        frame.extent = xb < 0 ? [0, nx, np / 2] : [xa, xb + 1, pext + 1];
+        frame.extent = xb < 0 ? null : [lower_x + xa * cellX, lower_x + (xb + 1) * cellX, pext + cellP];
     }
-    const st = panel.state;
-    st.xa = Math.min(st.xa ?? nx, frame.extent[0]);
-    st.xb = Math.max(st.xb ?? 0, frame.extent[1]);
-    st.pext = Math.max(st.pext ?? 0, frame.extent[2]);
-    const padX = Math.max(4, 0.25 * (st.xb - st.xa));
-    const ix0 = Math.max(0, Math.floor(st.xa - padX)), ix1 = Math.min(nx, Math.ceil(st.xb + padX));
-    const half = Math.min(np / 2, Math.ceil(Math.max(8, 1.3 * st.pext)));
-    const ip0 = np / 2 - half, ip1 = np / 2 + half;
+    const key = `${lower_x}|${upper_x}`;
+    let zoom = sharedZoom.get(key);
+    if (!zoom) sharedZoom.set(key, zoom = { xa: Infinity, xb: -Infinity, pext: 0 });
+    if (frame.extent) {
+        zoom.xa = Math.min(zoom.xa, frame.extent[0]);
+        zoom.xb = Math.max(zoom.xb, frame.extent[1]);
+        zoom.pext = Math.max(zoom.pext, frame.extent[2]);
+    }
+    let xa = lower_x, xb = upper_x, pa = lower_p, pb = upper_p;
+    if (zoom.xb > zoom.xa) {
+        const padX = Math.max(4 * cellX, 0.25 * (zoom.xb - zoom.xa));
+        xa = Math.max(lower_x, zoom.xa - padX);
+        xb = Math.min(upper_x, zoom.xb + padX);
+        const half = Math.max(8 * cellP, 1.3 * zoom.pext);
+        pa = Math.max(lower_p, -half);
+        pb = Math.min(upper_p, half);
+    }
 
-    const cellX = (upper_x - lower_x) / nx, cellP = (upper_p - lower_p) / np;
-    const f = new Frame(ctx, w, h, lower_x + ix0 * cellX, lower_x + ix1 * cellX, lower_p + ip0 * cellP, lower_p + ip1 * cellP);
+    const f = new Frame(ctx, w, h, xa, xb, pa, pb);
     drawImage(f, nx, np, (ix, ip) => {
-        const v = data[ix * np + ip] / amax;
+        const v = data[ix * np + ip] * k / amax;
         // A mild gamma keeps weak interference fringes visible next to strong peaks
         const t = Math.pow(Math.min(1, Math.abs(v)), 0.6);
         return lerpRgb(theme.divMid, v < 0 ? theme.divNeg : theme.divPos, t);
-    }, [ix0, ix1, ip0, ip1]);
+    }, [(xa - lower_x) / cellX, (xb - lower_x) / cellX, (pa - lower_p) / cellP, (pb - lower_p) / cellP]);
     f.axes(theme, 'x', 'p', { grid: false });
 
     const legend = [frame.classical ? {
@@ -351,7 +366,7 @@ function renderWigner(ctx, w, h, panel, frame, theme) {
         label: `W(x, p): −${fmt(amax)} … 0 … +${fmt(amax)}`,
     }];
     if (!frame.classical) {
-        if (frame.wmin === undefined) frame.wmin = minOf(data);
+        if (frame.wmin === undefined) frame.wmin = minOf(data) * k;
         legend.push({ label: `most negative value: ${fmt(Math.min(0, frame.wmin))}` });
     }
 
@@ -361,7 +376,7 @@ function renderWigner(ctx, w, h, panel, frame, theme) {
             if (!f.inside(px, py)) return null;
             const ix = Math.max(0, Math.min(nx - 1, Math.floor((f.x(px) - lower_x) / (upper_x - lower_x) * nx)));
             const ip = Math.max(0, Math.min(np - 1, Math.floor((f.y(py) - lower_p) / (upper_p - lower_p) * np)));
-            return `x = ${fmt(f.x(px))}\np = ${fmt(f.y(py))}\nW = ${fmt(data[ix * np + ip])}`;
+            return `x = ${fmt(f.x(px))}\np = ${fmt(f.y(py))}\nW = ${fmt(data[ix * np + ip] * k)}`;
         },
     };
 }
@@ -393,10 +408,11 @@ function renderImage(ctx, w, h, panel, frame, theme) {
 /// Complex field psi(x, y): brightness is |psi|^2, hue is the phase
 function renderField(ctx, w, h, panel, frame, theme) {
     const { re, im, nx, ny, x0, x1, y0, y1, V } = frame;
+    const k2 = (frame.scale ?? 1) ** 2;  // 8 bit frames: psi = (re + i im) * scale
     if (frame.dmax === undefined) {
         let m = 0;
         for (let i = 0; i < re.length; i++) m = Math.max(m, re[i] * re[i] + im[i] * im[i]);
-        frame.dmax = m;
+        frame.dmax = m * k2;
     }
     // Brightness is relative to the current maximum (a spreading wave would fade to black
     // otherwise), but never amplified by more than a factor of 50
@@ -407,7 +423,7 @@ function renderField(ctx, w, h, panel, frame, theme) {
     const f = new Frame(ctx, w, h, x0, x1, y0, y1);
     drawImage(f, nx, ny, (ix, iy) => {
         const i = iy * nx + ix;
-        const d = (re[i] * re[i] + im[i] * im[i]) / dmax;
+        const d = (re[i] * re[i] + im[i] * im[i]) * k2 / dmax;
         const c = phaseRgb(Math.atan2(im[i], re[i]), Math.pow(Math.min(1, d), 0.45));
         if (V && vmax > vmin && V[i] > vmin + 0.5 * (vmax - vmin)) {
             // Walls
@@ -427,7 +443,7 @@ function renderField(ctx, w, h, panel, frame, theme) {
             const ix = Math.max(0, Math.min(nx - 1, Math.floor((f.x(px) - x0) / (x1 - x0) * nx)));
             const iy = Math.max(0, Math.min(ny - 1, Math.floor((f.y(py) - y0) / (y1 - y0) * ny)));
             const i = iy * nx + ix;
-            return `x = ${fmt(f.x(px))}\ny = ${fmt(f.y(py))}\n|ψ|² = ${fmt(re[i] * re[i] + im[i] * im[i])}\nphase = ${fmt(Math.atan2(im[i], re[i]) / Math.PI)} π`;
+            return `x = ${fmt(f.x(px))}\ny = ${fmt(f.y(py))}\n|ψ|² = ${fmt((re[i] * re[i] + im[i] * im[i]) * k2)}\nphase = ${fmt(Math.atan2(im[i], re[i]) / Math.PI)} π`;
         },
     };
 }
@@ -647,6 +663,11 @@ const RENDERERS = {
 };
 
 export const SQUARE_KINDS = new Set(['wigner', 'image', 'field']);
+
+/// Layout order: phase space and fields first, then curves over x, then time series
+export function kindRank(kind) {
+    return SQUARE_KINDS.has(kind) ? 0 : kind === 'scalar' ? 2 : 1;
+}
 
 export function render(canvas, panel, frameIndex, fraction, theme) {
     const dpr = window.devicePixelRatio || 1;

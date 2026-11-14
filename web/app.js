@@ -1,11 +1,12 @@
-import { render, readTheme, SQUARE_KINDS } from './plots.js';
+import { render, readTheme, resetSharedState, kindRank, SQUARE_KINDS } from './plots.js';
 
 const $ = id => document.getElementById(id);
 const el = {
     examples: $('examples'), title: $('title'), description: $('description'),
     code: $('code'), run: $('run'), stop: $('stop'), reset: $('reset'), status: $('status'),
     console: $('console'), toggleEditor: $('toggle-editor'),
-    transport: $('transport'), play: $('play'), slider: $('slider'), frameLabel: $('frame-label'), speed: $('speed'),
+    transport: $('transport'), play: $('play'), prev: $('prev'), next: $('next'), slider: $('slider'),
+    frameLabel: $('frame-label'), speed: $('speed'), loop: $('loop'),
     panels: $('panels'), tooltip: $('tooltip'), theme: $('theme'),
 };
 
@@ -99,6 +100,13 @@ function decode(b64) {
     return new Float32Array(bytes.buffer);
 }
 
+function decodeInt8(b64) {
+    const bin = atob(b64);
+    const values = new Int8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) values[i] = bin.charCodeAt(i);
+    return values;
+}
+
 const ARRAY_FIELDS = ['re', 'im', 'V', 'data', 't'];
 
 function addPlot(message) {
@@ -123,12 +131,12 @@ function addPlot(message) {
 
     const frame = { ...message, label };
     for (const key of ARRAY_FIELDS) if (typeof frame[key] === 'string') frame[key] = decode(frame[key]);
-    if (typeof frame.data_i8 === 'string') {
-        // 8 bit quantised: data = data_i8 * scale
-        const bin = atob(frame.data_i8);
-        frame.data = new Float32Array(bin.length);
-        for (let i = 0; i < bin.length; i++) frame.data[i] = ((bin.charCodeAt(i) << 24) >> 24) * frame.scale;
-        delete frame.data_i8;
+    // 8 bit quantised frames stay compact in memory, the renderers multiply by frame.scale
+    for (const key of ['data', 're', 'im']) {
+        if (typeof frame[key + '_i8'] === 'string') {
+            frame[key] = decodeInt8(frame[key + '_i8']);
+            delete frame[key + '_i8'];
+        }
     }
     if (frame.series) frame.series = frame.series.map(s => ({ name: s.name, y: decode(s.y) }));
     if (frame.paths) frame.paths = frame.paths.map(decode);
@@ -157,6 +165,8 @@ async function run() {
 
     // Reset
     state.panels.clear();
+    resetSharedState();
+    visible.clear();
     el.panels.textContent = '';
     el.console.textContent = '';
     el.console.hidden = true;
@@ -272,8 +282,12 @@ function tick(now) {
         const interval = 1000 / Number(el.speed.value);
         if (now - lastTick >= interval) {
             lastTick = now;
-            state.position = (state.position + 1) % total;
-            state.dirty = true;
+            if (state.position >= total - 1 && !el.loop.checked) {
+                setPlaying(false);
+            } else {
+                state.position = (state.position + 1) % total;
+                state.dirty = true;
+            }
         }
     }
     if (state.follow && state.running && total > 0 && state.position !== total - 1) {
@@ -308,8 +322,19 @@ function draw() {
     el.frameLabel.textContent = label || `${state.position + 1} / ${total}`;
 }
 
+// Only panels on screen are drawn: a dozen heatmaps per tick would otherwise stall playback
+const visible = new Set();
+const observer = new IntersectionObserver(entries => {
+    for (const entry of entries) {
+        if (entry.isIntersecting) visible.add(entry.target); else visible.delete(entry.target);
+    }
+    state.dirty = true;
+}, { rootMargin: '200px' });
+
 function drawPanel(panel, index, fraction) {
     if (!panel.frames.length) return;
+    if (!visible.has(panel.card.card) && panel.drawnOnce && !state.drawAll) return;
+    panel.drawnOnce = true;
     const result = render(panel.card.canvas, panel, Math.max(0, index), fraction, state.theme);
     panel.hover = result.hover;
 
@@ -335,16 +360,29 @@ function drawPanel(panel, index, fraction) {
 function createCard(panel) {
     const card = document.createElement('article');
     card.className = 'card' + (SQUARE_KINDS.has(panel.kind) ? ' square' : '');
+    card.style.order = kindRank(panel.kind);
+    const header = document.createElement('header');
     const heading = document.createElement('h3');
     heading.textContent = panel.title;
+    const expand = document.createElement('button');
+    expand.className = 'ghost expand';
+    expand.title = 'Enlarge / shrink this panel';
+    expand.setAttribute('aria-label', 'Enlarge or shrink ' + panel.title);
+    expand.textContent = '\u2922';
+    expand.addEventListener('click', () => {
+        card.classList.toggle('expanded');
+        state.dirty = true;
+    });
+    header.append(heading, expand);
     const canvas = document.createElement('canvas');
     canvas.setAttribute('role', 'img');
     canvas.setAttribute('aria-label', panel.title);
     const legend = document.createElement('div');
     legend.className = 'legend';
-    card.append(heading, canvas, legend);
+    card.append(header, canvas, legend);
     el.panels.append(card);
     panel.card = { card, canvas, legend };
+    observer.observe(card);
 
     canvas.addEventListener('mousemove', event => {
         const rect = canvas.getBoundingClientRect();
@@ -382,14 +420,28 @@ el.code.addEventListener('keydown', event => {
         el.code.dispatchEvent(new Event('input'));
     }
 });
+function showEditor(show) {
+    el.code.hidden = !show;
+    el.toggleEditor.textContent = show ? 'Hide script' : 'Show script';
+}
 el.toggleEditor.addEventListener('click', () => {
-    el.code.hidden = !el.code.hidden;
-    el.toggleEditor.textContent = el.code.hidden ? 'Show script' : 'Hide script';
+    showEditor(el.code.hidden);
+    storage.set('editor', el.code.hidden ? '0' : '1');
 });
 el.play.addEventListener('click', () => {
     if (!state.playing && state.position >= maxFrames() - 1) state.position = 0;
     setPlaying(!state.playing);
 });
+function stepFrame(delta) {
+    setPlaying(false);
+    state.follow = false;
+    state.position += delta;
+    state.dirty = true;
+}
+el.prev.addEventListener('click', () => stepFrame(-1));
+el.next.addEventListener('click', () => stepFrame(+1));
+el.speed.addEventListener('change', () => storage.set('fps', el.speed.value));
+el.loop.addEventListener('change', () => storage.set('loop', el.loop.checked ? '1' : '0'));
 el.slider.addEventListener('input', () => {
     state.position = Number(el.slider.value);
     state.follow = false;
@@ -412,10 +464,7 @@ document.addEventListener('keydown', event => {
         event.preventDefault();
         el.play.click();
     } else if ((event.key === 'ArrowLeft' || event.key === 'ArrowRight') && !['TEXTAREA', 'INPUT', 'SELECT'].includes(document.activeElement?.tagName)) {
-        setPlaying(false);
-        state.follow = false;
-        state.position += event.key === 'ArrowLeft' ? -1 : 1;
-        state.dirty = true;
+        stepFrame(event.key === 'ArrowLeft' ? -1 : 1);
     }
 });
 window.addEventListener('resize', () => { state.dirty = true; });
@@ -424,6 +473,10 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () 
     for (const panel of state.panels.values()) panel.legendKey = null;
     state.dirty = true;
 });
+
+if (storage.get('editor') === '0') showEditor(false);
+if ([...el.speed.options].some(o => o.value === storage.get('fps'))) el.speed.value = storage.get('fps');
+if (storage.get('loop') === '0') el.loop.checked = false;
 
 const savedTheme = storage.get('theme');
 if (savedTheme) {
@@ -436,4 +489,4 @@ loadExamples();
 
 // For debugging from the browser console (and automated checks in background tabs,
 // where requestAnimationFrame does not fire)
-window.onedse = { state, draw, maxFrames };
+window.onedse = { state, draw, maxFrames, drawAll() { state.drawAll = true; draw(); state.drawAll = false; } };

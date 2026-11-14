@@ -28,7 +28,7 @@ end)
 local pointer = g1:gaussian(0, 0, 1/math.sqrt(2))
 local psi = g:product(system, pointer)
 
-local frames, t_final = 120, 4*math.pi
+local frames, t_final = 300, 4*math.pi
 for i = 0, frames do
     local t = i*t_final/frames
     local label = string.format("t = %.2f", t)

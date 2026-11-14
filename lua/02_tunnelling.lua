@@ -29,7 +29,7 @@ local psi = g:gaussian(-a, 0, sigma_x)
 local ensemble = classical_ensemble(30000, -a, 0, sigma_x, 1/(2*sigma_x), 1)
 print(string.format("Energy of the packet: %.4f", sys:energy(psi)))
 
-local frames = 100
+local frames = 240
 local t_final = 2*T
 for i = 0, frames do
     local t = i*t_final/frames

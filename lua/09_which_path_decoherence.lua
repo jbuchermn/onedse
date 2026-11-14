@@ -29,7 +29,7 @@ end)
 local probe = g1:gaussian(-12, p_probe, 1.5)
 local psi = g:product(cat, probe)
 
-local frames, t_final = 60, 7
+local frames, t_final = 140, 7
 for i = 0, frames do
     local t = i*t_final/frames
     local label = string.format("t = %.2f", t)

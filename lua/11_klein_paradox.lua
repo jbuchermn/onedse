@@ -10,7 +10,7 @@ print(string.format("E = %.3f: reflection for %.2f < V0 < %.2f, Klein tunnelling
 
 local g = grid(-50, 50, 2048)
 
-local frames, t_final = 80, 32
+local frames, t_final = 200, 32
 for _, V0 in ipairs({ 2.2, 5.0 }) do
     local dirac = g:dirac()
     dirac:set_potential(function(x) return 0.5*V0*(1 + math.tanh(x/0.3)) end)

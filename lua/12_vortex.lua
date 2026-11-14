@@ -28,7 +28,7 @@ end)
 psi = g:multiply(ground, psi)
 sys:relax(psi, 0.002, 40)
 
-local frames, t_final = 90, 9
+local frames, t_final = 225, 9
 for i = 0, frames do
     local t = i*t_final/frames
     plot:field(psi, "Condensate wave function" .. string.format("/t = %.2f", t))

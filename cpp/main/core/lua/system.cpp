@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <iostream>
 #include <utility>
 #include <vector>
@@ -820,8 +821,24 @@ namespace core::lua{
 
         json plot = { {"type", "plot"}, {"kind", "field"}, {"title", title},
                       {"x0", gx.lower}, {"x1", gx.upper}, {"y0", gy.lower}, {"y1", gy.upper},
-                      {"nx", (gx.size + sx - 1)/sx}, {"ny", (gy.size + sy - 1)/sy},
-                      {"re", encode_f32(re)}, {"im", encode_f32(im)} };
+                      {"nx", (gx.size + sx - 1)/sx}, {"ny", (gy.size + sy - 1)/sy} };
+        if(re.size() <= 128*128){
+            plot["re"] = encode_f32(re);
+            plot["im"] = encode_f32(im);
+        }else{
+            // Large frames are quantised to 8 bit: psi = (re_i8 + i im_i8) * scale
+            float amax = 0.f;
+            for(size_t i=0; i<re.size(); i++) amax = std::max({amax, std::abs(re[i]), std::abs(im[i])});
+            float scale = amax>0.f ? amax/127.f : 1.f;
+            std::vector<unsigned char> qre(re.size()), qim(im.size());
+            for(size_t i=0; i<re.size(); i++){
+                qre[i] = static_cast<unsigned char>(static_cast<signed char>(std::lround(re[i]/scale)));
+                qim[i] = static_cast<unsigned char>(static_cast<signed char>(std::lround(im[i]/scale)));
+            }
+            plot["re_i8"] = core::utility::base64(qre.data(), qre.size());
+            plot["im_i8"] = core::utility::base64(qim.data(), qim.size());
+            plot["scale"] = scale;
+        }
         if(system) plot["V"] = encode_f32(V);
 
         emit(std::move(plot));

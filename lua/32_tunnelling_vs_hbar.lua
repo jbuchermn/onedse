@@ -11,7 +11,7 @@ local function V(x)
 end
 local omega = math.sqrt(8*h)/a           -- frequency at the bottom of the wells
 
-local frames, t_final, dt = 120, 90, 0.01
+local frames, t_final, dt = 300, 90, 0.01
 
 for _, hbar in ipairs({ 1, 0.75, 0.5 }) do
     local g = grid_hbar(-6, 6, 512, hbar)

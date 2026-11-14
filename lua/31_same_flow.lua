@@ -15,7 +15,7 @@ local potentials = {
     { name = "anharmonic", V = function(x) return x*x/4 + x^4/32 end },
 }
 
-local frames, t_final, dt = 90, 9, 0.005
+local frames, t_final, dt = 225, 9, 0.005
 for _, potential in ipairs(potentials) do
     local sys = g:schroedinger()
     sys:set_potential(potential.V)

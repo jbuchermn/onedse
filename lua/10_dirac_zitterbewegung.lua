@@ -19,7 +19,7 @@ print(string.format("Positive energy fraction: %.3f (mixed), %.3f (projected)",
     dirac:positive_energy_fraction(mixed), dirac:positive_energy_fraction(positive)))
 print(string.format("Expected velocity p/E = %.3f", p0/math.sqrt(1 + p0*p0)))
 
-local frames, t_final = 150, 15
+local frames, t_final = 300, 15
 for i = 0, frames do
     local t = i*t_final/frames
     local label = string.format("t = %.2f", t)

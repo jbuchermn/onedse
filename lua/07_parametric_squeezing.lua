@@ -12,7 +12,7 @@ sys:set_potential_td(function(x, t) return 0.5*(1 + eps*math.sin(2*t))*x*x end)
 
 local psi = g:gaussian(0, 0, 1/math.sqrt(2))
 
-local frames, t_final = 150, 24
+local frames, t_final = 300, 24
 for i = 0, frames do
     local t = i*t_final/frames
     local label = string.format("t = %.2f", t)

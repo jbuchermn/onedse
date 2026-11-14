@@ -25,13 +25,13 @@ local psi = g:product(packet_x, packet_y)
 local screen_x = 10
 local screen = spacetime(256)
 
-local frames, t_final = 60, 5.4
+local frames, t_final = 135, 5.4
 for i = 0, frames do
     local t = i*t_final/frames
     local label = string.format("t = %.2f", t)
     plot:wave2d(sys, psi, "Wave function/" .. label)
     screen:add(psi:slice_x(screen_x), t)
-    if i == 42 then
+    if i == 95 then
         plot:wavefunction(psi:slice_x(screen_x), string.format("Cut along the screen at x = %d, t = %.2f", screen_x, t), 0)
     end
     plot:scalar("Probability", t, "behind the wall", psi:probability(0.5, 20, -20, 20))

@@ -16,7 +16,7 @@ local bohm = psi:bohmian(48, 0)
 
 plot:momentum(psi, "Momentum distribution/before", 5)
 
-local dt, t_final, frames = 0.01, 16, 80
+local dt, t_final, frames = 0.01, 16, 160
 local steps_per_frame = math.floor(t_final/dt/frames + 0.5)
 local t = 0
 for i = 0, frames do

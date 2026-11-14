@@ -13,10 +13,12 @@ local x0 = 3.5
 local p_window = 6                       -- classically |p| < 4.4 at this energy
 local resolution = 0.3                   -- of the "apparatus", in x and in p
 
-local frames, t_final, dt = 80, 16, 0.004
+local frames, t_final, dt = 160, 16, 0.004
 
 for _, hbar in ipairs({ 1, 0.2 }) do
     local g = grid_hbar(-8, 8, 640, hbar)
+    -- Phase space cells: the finer structures of small hbar need more of them
+    local points = hbar < 0.5 and 320 or 160
     local sys = g:schroedinger()
     sys:set_potential(V)
 
@@ -31,15 +33,15 @@ for _, hbar in ipairs({ 1, 0.2 }) do
         local t = i*t_final/frames
         local label = string.format("t = %.1f", t)
 
-        plot:wigner_p(psi, "Quantum, " .. name .. "/" .. label, 320, p_window)
-        plot:ensemble_p(ensemble, sys, "Classical, " .. name .. "/" .. label, 320, p_window)
+        plot:wigner_p(psi, "Quantum, " .. name .. "/" .. label, points, p_window)
+        plot:ensemble_p(ensemble, sys, "Classical, " .. name .. "/" .. label, points, p_window)
         plot:scalar("Mean position, " .. name, t, "quantum", psi:expect_x())
         plot:scalar("Mean position, " .. name, t, "classical", ensemble:expect_x())
-        plot:wigner_smooth(psi, "Quantum at finite resolution, " .. name .. "/" .. label, 320, p_window, resolution, resolution)
-        plot:ensemble_smooth(ensemble, sys, "Classical at finite resolution, " .. name .. "/" .. label, 320, p_window, resolution, resolution)
-        plot:scalar("Negativity of the Wigner function", t, name, psi:negativity(320))
-        plot:scalar("Negativity left at finite resolution", t, name, psi:negativity_smoothed(320, resolution, resolution))
-        plot:scalar("Quantum - classical distance at finite resolution", t, name, ensemble:distance_smoothed(psi, 320, resolution, resolution))
+        plot:wigner_smooth(psi, "Quantum at finite resolution, " .. name .. "/" .. label, points, p_window, resolution, resolution)
+        plot:ensemble_smooth(ensemble, sys, "Classical at finite resolution, " .. name .. "/" .. label, points, p_window, resolution, resolution)
+        plot:scalar("Negativity of the Wigner function", t, name, psi:negativity(points))
+        plot:scalar("Negativity left at finite resolution", t, name, psi:negativity_smoothed(points, resolution, resolution))
+        plot:scalar("Quantum - classical distance at finite resolution", t, name, ensemble:distance_smoothed(psi, points, resolution, resolution))
 
         if i < frames then
             sys:propagate(psi, t, t + t_final/frames, dt)

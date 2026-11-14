@@ -27,6 +27,10 @@ nix run github:jbuchermn/onedse          # or, in a checkout: nix run
 Open <http://localhost:8080>, pick an example on the left, edit the script, press
 <kbd>Ctrl/Cmd</kbd>+<kbd>Enter</kbd>. Results stream in while the script is still running.
 
+Playback: <kbd>Space</kbd> plays and pauses, <kbd>←</kbd> <kbd>→</kbd> step through single
+frames, the speed is set in frames per second. All panels share one timeline; panels that
+show the same region of phase space zoom together, and every panel can be enlarged.
+
 ```sh
 nix run .#script -- lua/02_tunnelling.lua --plot   # headless: data.json + PNGs via matplotlib
 nix flake check                                     # unit tests + every example, in the sandbox

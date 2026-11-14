@@ -12,7 +12,7 @@ local kappa = 0.04                       -- measurement strength
 local runs = 300
 local seed = 1
 
-local g = grid(-14, 14, 256)
+local g = grid(-14, 14, 128)
 local sys = g:schroedinger()
 sys:set_mass(20)                         -- heavy: hardly moves on its own
 
@@ -23,7 +23,7 @@ local function cat()
     end)
 end
 
-local frames, t_final, dt = 50, 5, 0.01
+local frames, t_final, dt = 125, 5, 0.01
 local steps = math.floor(t_final/frames/dt + 0.5)
 
 -- The ensemble average, one density matrix per frame

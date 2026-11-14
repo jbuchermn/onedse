@@ -22,16 +22,14 @@ local T = 4*L*L/math.pi
 local carpet = spacetime(256)
 print(string.format("Revival time T = %.2f", T))
 
-local frames, dt = 240, 0.002
+local frames, dt = 320, 0.002
 for i = 0, frames do
     local t = i*T/frames
     local label = string.format("t = %.3f T", t/T)
 
     carpet:add(psi, t/T)
-    if i % 2 == 0 then
-        plot:wave(sys, psi, "Wave function/" .. label)
-        plot:wigner(psi, "Wigner function/" .. label, 256)
-    end
+    plot:wave(sys, psi, "Wave function/" .. label)
+    plot:wigner(psi, "Wigner function/" .. label, 256)
     local overlap = psi0:dot(psi)
     plot:scalar("Autocorrelation |<psi(0)|psi(t)>|^2", t/T, "fidelity", overlap:get_re()^2 + overlap:get_im()^2)
 

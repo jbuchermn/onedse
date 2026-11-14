@@ -37,16 +37,21 @@
             </section>
 
             <section class="transport" id="transport" hidden>
-                <button id="play" title="Space">Play</button>
+                <button id="play" title="Play / pause (Space)">Play</button>
+                <button id="prev" class="ghost step" title="Previous frame (Left arrow)" aria-label="Previous frame">&#9664;</button>
+                <button id="next" class="ghost step" title="Next frame (Right arrow)" aria-label="Next frame">&#9654;</button>
                 <input id="slider" type="range" min="0" max="0" value="0" step="1" aria-label="Frame">
                 <span id="frame-label"></span>
                 <label>Speed
-                    <select id="speed">
-                        <option value="8">slow</option>
-                        <option value="20" selected>normal</option>
-                        <option value="45">fast</option>
+                    <select id="speed" title="Frames per second">
+                        <option value="3">3 fps</option>
+                        <option value="6">6 fps</option>
+                        <option value="12" selected>12 fps</option>
+                        <option value="24">24 fps</option>
+                        <option value="48">48 fps</option>
                     </select>
                 </label>
+                <label class="check" title="Start over when the end is reached"><input id="loop" type="checkbox" checked> Loop</label>
             </section>
 
             <section id="panels" class="panels"></section>

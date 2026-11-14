@@ -164,7 +164,7 @@ Arrays are base64 encoded little-endian float32.
 | `wavefunction` | `lower`, `upper`, `re`, `im`, optional `V`, `space: "p"` |
 | `wigner` | `lower_x`, `upper_x`, `lower_p`, `upper_p`, `nx`, `np`, `data[ix*np + ip]`, optional `classical`. Frames larger than 128² come as `data_i8` (base64 int8) and `scale` instead of `data` |
 | `image` | `x0`, `x1`, `y0`, `y1`, `nx`, `ny`, `data[iy*nx + ix]`, `xlabel`, `ylabel` |
-| `field` | like `image` with `re`, `im`, optional `V` |
+| `field` | like `image` with `re`, `im`, optional `V`. Frames larger than 128² come as `re_i8`, `im_i8` and `scale` |
 | `curves` | `lower`, `upper`, `series: [{name, y}]`, optional `V` |
 | `scalar` | `t`, `name`, `value` |
 | `paths` | `t`, `paths: [..]` |

@@ -13,7 +13,7 @@ sys:set_potential(function(x) return 0.5*x*x end)
 local psi = g:gaussian(4, 0, squeeze*sigma0)
 
 local T = 2*math.pi
-local frames = 96
+local frames = 192
 for i = 0, frames do
     local t = i*T/frames
     local label = string.format("t = %.2f", t)

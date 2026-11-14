@@ -77,7 +77,11 @@ def draw_image(ax, frame):
 
 def draw_field(ax, frame):
     shape = (frame["ny"], frame["nx"])
-    psi = decode(frame["re"]).reshape(shape) + 1j*decode(frame["im"]).reshape(shape)
+    if "re_i8" in frame:
+        re, im = (np.frombuffer(base64.b64decode(frame[k]), dtype=np.int8)*frame["scale"] for k in ("re_i8", "im_i8"))
+    else:
+        re, im = decode(frame["re"]), decode(frame["im"])
+    psi = re.reshape(shape) + 1j*im.reshape(shape)
     density = np.abs(psi)**2
     # Hue: phase, brightness: density
     hsv = np.stack([(np.angle(psi)/(2*np.pi)) % 1, np.full(shape, 0.85), (density/max(density.max(), 1e-30))**0.45], axis=-1)

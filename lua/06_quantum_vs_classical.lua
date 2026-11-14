@@ -12,7 +12,7 @@ local x0, sigma = 4, 0.6
 local psi = g:gaussian(x0, 0, sigma)
 local ensemble = classical_ensemble(60000, x0, 0, sigma, 1/(2*sigma), 7)
 
-local frames, t_final = 120, 24
+local frames, t_final = 300, 24
 for i = 0, frames do
     local t = i*t_final/frames
     local label = string.format("t = %.1f", t)
