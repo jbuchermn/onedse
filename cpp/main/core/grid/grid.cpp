@@ -14,6 +14,12 @@ namespace core::grid{
     namespace{
         const std::complex<double> I(0., 1.);
 
+        /// from_correlation works in (x, k); convert to (x, p = hbar k) keeping \int W dx dp = 1
+        WignerFunction with_hbar(const WignerFunction& w, double hbar){
+            if(hbar==1.) return w;
+            return WignerFunction{w.get_lower_x(), w.get_upper_x(), hbar*w.get_lower_p(), hbar*w.get_upper_p(), w.matrix/hbar};
+        }
+
         /// Smallest stride >= size/points that divides size
         int stride_for(int size, int points){
             int stride = std::max(1, size/std::max(points, 1));
@@ -22,10 +28,43 @@ namespace core::grid{
         }
     }
 
+    WignerFunction smooth(const WignerFunction& w, double sigma_x, double sigma_p){
+        int nx = w.matrix.rows(), np = w.matrix.cols();
+        double cell_x = (w.get_upper_x()-w.get_lower_x())/nx;
+        double cell_p = (w.get_upper_p()-w.get_lower_p())/np;
+
+        auto kernel = [](double sigma, double cell){
+            int half = std::max(0, int(std::ceil(4.*sigma/cell)));
+            Eigen::VectorXd k(2*half+1);
+            for(int i=-half; i<=half; i++) k(i+half) = sigma>0. ? std::exp(-.5*std::pow(i*cell/sigma, 2.)) : 1.;
+            return Eigen::VectorXd(k/k.sum());
+        };
+        Eigen::VectorXd kx = kernel(sigma_x, cell_x), kp = kernel(sigma_p, cell_p);
+        int hx = kx.size()/2, hp = kp.size()/2;
+
+        // Separable convolution, zero outside
+        Eigen::MatrixXd tmp = Eigen::MatrixXd::Zero(nx, np);
+        for(int i=0; i<nx; i++){
+            for(int a=-hx; a<=hx; a++){
+                if(i+a<0 || i+a>=nx) continue;
+                tmp.row(i) += kx(a+hx)*w.matrix.row(i+a);
+            }
+        }
+        Eigen::MatrixXd result = Eigen::MatrixXd::Zero(nx, np);
+        for(int j=0; j<np; j++){
+            for(int b=-hp; b<=hp; b++){
+                if(j+b<0 || j+b>=np) continue;
+                result.col(j) += kp(b+hp)*tmp.col(j+b);
+            }
+        }
+        return WignerFunction{w.get_lower_x(), w.get_upper_x(), w.get_lower_p(), w.get_upper_p(), result};
+    }
+
     /*
      * Grid
      */
-    Grid::Grid(double lower_, double upper_, int size_): lower(lower_), upper(upper_), size(size_){
+    Grid::Grid(double lower_, double upper_, int size_, double hbar_): lower(lower_), upper(upper_), size(size_), hbar(hbar_){
+        if(!(hbar>0.)) throw std::invalid_argument("Grid: hbar must be positive");
         if(size<2) throw std::invalid_argument("Grid: need at least two points");
         if(!(upper>lower)) throw std::invalid_argument("Grid: upper bound must be larger than lower bound");
     }
@@ -53,7 +92,7 @@ namespace core::grid{
 
     GridWaveFunction GridWaveFunction::gaussian(std::shared_ptr<const Grid> grid, double x0, double p0, double sigma){
         return GridWaveFunction(grid, [=](double x){
-            return std::exp(-(x-x0)*(x-x0)/(4.*sigma*sigma) + I*p0*(x-x0));
+            return std::exp(-(x-x0)*(x-x0)/(4.*sigma*sigma) + I*p0*(x-x0)/grid->hbar);
         });
     }
 
@@ -92,7 +131,7 @@ namespace core::grid{
         fft_1d(phi.data(), grid->size, -1);
         double res = 0.;
         for(int i=0; i<grid->size; i++) res += grid->k(i) * std::norm(phi(i));
-        return res / phi.abs2().sum();
+        return grid->hbar * res / phi.abs2().sum();
     }
 
     double GridWaveFunction::sigma_p() const{
@@ -104,7 +143,7 @@ namespace core::grid{
         mean /= total;
         double res = 0.;
         for(int i=0; i<grid->size; i++) res += std::pow(grid->k(i) - mean, 2.) * std::norm(phi(i));
-        return std::sqrt(res / total);
+        return grid->hbar * std::sqrt(res / total);
     }
 
     double GridWaveFunction::probability(double a, double b) const{
@@ -126,15 +165,27 @@ namespace core::grid{
         int first_negative = (n+1)/2;
         for(int j=0; j<n; j++){
             int i = (first_negative + j) % n;
-            p(j) = grid->k(i);
-            phi(j) = tmp(i) * std::exp(-I*p(j)*grid->lower) * grid->dx() / std::sqrt(2.*M_PI);
+            p(j) = grid->hbar*grid->k(i);
+            phi(j) = tmp(i) * std::exp(-I*grid->k(i)*grid->lower) * grid->dx() / std::sqrt(2.*M_PI*grid->hbar);
         }
     }
 
     WignerFunction GridWaveFunction::wigner(int points) const{
         int stride = stride_for(grid->size, points);
-        return WignerFunction::from_correlation(grid->size/stride, grid->lower, grid->upper, false,
-                [this, stride](int a, int b){ return psi(a*stride)*std::conj(psi(b*stride)); });
+        return with_hbar(WignerFunction::from_correlation(grid->size/stride, grid->lower, grid->upper, false,
+                [this, stride](int a, int b){ return psi(a*stride)*std::conj(psi(b*stride)); }), grid->hbar);
+    }
+
+    double GridWaveFunction::negativity_smoothed(int points, double sigma_x, double sigma_p) const{
+        WignerFunction w = smooth(wigner(points), sigma_x, sigma_p);
+        double cell = (w.get_upper_x()-w.get_lower_x())*(w.get_upper_p()-w.get_lower_p())/w.matrix.size();
+        return w.matrix.cwiseAbs().sum()*cell - w.matrix.sum()*cell;
+    }
+
+    double GridWaveFunction::negativity(int points) const{
+        WignerFunction w = wigner(points);
+        double cell = (w.get_upper_x()-w.get_lower_x())*(w.get_upper_p()-w.get_lower_p())/w.matrix.size();
+        return w.matrix.cwiseAbs().sum()*cell - 1.;
     }
 
     /*
@@ -185,8 +236,8 @@ namespace core::grid{
 
     WignerFunction GridDensityMatrix::wigner(int points) const{
         int stride = stride_for(grid->size, points);
-        return WignerFunction::from_correlation(grid->size/stride, grid->lower, grid->upper, false,
-                [this, stride](int a, int b){ return rho(a*stride, b*stride); });
+        return with_hbar(WignerFunction::from_correlation(grid->size/stride, grid->lower, grid->upper, false,
+                [this, stride](int a, int b){ return rho(a*stride, b*stride); }), grid->hbar);
     }
 
     /*
@@ -233,7 +284,7 @@ namespace core::grid{
             kinetic_phase.resize(grid->size);
             for(int i=0; i<grid->size; i++){
                 double k = grid->k(i);
-                kinetic_phase(i) = std::exp(-I*dt*k*k/(2.*mass));
+                kinetic_phase(i) = std::exp(-I*dt*grid->hbar*k*k/(2.*mass));
             }
             kinetic_phase_dt = dt;
         }
@@ -241,12 +292,24 @@ namespace core::grid{
     }
 
     void Schroedinger1D::apply_potential(GridWaveFunction& psi, std::complex<double> dt) const{
+        std::complex<double> tau = dt/grid->hbar;
         if(nonlinearity != 0.){
-            psi.psi *= (-I*dt*(V + nonlinearity*psi.psi.abs2())).exp();
+            psi.psi *= (-I*tau*(V + nonlinearity*psi.psi.abs2())).exp();
         }else{
-            psi.psi *= (-I*dt*V).exp();
+            psi.psi *= (-I*tau*V).exp();
         }
         if(absorber.size()>0 && dt.imag()==0.) psi.psi *= (-dt.real()*absorber).exp();
+    }
+
+    void Schroedinger1D::kick(GridWaveFunction& psi, double tau) const{
+        psi.psi *= (-I*(tau/grid->hbar)*V).exp();
+    }
+
+    void Schroedinger1D::drift(GridWaveFunction& psi, double tau) const{
+        fft_1d(psi.psi.data(), grid->size, -1);
+        psi.psi *= get_kinetic_phase(tau);
+        fft_1d(psi.psi.data(), grid->size, +1);
+        psi.psi /= double(grid->size);
     }
 
     void Schroedinger1D::step_complex(GridWaveFunction& psi, double t, std::complex<double> dt){
@@ -290,7 +353,7 @@ namespace core::grid{
             double k = grid->k(i);
             res += k*k/(2.*mass) * std::norm(phi(i));
         }
-        return res * grid->dx() / grid->size;
+        return grid->hbar*grid->hbar * res * grid->dx() / grid->size;
     }
 
     double Schroedinger1D::potential_energy(const GridWaveFunction& psi) const{
@@ -314,7 +377,7 @@ namespace core::grid{
         for(int i=0; i<n; i++){
             double k = grid->k(i);
             // The Nyquist mode of even grids has no well defined sign of k, but k^2 is fine
-            t(i) = k*k/(2.*mass);
+            t(i) = grid->hbar*grid->hbar*k*k/(2.*mass);
         }
         fft_1d(t.data(), n, +1);
         t /= double(n);
@@ -362,7 +425,72 @@ namespace core::grid{
     /*
      * ClassicalEnsemble
      */
-    ClassicalEnsemble::ClassicalEnsemble(int n, double x0, double p0, double sigma_x, double sigma_p, int seed): x(n), p(n){
+    ClassicalEnsemble::ClassicalEnsemble(const WignerFunction& w, int n, int seed): x(n), p(n), weight(n){
+        int nx = w.matrix.rows(), np = w.matrix.cols();
+        double cell_x = (w.get_upper_x()-w.get_lower_x())/nx;
+        double cell_p = (w.get_upper_p()-w.get_lower_p())/np;
+
+        // Cumulative distribution of |W| over the cells
+        std::vector<double> cdf(nx*np);
+        double total = 0.;
+        for(int i=0; i<nx; i++){
+            for(int j=0; j<np; j++){
+                total += std::abs(w.matrix(i, j));
+                cdf[i*np + j] = total;
+            }
+        }
+        if(!(total>0.)) throw std::invalid_argument("Cannot sample from a vanishing Wigner function");
+
+        std::mt19937_64 rng(seed);
+        std::uniform_real_distribution<double> uniform(0., 1.);
+        double magnitude = total*cell_x*cell_p/n;
+        for(int k=0; k<n; k++){
+            int idx = int(std::lower_bound(cdf.begin(), cdf.end(), uniform(rng)*total) - cdf.begin());
+            idx = std::min(idx, nx*np-1);
+            int i = idx/np, j = idx%np;
+            // Cells are centred on the sample points
+            x(k) = w.get_lower_x() + (i - .5 + uniform(rng))*cell_x;
+            p(k) = w.get_lower_p() + (j - .5 + uniform(rng))*cell_p;
+            weight(k) = w.matrix(i, j)<0. ? -magnitude : magnitude;
+        }
+    }
+
+    void ClassicalEnsemble::kick(const Schroedinger1D& system, double tau){
+        for(int i=0; i<x.size(); i++) p(i) += tau*system.force(x(i));
+    }
+
+    void ClassicalEnsemble::drift(const Schroedinger1D& system, double tau){
+        for(int i=0; i<x.size(); i++) x(i) = system.grid->wrap(x(i) + tau*p(i)/system.mass);
+    }
+
+    WignerFunction ClassicalEnsemble::histogram_like(const WignerFunction& w) const{
+        int nx = w.matrix.rows(), np = w.matrix.cols();
+        double cell_x = (w.get_upper_x()-w.get_lower_x())/nx;
+        double cell_p = (w.get_upper_p()-w.get_lower_p())/np;
+
+        Eigen::MatrixXd matrix = Eigen::MatrixXd::Zero(nx, np);
+        for(int i=0; i<x.size(); i++){
+            int ix = int(std::lround((x(i)-w.get_lower_x())/cell_x));
+            int ip = int(std::lround((p(i)-w.get_lower_p())/cell_p));
+            if(ix>=0 && ix<nx && ip>=0 && ip<np) matrix(ix, ip) += weight(i)/(cell_x*cell_p);
+        }
+        return WignerFunction{w.get_lower_x(), w.get_upper_x(), w.get_lower_p(), w.get_upper_p(), matrix};
+    }
+
+    double ClassicalEnsemble::distance_smoothed(const WignerFunction& w, double sigma_x, double sigma_p) const{
+        WignerFunction a = smooth(histogram_like(w), sigma_x, sigma_p);
+        WignerFunction b = smooth(w, sigma_x, sigma_p);
+        double cell = (w.get_upper_x()-w.get_lower_x())*(w.get_upper_p()-w.get_lower_p())/w.matrix.size();
+        return .5*(a.matrix - b.matrix).cwiseAbs().sum()*cell;
+    }
+
+    double ClassicalEnsemble::distance(const WignerFunction& w) const{
+        WignerFunction h = histogram_like(w);
+        double cell = (w.get_upper_x()-w.get_lower_x())*(w.get_upper_p()-w.get_lower_p())/w.matrix.size();
+        return .5*(h.matrix - w.matrix).cwiseAbs().sum()*cell;
+    }
+
+    ClassicalEnsemble::ClassicalEnsemble(int n, double x0, double p0, double sigma_x, double sigma_p, int seed): x(n), p(n), weight(Eigen::ArrayXd::Constant(n, 1./n)){
         std::mt19937_64 rng(seed);
         std::normal_distribution<double> normal(0., 1.);
         for(int i=0; i<n; i++){
@@ -388,9 +516,9 @@ namespace core::grid{
     }
 
     double ClassicalEnsemble::probability(double a, double b) const{
-        int count = 0;
-        for(int i=0; i<x.size(); i++) if(x(i)>=a && x(i)<=b) count++;
-        return double(count)/x.size();
+        double res = 0.;
+        for(int i=0; i<x.size(); i++) if(x(i)>=a && x(i)<=b) res += weight(i);
+        return res;
     }
 
     double ClassicalEnsemble::energy(const Schroedinger1D& system) const{
@@ -400,30 +528,15 @@ namespace core::grid{
             double pos = (g.wrap(x(i)) - g.lower)/g.dx();
             int j = int(std::floor(pos)) % g.size;
             double frac = pos - std::floor(pos);
-            res += p(i)*p(i)/(2.*system.mass) + (1.-frac)*system.V(j) + frac*system.V((j+1)%g.size);
+            res += weight(i)*(p(i)*p(i)/(2.*system.mass) + (1.-frac)*system.V(j) + frac*system.V((j+1)%g.size));
         }
-        return res/x.size();
+        return res;
     }
 
     WignerFunction ClassicalEnsemble::histogram(const Grid& grid, int points) const{
         int m = grid.size/stride_for(grid.size, points);
-
-        double lower_x = grid.lower;
-        double upper_x = grid.upper;
-        double upper_p =  .5*M_PI/(upper_x-lower_x) * m;
-        double lower_p = -upper_p;
-        double bin_x = (upper_x-lower_x)/m;
-        double bin_p = (upper_p-lower_p)/m;
-
-        Eigen::MatrixXd matrix = Eigen::MatrixXd::Zero(m, m);
-        double weight = 1./(x.size()*bin_x*bin_p);
-        for(int i=0; i<x.size(); i++){
-            int ix = int(std::lround((x(i)-lower_x)/bin_x));
-            int ip = int(std::lround((p(i)-lower_p)/bin_p));
-            if(ix>=0 && ix<m && ip>=0 && ip<m) matrix(ix, ip) += weight;
-        }
-
-        return WignerFunction{lower_x, upper_x, lower_p, upper_p, matrix};
+        double upper_p = grid.hbar * .5*M_PI/(grid.upper-grid.lower) * m;
+        return histogram_like(WignerFunction{grid.lower, grid.upper, -upper_p, upper_p, Eigen::MatrixXd::Zero(m, m)});
     }
 
     /*
@@ -459,11 +572,11 @@ namespace core::grid{
         if(n%2==0) dpsi(n/2) = 0.;
         fft_1d(dpsi.data(), n, +1);
 
-        double v_max = g.k_max()/mass;
+        double v_max = g.p_max()/mass;
         Eigen::ArrayXd v(n);
         for(int i=0; i<n; i++){
             double density = std::norm(psi.psi(i));
-            v(i) = density>1.e-280 ? (std::conj(psi.psi(i))*dpsi(i)).imag()/density/mass : 0.;
+            v(i) = density>1.e-280 ? g.hbar*(std::conj(psi.psi(i))*dpsi(i)).imag()/density/mass : 0.;
             v(i) = std::max(-v_max, std::min(v_max, v(i)));
         }
 

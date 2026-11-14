@@ -52,7 +52,9 @@ namespace core::grid{
     }
 
 
-    Dirac1D::Dirac1D(std::shared_ptr<const Grid> grid_): grid(grid_), V(Eigen::ArrayXd::Zero(grid_->size)), absorber(0){}
+    Dirac1D::Dirac1D(std::shared_ptr<const Grid> grid_): grid(grid_), V(Eigen::ArrayXd::Zero(grid_->size)), absorber(0){
+        if(grid_->hbar!=1.) throw std::invalid_argument("Dirac1D supports hbar = 1 only");
+    }
 
     void Dirac1D::set_potential(std::function<double(double)> V_){
         for(int i=0; i<grid->size; i++) V(i) = V_(grid->x(i));

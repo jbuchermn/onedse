@@ -63,6 +63,11 @@ namespace core::lua{
         void plot_wave(std::shared_ptr<core::grid::Schroedinger1D> system, std::shared_ptr<core::grid::GridWaveFunction> wavefunction, std::string title);
         void plot_momentum(std::shared_ptr<core::grid::GridWaveFunction> wavefunction, std::string title, double p_max);
         void plot_wigner(AnyState state, std::string title, int points);
+        void plot_wigner_p(AnyState state, std::string title, int points, double p_max);
+        void plot_ensemble_p(std::shared_ptr<core::grid::ClassicalEnsemble> ensemble, std::shared_ptr<core::grid::Schroedinger1D> system, std::string title, int points, double p_max);
+        void plot_momentum_compare(std::shared_ptr<core::grid::GridWaveFunction> wavefunction, std::shared_ptr<core::grid::ClassicalEnsemble> ensemble, std::string title, double p_max, int bins);
+        void plot_wigner_smooth(std::shared_ptr<core::grid::GridWaveFunction> wavefunction, std::string title, int points, double p_max, double sigma_x, double sigma_p);
+        void plot_ensemble_smooth(std::shared_ptr<core::grid::ClassicalEnsemble> ensemble, std::shared_ptr<core::grid::Schroedinger1D> system, std::string title, int points, double p_max, double sigma_x, double sigma_p);
         void plot_ensemble(std::shared_ptr<core::grid::ClassicalEnsemble> ensemble, std::shared_ptr<core::grid::Schroedinger1D> system, std::string title, int points);
         void plot_density_matrix(std::shared_ptr<core::grid::GridDensityMatrix> rho, std::string title, int points);
         void plot_scalar(std::string title, double t, std::string name, double value);

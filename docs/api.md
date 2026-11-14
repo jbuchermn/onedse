@@ -10,8 +10,12 @@ become the frames of one animation. Without a `/` the plot is a single still.
 
 ```lua
 g = grid(lower, upper, n)          -- periodic, n points (powers of two are fastest)
-g:dx()  g:length()  g:k_max()
+g = grid_hbar(lower, upper, n, hbar)   -- the same with a different value of hbar (1D only)
+g:dx()  g:length()  g:k_max()  g:p_max()  g:hbar()
 ```
+
+With `grid_hbar` everything on that grid uses p = ħk: packets, expectation values, Wigner
+functions (axes in x and p, normalised to ∫W dx dp = 1), energies and propagation.
 
 ### Wave functions
 
@@ -25,6 +29,9 @@ g:dx()  g:length()  g:k_max()
 | `psi:dot(other)` | `<psi|other>`, complex |
 | `psi:copy()`, `psi:add(other)`, `psi:sub(other)`, `psi:mul(c)`, `psi:div(c)` | plus in-place `iadd`, `isub`, `imul`, `idiv` |
 | `psi:density_matrix()` | pure state as density matrix |
+| `psi:negativity(points)` | `∫|W| dx dp − 1`: 0 if the Wigner function could be a classical density |
+| `psi:negativity_smoothed(points, sx, sp)` | negativity left after coarse-graining with resolution `(sx, sp)` |
+| `psi:wigner_ensemble(n, points, seed)` | classical ensemble sampled from the Wigner function, negative regions as negative weights |
 | `psi:bohmian(n, t)` | `n` Bohmian trajectories starting at the quantiles of `|psi|²` |
 
 ### Schrödinger / Gross–Pitaevskii equation
@@ -40,6 +47,7 @@ g:dx()  g:length()  g:k_max()
 | `sys:set_nonlinearity(g)` | Gross–Pitaevskii |
 | `sys:set_absorber(width, strength)` | absorbing layer at both ends |
 | `sys:step(psi, t, dt)`, `sys:propagate(psi, t0, t1, dt)` | |
+| `sys:kick(psi, tau)`, `sys:drift(psi, tau)` | potential part / kinetic part only (kicked systems) |
 | `sys:relax(psi, dt, steps)` | imaginary time: converges to the ground state |
 | `sys:energy(psi)`, `sys:kinetic_energy(psi)`, `sys:potential_energy(psi)` | |
 | `sys:eigenstates(n)` | `{ {E0, psi0}, {E1, psi1}, .. }` by dense diagonalisation (≤ 4096 points) |
@@ -50,7 +58,10 @@ g:dx()  g:length()  g:k_max()
 |---|---|
 | `ens = classical_ensemble(n, x0, p0, sigma_x, sigma_p, seed)` | Gaussian cloud = Wigner function of a Gaussian packet if `sigma_p = 1/(2 sigma_x)` |
 | `ens:propagate(sys, t0, t1, dt)` | velocity Verlet in the potential of `sys` |
-| `ens:expect_x()`, `ens:expect_p()`, `ens:probability(a, b)`, `ens:energy(sys)` | |
+| `ens:kick(sys, tau)`, `ens:drift(sys, tau)` | counterparts of `sys:kick`, `sys:drift` |
+| `ens:expect_x()`, `ens:expect_p()`, `ens:expect_p2()`, `ens:probability(a, b)`, `ens:energy(sys)` | |
+| `ens:distance(psi, points)` | `½∫|W_classical − W_quantum| dx dp` |
+| `ens:distance_smoothed(psi, points, sx, sp)` | the same at finite resolution |
 | `bohm:advance(psi, mass, t, dt)` | call after every `sys:step` |
 | `st = spacetime(max_points)`, `st:add(psi, t)` | record `|psi(x)|²` over time |
 
@@ -124,6 +135,9 @@ basis = scaled_basis(orthogonal_legendre(n), lower, upper)  -- interval; also or
 | `plot:momentum(psi, title, p_max)` | momentum space |
 | `plot:wigner(state, title, points)` | density operator, grid wave function or grid density matrix |
 | `plot:ensemble(ens, sys, title, points)` | classical phase space density on the same grid as `plot:wigner` |
+| `plot:wigner_p(state, title, points, p_max)`, `plot:ensemble_p(ens, sys, title, points, p_max)` | only `|p| ≤ p_max` (much smaller frames for small ħ) |
+| `plot:wigner_smooth(psi, title, points, p_max, sx, sp)`, `plot:ensemble_smooth(ens, sys, ..)` | coarse-grained with a Gaussian of widths `(sx, sp)` |
+| `plot:momentum_compare(psi, ens, title, p_max, bins)` | quantum and classical momentum distribution in one plot |
 | `plot:density_matrix(rho, title, points)` | `|ρ(x, x')|` |
 | `plot:scalar(panel, t, name, value)` | time series; several names per panel share one axis |
 | `plot:levels(sys, n, title)` | energy level diagram with eigenfunctions |
@@ -148,7 +162,7 @@ Arrays are base64 encoded little-endian float32.
 | kind | fields |
 |---|---|
 | `wavefunction` | `lower`, `upper`, `re`, `im`, optional `V`, `space: "p"` |
-| `wigner` | `lower_x`, `upper_x`, `lower_p`, `upper_p`, `nx`, `np`, `data[ix*np + ip]`, optional `classical` |
+| `wigner` | `lower_x`, `upper_x`, `lower_p`, `upper_p`, `nx`, `np`, `data[ix*np + ip]`, optional `classical`. Frames larger than 128² come as `data_i8` (base64 int8) and `scale` instead of `data` |
 | `image` | `x0`, `x1`, `y0`, `y1`, `nx`, `ny`, `data[iy*nx + ix]`, `xlabel`, `ylabel` |
 | `field` | like `image` with `re`, `im`, optional `V` |
 | `curves` | `lower`, `upper`, `series: [{name, y}]`, optional `V` |

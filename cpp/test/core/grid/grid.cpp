@@ -291,3 +291,59 @@ TEST(position_measurement, unravels_the_master_equation){
     // Born rule: 3 sigma of the binomial distribution is 0.025
     EXPECT_NEAR(double(left)/runs, weight_left, .03);
 }
+
+TEST(hbar, harmonic_oscillator){
+    double hbar = .25;
+    auto g = std::make_shared<Grid>(-8., 8., 512, hbar);
+    auto sys = harmonic(g);
+
+    // E_n = hbar (n + 1/2), ground state width sqrt(hbar/2)
+    auto states = sys->eigenstates(5);
+    for(int n=0; n<5; n++) EXPECT_NEAR(states[n].first, hbar*(n + .5), 1.e-9);
+    EXPECT_NEAR(states[0].second->sigma_x(), std::sqrt(hbar/2.), 1.e-8);
+    EXPECT_NEAR(states[0].second->sigma_x()*states[0].second->sigma_p(), hbar/2., 1.e-8);
+
+    // Coherent state: classical motion, independent of hbar
+    auto psi = GridWaveFunction::gaussian(g, 3., 0., std::sqrt(hbar/2.));
+    EXPECT_NEAR(sys->energy(psi), 4.5 + hbar/2., 1.e-8);
+    sys->propagate(psi, 0., M_PI/2., 1.e-3);
+    EXPECT_NEAR(psi.expect_x(), 0., 1.e-5);
+    EXPECT_NEAR(psi.expect_p(), -3., 1.e-5);
+
+    // Wigner function in (x, p): normalised, centred at the classical phase space point, peak 1/(pi hbar)
+    WignerFunction w = psi.wigner(256);
+    EXPECT_NEAR(w.norm(), 1., 1.e-8);
+    EXPECT_NEAR(w.matrix.maxCoeff(), 1./(M_PI*hbar), 2.e-2/hbar);
+    EXPECT_NEAR(psi.negativity(256), 0., 1.e-6);
+
+    Eigen::ArrayXd p;
+    Eigen::ArrayXcd phi;
+    psi.momentum_space(p, phi);
+    EXPECT_NEAR(phi.abs2().sum()*(p(1)-p(0)), 1., 1.e-10);
+}
+
+TEST(classical_ensemble, sampled_from_wigner_function){
+    // In a harmonic potential the Wigner function follows the classical flow exactly -
+    // even for a cat state with its negative regions.
+    auto g = std::make_shared<Grid>(-12., 12., 256);
+    auto sys = harmonic(g);
+    GridWaveFunction psi(g, [](double x){ return std::exp(-std::pow(x-3., 2.)/2.) + std::exp(-std::pow(x+3., 2.)/2.); });
+    EXPECT_GT(psi.negativity(128), .3);
+
+    ClassicalEnsemble ensemble(psi.wigner(128), 400000, 3);
+    EXPECT_NEAR(ensemble.weight.sum(), 1., .01);
+    EXPECT_LT(ensemble.weight.minCoeff(), 0.);
+    double noise = ensemble.distance(psi.wigner(128));
+    EXPECT_LT(noise, .25);
+
+    sys->propagate(psi, 0., 1., 2.e-3);
+    ensemble.propagate(*sys, 0., 1., 2.e-3);
+    EXPECT_NEAR(ensemble.distance(psi.wigner(128)), noise, .05);
+
+    // ... but not in an anharmonic one
+    Schroedinger1D quartic(g);
+    quartic.set_potential([](double x){ return std::pow(x, 4.)/16.; });
+    quartic.propagate(psi, 0., 3., 2.e-3);
+    ensemble.propagate(quartic, 0., 3., 2.e-3);
+    EXPECT_GT(ensemble.distance(psi.wigner(128)), noise + .2);
+}

@@ -11,7 +11,7 @@ What started as a one-dimensional Schrödinger / Liouville–von Neumann solver 
 | **Closed systems** | coherent and squeezed states, tunnelling, scattering, revivals and quantum carpets, time-dependent Hamiltonians, eigenstates of arbitrary potentials |
 | **Open systems** | Lindblad master equations, decoherence of cat states, damped oscillators |
 | **Measurement and decoherence** | a pointer entangling with a superposition (exact, two particles) and the Born weights appearing in the reduced state; recoherence when the environment is a single degree of freedom; single runs of a continuous measurement collapsing while their average follows the Lindblad equation |
-| **Quantum vs. classical** | classical Liouville ensembles next to the Wigner function, Bohmian trajectories |
+| **Quantum vs. classical** | the same system evolved both ways, side by side in phase space; the classical limit with an adjustable ħ and finite resolution; classical flow of a Wigner function with its negative parts; tunnelling vs. ħ; the kicked rotor (chaos and dynamical localisation); Bohmian trajectories |
 | **Two dimensions** | double slit, quantised vortices |
 | **Beyond linear QM** | Gross–Pitaevskii equation (solitons, condensates) |
 | **Beyond non-relativistic QM** | Dirac equation in 1+1 dimensions (Zitterbewegung, Klein paradox) |
@@ -37,7 +37,7 @@ nix flake check                                     # unit tests + every example
 ```sh
 nix develop
 cmake -S cpp -B build && cmake --build build -j
-ctest --test-dir build --output-on-failure          # 55 unit tests, 20 example scripts
+ctest --test-dir build --output-on-failure          # 57 unit tests, 24 example scripts
 ./build/main/server/onedse_server                   # serves web/ and lua/ straight from the checkout
 ./build/main/script/onedse --check lua/03_scattering.lua
 ```
@@ -87,7 +87,7 @@ end
 ```
 
 Plots with the same panel name become frames of one animation; all panels share one
-timeline. Units are ħ = 1. The full API is in [docs/api.md](docs/api.md).
+timeline. Units are ħ = 1 unless a grid is created with `grid_hbar`. The full API is in [docs/api.md](docs/api.md).
 
 ## Notes
 

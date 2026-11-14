@@ -52,7 +52,11 @@ def draw_wavefunction(ax, frame):
 
 
 def draw_wigner(ax, frame):
-    w = decode(frame["data"]).reshape(frame["nx"], frame["np"]).T
+    if "data_i8" in frame:
+        data = np.frombuffer(base64.b64decode(frame["data_i8"]), dtype=np.int8)*frame["scale"]
+    else:
+        data = decode(frame["data"])
+    w = data.reshape(frame["nx"], frame["np"]).T
     limit = max(np.abs(w).max(), 1e-12)
     extent = [frame["lower_x"], frame["upper_x"], frame["lower_p"], frame["upper_p"]]
     # Diverging map with a neutral midpoint: negative values are the quantum signature

@@ -32,7 +32,8 @@ const storage = {
  * Examples
  */
 const GROUPS = [
-    [/^0[1-7]_|^13_/, 'One dimension'],
+    [/^0[1-57]_|^13_/, 'One dimension'],
+    [/^06_|^3\d_/, 'Classical versus quantum'],
     [/^08_|^12_/, 'Two dimensions'],
     [/^09_|^1[456]_|^22_/, 'Measurement and decoherence'],
     [/^1[01]_/, 'Relativistic'],
@@ -122,6 +123,13 @@ function addPlot(message) {
 
     const frame = { ...message, label };
     for (const key of ARRAY_FIELDS) if (typeof frame[key] === 'string') frame[key] = decode(frame[key]);
+    if (typeof frame.data_i8 === 'string') {
+        // 8 bit quantised: data = data_i8 * scale
+        const bin = atob(frame.data_i8);
+        frame.data = new Float32Array(bin.length);
+        for (let i = 0; i < bin.length; i++) frame.data[i] = ((bin.charCodeAt(i) << 24) >> 24) * frame.scale;
+        delete frame.data_i8;
+    }
     if (frame.series) frame.series = frame.series.map(s => ({ name: s.name, y: decode(s.y) }));
     if (frame.paths) frame.paths = frame.paths.map(decode);
     if (frame.states) frame.states = frame.states.map(decode);

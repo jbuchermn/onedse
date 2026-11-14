@@ -119,7 +119,9 @@ namespace core::grid{
      * Schroedinger2D
      */
     Schroedinger2D::Schroedinger2D(std::shared_ptr<const Grid2D> grid_):
-        grid(grid_), V(Eigen::ArrayXXd::Zero(grid_->x->size, grid_->y->size)), absorber(0, 0){}
+        grid(grid_), V(Eigen::ArrayXXd::Zero(grid_->x->size, grid_->y->size)), absorber(0, 0){
+        if(grid_->x->hbar!=1. || grid_->y->hbar!=1.) throw std::invalid_argument("Schroedinger2D supports hbar = 1 only");
+    }
 
     void Schroedinger2D::set_mass(double mass_x_, double mass_y_){
         if(!(mass_x_>0.) || !(mass_y_>0.)) throw std::invalid_argument("Mass must be positive");

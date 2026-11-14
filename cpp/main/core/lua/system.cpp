@@ -103,20 +103,45 @@ namespace{
         return res;
     }
 
-    void wigner_to_json(const WignerFunction& wigner, json& plot){
+    /// p_max > 0: only the rows with |p| <= p_max are sent
+    void wigner_to_json(const WignerFunction& wigner, json& plot, double p_max=0.){
+        int np = wigner.matrix.cols();
+        double cell_p = (wigner.get_upper_p() - wigner.get_lower_p())/np;
+        int j0 = 0, j1 = np;
+        if(p_max>0.){
+            j0 = std::max(0, int(std::floor((-p_max - wigner.get_lower_p())/cell_p)));
+            j1 = std::min(np, int(std::ceil((p_max - wigner.get_lower_p())/cell_p)) + 1);
+            if(j1<=j0){ j0 = 0; j1 = np; }
+        }
+
         plot["lower_x"] = wigner.get_lower_x();
         plot["upper_x"] = wigner.get_upper_x();
-        plot["lower_p"] = wigner.get_lower_p();
-        plot["upper_p"] = wigner.get_upper_p();
+        plot["lower_p"] = wigner.get_lower_p() + j0*cell_p;
+        plot["upper_p"] = wigner.get_lower_p() + j1*cell_p;
         plot["nx"] = wigner.matrix.rows();
-        plot["np"] = wigner.matrix.cols();
+        plot["np"] = j1 - j0;
 
-        std::vector<float> data;
-        data.reserve(wigner.matrix.size());
-        for(int i=0; i<wigner.matrix.rows(); i++){
-            for(int j=0; j<wigner.matrix.cols(); j++) data.push_back(float(wigner.matrix(i, j)));
+        size_t cells = wigner.matrix.rows()*(j1 - j0);
+        if(cells <= 128*128){
+            std::vector<float> data;
+            data.reserve(cells);
+            for(int i=0; i<wigner.matrix.rows(); i++){
+                for(int j=j0; j<j1; j++) data.push_back(float(wigner.matrix(i, j)));
+            }
+            plot["data"] = encode_f32(data);
+        }else{
+            // Large frames are quantised to 8 bit (data = data_i8 * scale): a quarter of the size,
+            // and more levels than a colour scale can show anyway
+            double amax = wigner.matrix.cwiseAbs().maxCoeff();
+            double scale = amax>0. ? amax/127. : 1.;
+            std::vector<unsigned char> data;
+            data.reserve(cells);
+            for(int i=0; i<wigner.matrix.rows(); i++){
+                for(int j=j0; j<j1; j++) data.push_back(static_cast<unsigned char>(static_cast<signed char>(std::lround(wigner.matrix(i, j)/scale))));
+            }
+            plot["data_i8"] = core::utility::base64(data.data(), data.size());
+            plot["scale"] = scale;
         }
-        plot["data"] = encode_f32(data);
     }
 }
 
@@ -302,6 +327,9 @@ namespace core::lua{
          * Grid
          */
         lua.writeFunction("grid", [](double lower, double upper, int size){ return std::make_shared<Grid>(lower, upper, size); });
+        lua.writeFunction("grid_hbar", [](double lower, double upper, int size, double hbar){ return std::make_shared<Grid>(lower, upper, size, hbar); });
+        lua.registerFunction<double (Grid::*)()>("hbar", [](Grid& self){ return self.hbar; });
+        lua.registerFunction("p_max", &Grid::p_max);
         lua.registerFunction("dx", &Grid::dx);
         lua.registerFunction("length", &Grid::length);
         lua.registerFunction("k_max", &Grid::k_max);
@@ -329,6 +357,10 @@ namespace core::lua{
         lua.registerFunction("sigma_x", &GridWaveFunction::sigma_x);
         lua.registerFunction("sigma_p", &GridWaveFunction::sigma_p);
         lua.registerFunction("probability", &GridWaveFunction::probability);
+        lua.registerFunction("negativity", &GridWaveFunction::negativity);
+        lua.registerFunction("negativity_smoothed", &GridWaveFunction::negativity_smoothed);
+        lua.registerFunction<std::shared_ptr<ClassicalEnsemble> (GridWaveFunction::*)(int, int, int)>("wigner_ensemble",
+                [](GridWaveFunction& self, int n, int points, int seed){ return std::make_shared<ClassicalEnsemble>(self.wigner(points), n, seed); });
         lua.registerFunction<complex (GridWaveFunction::*)(std::shared_ptr<GridWaveFunction>)>("dot",
                 [](GridWaveFunction& self, std::shared_ptr<GridWaveFunction> other){ return self.dot(*other); });
         lua.registerFunction<std::shared_ptr<GridWaveFunction> (GridWaveFunction::*)()>("copy",
@@ -375,6 +407,10 @@ namespace core::lua{
                 [](Schroedinger1D& self, std::shared_ptr<GridWaveFunction> psi, double t, double dt){ self.step(*psi, t, dt); });
         lua.registerFunction<void (Schroedinger1D::*)(std::shared_ptr<GridWaveFunction>, double, double, double)>("propagate",
                 [](Schroedinger1D& self, std::shared_ptr<GridWaveFunction> psi, double t_start, double t_final, double dt){ self.propagate(*psi, t_start, t_final, dt); });
+        lua.registerFunction<void (Schroedinger1D::*)(std::shared_ptr<GridWaveFunction>, double)>("kick",
+                [](Schroedinger1D& self, std::shared_ptr<GridWaveFunction> psi, double tau){ self.kick(*psi, tau); });
+        lua.registerFunction<void (Schroedinger1D::*)(std::shared_ptr<GridWaveFunction>, double)>("drift",
+                [](Schroedinger1D& self, std::shared_ptr<GridWaveFunction> psi, double tau){ self.drift(*psi, tau); });
         lua.registerFunction<void (Schroedinger1D::*)(std::shared_ptr<GridWaveFunction>, double, int)>("relax",
                 [](Schroedinger1D& self, std::shared_ptr<GridWaveFunction> psi, double dt, int steps){ self.relax(*psi, dt, steps); });
         lua.registerFunction<double (Schroedinger1D::*)(std::shared_ptr<GridWaveFunction>)>("energy",
@@ -403,6 +439,17 @@ namespace core::lua{
                 [](ClassicalEnsemble& self, std::shared_ptr<Schroedinger1D> system, double t_start, double t_final, double dt){
                     self.propagate(*system, t_start, t_final, dt);
                 });
+        lua.registerFunction<void (ClassicalEnsemble::*)(std::shared_ptr<Schroedinger1D>, double)>("kick",
+                [](ClassicalEnsemble& self, std::shared_ptr<Schroedinger1D> system, double tau){ self.kick(*system, tau); });
+        lua.registerFunction<void (ClassicalEnsemble::*)(std::shared_ptr<Schroedinger1D>, double)>("drift",
+                [](ClassicalEnsemble& self, std::shared_ptr<Schroedinger1D> system, double tau){ self.drift(*system, tau); });
+        lua.registerFunction<double (ClassicalEnsemble::*)(std::shared_ptr<GridWaveFunction>, int)>("distance",
+                [](ClassicalEnsemble& self, std::shared_ptr<GridWaveFunction> psi, int points){ return self.distance(psi->wigner(points)); });
+        lua.registerFunction<double (ClassicalEnsemble::*)(std::shared_ptr<GridWaveFunction>, int, double, double)>("distance_smoothed",
+                [](ClassicalEnsemble& self, std::shared_ptr<GridWaveFunction> psi, int points, double sigma_x, double sigma_p){
+                    return self.distance_smoothed(psi->wigner(points), sigma_x, sigma_p);
+                });
+        lua.registerFunction("expect_p2", &ClassicalEnsemble::expect_p2);
         lua.registerFunction("expect_x", &ClassicalEnsemble::expect_x);
         lua.registerFunction("expect_p", &ClassicalEnsemble::expect_p);
         lua.registerFunction("probability", &ClassicalEnsemble::probability);
@@ -510,6 +557,11 @@ namespace core::lua{
         lua.registerFunction("momentum", &System::plot_momentum);
         lua.registerFunction("wigner", &System::plot_wigner);
         lua.registerFunction("ensemble", &System::plot_ensemble);
+        lua.registerFunction("wigner_p", &System::plot_wigner_p);
+        lua.registerFunction("wigner_smooth", &System::plot_wigner_smooth);
+        lua.registerFunction("ensemble_smooth", &System::plot_ensemble_smooth);
+        lua.registerFunction("ensemble_p", &System::plot_ensemble_p);
+        lua.registerFunction("momentum_compare", &System::plot_momentum_compare);
         lua.registerFunction("density_matrix", &System::plot_density_matrix);
         lua.registerFunction("scalar", &System::plot_scalar);
         lua.registerFunction("levels", &System::plot_levels);
@@ -594,7 +646,7 @@ namespace core::lua{
         Eigen::ArrayXcd phi;
         wavefunction->momentum_space(p, phi);
 
-        if(!(p_max>0.)) p_max = wavefunction->grid->k_max();
+        if(!(p_max>0.)) p_max = wavefunction->grid->p_max();
         std::vector<float> re, im;
         double lower = 0., upper = 0.;
         bool first = true;
@@ -613,24 +665,75 @@ namespace core::lua{
     }
 
     void System::plot_wigner(AnyState state, std::string title, int points){
+        plot_wigner_p(state, title, points, 0.);
+    }
+
+    void System::plot_wigner_p(AnyState state, std::string title, int points, double p_max){
         json plot = { {"type", "plot"}, {"kind", "wigner"}, {"title", title} };
         if(points<2) points = 128;
 
         if(auto* rho = boost::get<std::shared_ptr<DensityOperator>>(&state)){
-            wigner_to_json(WignerFunction{ **rho, points }, plot);
+            wigner_to_json(WignerFunction{ **rho, points }, plot, p_max);
         }else if(auto* psi = boost::get<std::shared_ptr<GridWaveFunction>>(&state)){
-            wigner_to_json((*psi)->wigner(points), plot);
+            wigner_to_json((*psi)->wigner(points), plot, p_max);
         }else{
-            wigner_to_json(boost::get<std::shared_ptr<GridDensityMatrix>>(state)->wigner(points), plot);
+            wigner_to_json(boost::get<std::shared_ptr<GridDensityMatrix>>(state)->wigner(points), plot, p_max);
         }
 
         emit(std::move(plot));
     }
 
     void System::plot_ensemble(std::shared_ptr<ClassicalEnsemble> ensemble, std::shared_ptr<Schroedinger1D> system, std::string title, int points){
-        json plot = { {"type", "plot"}, {"kind", "wigner"}, {"title", title}, {"classical", true} };
+        plot_ensemble_p(ensemble, system, title, points, 0.);
+    }
+
+    void System::plot_ensemble_p(std::shared_ptr<ClassicalEnsemble> ensemble, std::shared_ptr<Schroedinger1D> system, std::string title, int points, double p_max){
+        json plot = { {"type", "plot"}, {"kind", "wigner"}, {"title", title} };
+        // Ensembles sampled from a Wigner function carry negative weights: show them on the signed scale
+        if(ensemble->weight.minCoeff()>=0.) plot["classical"] = true;
         if(points<2) points = 128;
-        wigner_to_json(ensemble->histogram(*system->grid, points), plot);
+        wigner_to_json(ensemble->histogram(*system->grid, points), plot, p_max);
+        emit(std::move(plot));
+    }
+
+    void System::plot_wigner_smooth(std::shared_ptr<GridWaveFunction> wavefunction, std::string title, int points, double p_max, double sigma_x, double sigma_p){
+        json plot = { {"type", "plot"}, {"kind", "wigner"}, {"title", title} };
+        wigner_to_json(core::grid::smooth(wavefunction->wigner(points<2 ? 128 : points), sigma_x, sigma_p), plot, p_max);
+        emit(std::move(plot));
+    }
+
+    void System::plot_ensemble_smooth(std::shared_ptr<ClassicalEnsemble> ensemble, std::shared_ptr<Schroedinger1D> system, std::string title, int points, double p_max, double sigma_x, double sigma_p){
+        json plot = { {"type", "plot"}, {"kind", "wigner"}, {"title", title} };
+        if(ensemble->weight.minCoeff()>=0.) plot["classical"] = true;
+        wigner_to_json(core::grid::smooth(ensemble->histogram(*system->grid, points<2 ? 128 : points), sigma_x, sigma_p), plot, p_max);
+        emit(std::move(plot));
+    }
+
+    void System::plot_momentum_compare(std::shared_ptr<GridWaveFunction> wavefunction, std::shared_ptr<ClassicalEnsemble> ensemble, std::string title, double p_max, int bins){
+        if(!(p_max>0.)) p_max = wavefunction->grid->p_max();
+        if(bins<2) bins = 200;
+        double width = 2.*p_max/bins;
+
+        Eigen::ArrayXd p;
+        Eigen::ArrayXcd phi;
+        wavefunction->momentum_space(p, phi);
+        double dp = p(1) - p(0);
+
+        std::vector<float> quantum(bins, 0.f), classical(bins, 0.f);
+        for(int i=0; i<p.size(); i++){
+            int b = int(std::floor((p(i) + p_max)/width));
+            if(b>=0 && b<bins) quantum[b] += float(std::norm(phi(i))*dp/width);
+        }
+        for(int i=0; i<ensemble->p.size(); i++){
+            int b = int(std::floor((ensemble->p(i) + p_max)/width));
+            if(b>=0 && b<bins) classical[b] += float(ensemble->weight(i)/width);
+        }
+
+        json plot = { {"type", "plot"}, {"kind", "curves"}, {"title", title}, {"lower", -p_max}, {"upper", p_max}, {"xlabel", "p"} };
+        plot["series"] = json::array({
+            { {"name", "quantum"},   {"y", encode_f32(quantum)} },
+            { {"name", "classical"}, {"y", encode_f32(classical)} },
+        });
         emit(std::move(plot));
     }
 

@@ -17,25 +17,37 @@
  * arbitrary operators), but fast enough for long propagations, nonlinear
  * equations and two-dimensional configuration spaces.
  *
- * Units: hbar = 1 throughout.
+ * Units: hbar = 1 by default. One-dimensional grids can carry a different value of
+ * hbar, to study the classical limit of the same system.
  */
 namespace core::grid{
+
+    /**
+     * Gaussian coarse-graining of a phase space distribution with resolution (sigma_x, sigma_p):
+     * what an apparatus sees that cannot resolve finer structures. For
+     * sigma_x sigma_p >= hbar/2 the result is non-negative (Husimi function).
+     */
+    core::state::WignerFunction smooth(const core::state::WignerFunction& wigner, double sigma_x, double sigma_p);
 
     class Grid{
     public:
         const double lower;
         const double upper;
         const int size;
+        /// Planck's constant: p = hbar k
+        const double hbar;
 
-        Grid(double lower_, double upper_, int size_);
+        Grid(double lower_, double upper_, int size_, double hbar_=1.);
 
         double length() const{ return upper - lower; }
         double dx() const{ return (upper - lower)/size; }
         double x(int i) const{ return lower + i*dx(); }
         /// Wave number of FFT bin i
         double k(int i) const;
-        /// Largest representable momentum
+        /// Largest representable wave number
         double k_max() const;
+        /// Largest representable momentum hbar k_max
+        double p_max() const{ return hbar*k_max(); }
         /// Map any coordinate back into [lower, upper)
         double wrap(double x) const;
     };
@@ -70,6 +82,10 @@ namespace core::grid{
 
         /// Wigner function sampled on (approximately) points x points
         core::state::WignerFunction wigner(int points) const;
+        /// \int |W| dx dp - 1: zero for classical-looking states, grows with interference
+        double negativity(int points) const;
+        /// Negativity that survives coarse-graining with resolution (sigma_x, sigma_p)
+        double negativity_smoothed(int points, double sigma_x, double sigma_p) const;
 
         GridWaveFunction& operator/=(const std::complex<double>& scalar){ psi/=scalar;    return *this; }
         GridWaveFunction& operator*=(const std::complex<double>& scalar){ psi*=scalar;    return *this; }
@@ -152,6 +168,10 @@ namespace core::grid{
 
         /// One Strang step
         void step(GridWaveFunction& psi, double t, double dt);
+        /// Potential part only, exp(-i V tau / hbar): a "kick" of strength tau
+        void kick(GridWaveFunction& psi, double tau) const;
+        /// Kinetic part only (exact for any tau)
+        void drift(GridWaveFunction& psi, double tau) const;
         void propagate(GridWaveFunction& psi, double t_start, double t_final, double dt);
         /// Imaginary time propagation: converges towards the ground state
         void relax(GridWaveFunction& psi, double dt, int steps);
@@ -179,14 +199,35 @@ namespace core::grid{
     public:
         Eigen::ArrayXd x;
         Eigen::ArrayXd p;
+        /// Weights summing to one. Negative for particles sampled from negative regions of a Wigner function.
+        Eigen::ArrayXd weight;
 
         ClassicalEnsemble(int n, double x0, double p0, double sigma_x, double sigma_p, int seed);
+
+        /**
+         * Sample a Wigner function, including its negative parts (as particles with negative
+         * weight). Propagating this ensemble shows what classical mechanics would do to
+         * the very same initial state ("truncated Wigner approximation").
+         */
+        ClassicalEnsemble(const core::state::WignerFunction& wigner, int n, int seed);
+
+        /// Momentum change by the force of the system's potential acting for a time tau
+        void kick(const Schroedinger1D& system, double tau);
+        /// Free motion for a time tau
+        void drift(const Schroedinger1D& system, double tau);
+        double expect_p2() const{ return (weight*p*p).sum(); }
+        /// 1/2 \int |W_ensemble - W| dx dp: 0 for identical, 1 for non-overlapping distributions
+        double distance(const core::state::WignerFunction& wigner) const;
+        /// The same after coarse-graining both with resolution (sigma_x, sigma_p)
+        double distance_smoothed(const core::state::WignerFunction& wigner, double sigma_x, double sigma_p) const;
+        /// Histogram on the phase space grid of a given Wigner function
+        core::state::WignerFunction histogram_like(const core::state::WignerFunction& wigner) const;
 
         /// Velocity-Verlet in the potential of the given system
         void propagate(Schroedinger1D& system, double t_start, double t_final, double dt);
 
-        double expect_x() const{ return x.mean(); }
-        double expect_p() const{ return p.mean(); }
+        double expect_x() const{ return (weight*x).sum(); }
+        double expect_p() const{ return (weight*p).sum(); }
         double probability(double a, double b) const;
         double energy(const Schroedinger1D& system) const;
 
