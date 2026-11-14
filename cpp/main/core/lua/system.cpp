@@ -36,6 +36,19 @@ using WignerFunction = core::state::WignerFunction;
 using MapWaveFunction = core::map::MapWaveFunction;
 using MapDensityOperator = core::map::MapDensityOperator;
 
+using Grid = core::grid::Grid;
+using Grid2D = core::grid::Grid2D;
+using GridWaveFunction = core::grid::GridWaveFunction;
+using GridWaveFunction2D = core::grid::GridWaveFunction2D;
+using GridDensityMatrix = core::grid::GridDensityMatrix;
+using GridSpinor = core::grid::GridSpinor;
+using Schroedinger1D = core::grid::Schroedinger1D;
+using Schroedinger2D = core::grid::Schroedinger2D;
+using Dirac1D = core::grid::Dirac1D;
+using ClassicalEnsemble = core::grid::ClassicalEnsemble;
+using BohmianTrajectories = core::grid::BohmianTrajectories;
+using SpaceTime = core::grid::SpaceTime;
+
 using core::utility::encode_f32;
 using core::utility::encode_f32_from;
 
@@ -50,6 +63,9 @@ using DiagonalPropagator = core::propagation::DiagonalPropagator<StateClass>;
 
 using DiagonalRepresentationLuaElement = std::vector<std::pair< int, boost::variant<double, std::shared_ptr<WaveFunction>>>>;
 using DiagonalRepresentationLua = std::vector<std::pair<int, DiagonalRepresentationLuaElement>>;
+
+using EigenstatesLuaElement = std::vector<std::pair< int, boost::variant<double, std::shared_ptr<GridWaveFunction>>>>;
+using EigenstatesLua = std::vector<std::pair<int, EigenstatesLuaElement>>;
 
 using complex = std::complex<double>;
 
@@ -72,6 +88,19 @@ namespace{
         if(core::utility::interrupt_flag.load(std::memory_order_relaxed)){
             luaL_error(L, "Interrupted");
         }
+    }
+
+    /// Smallest stride such that size/stride <= max_points
+    int stride_for(int size, int max_points){
+        if(max_points<=0) return 1;
+        return std::max(1, (size + max_points - 1)/max_points);
+    }
+
+    template<class Array>
+    std::vector<float> strided(const Array& values, int stride){
+        std::vector<float> res;
+        for(int i=0; i<values.size(); i+=stride) res.push_back(float(values(i)));
+        return res;
     }
 
     void wigner_to_json(const WignerFunction& wigner, json& plot){
@@ -130,6 +159,7 @@ namespace core::lua{
         }
 
         expose_spectral();
+        expose_grid();
         expose_plot();
 
         lua_State* L = lua.*get(LuaStateTag());
@@ -260,10 +290,234 @@ namespace core::lua{
         );
     }
 
+    /*
+     * Fourier grids: split-operator propagation in 1D and 2D, Gross-Pitaevskii, Dirac,
+     * classical ensembles and Bohmian trajectories
+     */
+    void System::expose_grid(){
+        using GridPtr = std::shared_ptr<Grid>;
+        using Grid2DPtr = std::shared_ptr<Grid2D>;
+
+        /*
+         * Grid
+         */
+        lua.writeFunction("grid", [](double lower, double upper, int size){ return std::make_shared<Grid>(lower, upper, size); });
+        lua.registerFunction("dx", &Grid::dx);
+        lua.registerFunction("length", &Grid::length);
+        lua.registerFunction("k_max", &Grid::k_max);
+
+        lua.registerFunction<std::shared_ptr<GridWaveFunction> (GridPtr::*)(std::function<complex(double)>)>("wavefunction",
+                [](GridPtr& self, std::function<complex(double)> f){ return std::make_shared<GridWaveFunction>(self, f); });
+        lua.registerFunction<std::shared_ptr<GridWaveFunction> (GridPtr::*)(double, double, double)>("gaussian",
+                [](GridPtr& self, double x0, double p0, double sigma){
+                    return std::make_shared<GridWaveFunction>(GridWaveFunction::gaussian(self, x0, p0, sigma));
+                });
+        lua.registerFunction<std::shared_ptr<Schroedinger1D> (GridPtr::*)()>("schroedinger",
+                [](GridPtr& self){ return std::make_shared<Schroedinger1D>(self); });
+        lua.registerFunction<std::shared_ptr<Dirac1D> (GridPtr::*)()>("dirac",
+                [](GridPtr& self){ return std::make_shared<Dirac1D>(self); });
+
+        /*
+         * GridWaveFunction
+         */
+        expose_linear_space_operators<GridWaveFunction, complex>(lua);
+        lua.registerFunction("norm", &GridWaveFunction::norm);
+        lua.registerFunction("normalize", &GridWaveFunction::normalize);
+        lua.registerFunction("validate", &GridWaveFunction::validate);
+        lua.registerFunction("expect_x", &GridWaveFunction::expect_x);
+        lua.registerFunction("expect_p", &GridWaveFunction::expect_p);
+        lua.registerFunction("sigma_x", &GridWaveFunction::sigma_x);
+        lua.registerFunction("sigma_p", &GridWaveFunction::sigma_p);
+        lua.registerFunction("probability", &GridWaveFunction::probability);
+        lua.registerFunction<complex (GridWaveFunction::*)(std::shared_ptr<GridWaveFunction>)>("dot",
+                [](GridWaveFunction& self, std::shared_ptr<GridWaveFunction> other){ return self.dot(*other); });
+        lua.registerFunction<std::shared_ptr<GridWaveFunction> (GridWaveFunction::*)()>("copy",
+                [](GridWaveFunction& self){ return std::make_shared<GridWaveFunction>(self); });
+        lua.registerFunction<std::shared_ptr<GridDensityMatrix> (GridWaveFunction::*)()>("density_matrix",
+                [](GridWaveFunction& self){ return std::make_shared<GridDensityMatrix>(self); });
+        lua.registerFunction<std::shared_ptr<BohmianTrajectories> (GridWaveFunction::*)(int, double)>("bohmian",
+                [](GridWaveFunction& self, int n, double t){ return std::make_shared<BohmianTrajectories>(self, n, t); });
+
+        /*
+         * GridDensityMatrix
+         */
+        lua.registerFunction<std::shared_ptr<GridDensityMatrix> (GridPtr::*)()>("density_matrix",
+                [](GridPtr& self){ return std::make_shared<GridDensityMatrix>(self); });
+        lua.registerFunction<void (GridDensityMatrix::*)(double, std::shared_ptr<GridWaveFunction>)>("add",
+                [](GridDensityMatrix& self, double weight, std::shared_ptr<GridWaveFunction> psi){ self.add(weight, *psi); });
+        lua.registerFunction("coherence", &GridDensityMatrix::coherence);
+
+        using PositionMeasurement = core::grid::PositionMeasurement;
+        lua.writeFunction("position_measurement", [](double kappa, int seed){ return std::make_shared<PositionMeasurement>(kappa, seed); });
+        lua.registerFunction<void (PositionMeasurement::*)(std::shared_ptr<GridWaveFunction>, double)>("apply",
+                [](PositionMeasurement& self, std::shared_ptr<GridWaveFunction> psi, double dt){ self.apply(*psi, dt); });
+
+        lua.registerFunction("trace", &GridDensityMatrix::trace);
+        lua.registerFunction("purity", &GridDensityMatrix::purity);
+        lua.registerFunction("entropy", &GridDensityMatrix::entropy);
+        lua.registerFunction<std::vector<std::pair<int, double>> (GridDensityMatrix::*)(int)>("eigenvalues",
+                [](GridDensityMatrix& self, int n){
+                    Eigen::ArrayXd ev = self.eigenvalues();
+                    std::vector<std::pair<int, double>> result;
+                    for(int i=0; i<std::min<int>(n, ev.size()); i++) result.push_back({ i+1, ev(i) });
+                    return result;
+                });
+
+        /*
+         * Schroedinger1D
+         */
+        lua.registerFunction("set_mass", &Schroedinger1D::set_mass);
+        lua.registerFunction("set_nonlinearity", &Schroedinger1D::set_nonlinearity);
+        lua.registerFunction("set_potential", &Schroedinger1D::set_potential);
+        lua.registerFunction("set_potential_td", &Schroedinger1D::set_potential_td);
+        lua.registerFunction("set_absorber", &Schroedinger1D::set_absorber);
+        lua.registerFunction<void (Schroedinger1D::*)(std::shared_ptr<GridWaveFunction>, double, double)>("step",
+                [](Schroedinger1D& self, std::shared_ptr<GridWaveFunction> psi, double t, double dt){ self.step(*psi, t, dt); });
+        lua.registerFunction<void (Schroedinger1D::*)(std::shared_ptr<GridWaveFunction>, double, double, double)>("propagate",
+                [](Schroedinger1D& self, std::shared_ptr<GridWaveFunction> psi, double t_start, double t_final, double dt){ self.propagate(*psi, t_start, t_final, dt); });
+        lua.registerFunction<void (Schroedinger1D::*)(std::shared_ptr<GridWaveFunction>, double, int)>("relax",
+                [](Schroedinger1D& self, std::shared_ptr<GridWaveFunction> psi, double dt, int steps){ self.relax(*psi, dt, steps); });
+        lua.registerFunction<double (Schroedinger1D::*)(std::shared_ptr<GridWaveFunction>)>("energy",
+                [](Schroedinger1D& self, std::shared_ptr<GridWaveFunction> psi){ return self.energy(*psi); });
+        lua.registerFunction<double (Schroedinger1D::*)(std::shared_ptr<GridWaveFunction>)>("kinetic_energy",
+                [](Schroedinger1D& self, std::shared_ptr<GridWaveFunction> psi){ return self.kinetic_energy(*psi); });
+        lua.registerFunction<double (Schroedinger1D::*)(std::shared_ptr<GridWaveFunction>)>("potential_energy",
+                [](Schroedinger1D& self, std::shared_ptr<GridWaveFunction> psi){ return self.potential_energy(*psi); });
+        lua.registerFunction<EigenstatesLua (Schroedinger1D::*)(int)>("eigenstates",
+                [](Schroedinger1D& self, int n){
+                    EigenstatesLua result;
+                    int i=1;
+                    for(auto& v: self.eigenstates(n)){
+                        result.push_back({i++, EigenstatesLuaElement{ {1, v.first}, {2, v.second} }});
+                    }
+                    return result;
+                });
+
+        /*
+         * ClassicalEnsemble
+         */
+        lua.writeFunction("classical_ensemble", [](int n, double x0, double p0, double sigma_x, double sigma_p, int seed){
+            return std::make_shared<ClassicalEnsemble>(n, x0, p0, sigma_x, sigma_p, seed);
+        });
+        lua.registerFunction<void (ClassicalEnsemble::*)(std::shared_ptr<Schroedinger1D>, double, double, double)>("propagate",
+                [](ClassicalEnsemble& self, std::shared_ptr<Schroedinger1D> system, double t_start, double t_final, double dt){
+                    self.propagate(*system, t_start, t_final, dt);
+                });
+        lua.registerFunction("expect_x", &ClassicalEnsemble::expect_x);
+        lua.registerFunction("expect_p", &ClassicalEnsemble::expect_p);
+        lua.registerFunction("probability", &ClassicalEnsemble::probability);
+        lua.registerFunction<double (ClassicalEnsemble::*)(std::shared_ptr<Schroedinger1D>)>("energy",
+                [](ClassicalEnsemble& self, std::shared_ptr<Schroedinger1D> system){ return self.energy(*system); });
+
+        /*
+         * BohmianTrajectories, SpaceTime
+         */
+        lua.registerFunction<void (BohmianTrajectories::*)(std::shared_ptr<GridWaveFunction>, double, double, double)>("advance",
+                [](BohmianTrajectories& self, std::shared_ptr<GridWaveFunction> psi, double mass, double t, double dt){
+                    self.advance(*psi, mass, t, dt);
+                });
+
+        lua.writeFunction("spacetime", [](int max_points){ return std::make_shared<SpaceTime>(max_points); });
+        lua.registerFunction<void (SpaceTime::*)(std::shared_ptr<GridWaveFunction>, double)>("add",
+                [](SpaceTime& self, std::shared_ptr<GridWaveFunction> psi, double t){ self.add(*psi, t); });
+
+        /*
+         * Two dimensions / two particles
+         */
+        lua.writeFunction("grid2d", [](GridPtr x, GridPtr y){ return std::make_shared<Grid2D>(x, y); });
+        lua.registerFunction<std::shared_ptr<GridWaveFunction2D> (Grid2DPtr::*)(std::function<complex(double, double)>)>("wavefunction",
+                [](Grid2DPtr& self, std::function<complex(double, double)> f){ return std::make_shared<GridWaveFunction2D>(self, f); });
+        lua.registerFunction<std::shared_ptr<GridWaveFunction2D> (Grid2DPtr::*)(std::shared_ptr<GridWaveFunction>, std::shared_ptr<GridWaveFunction>)>("product",
+                [](Grid2DPtr& self, std::shared_ptr<GridWaveFunction> a, std::shared_ptr<GridWaveFunction> b){
+                    return std::make_shared<GridWaveFunction2D>(self, *a, *b);
+                });
+        lua.registerFunction<std::shared_ptr<Schroedinger2D> (Grid2DPtr::*)()>("schroedinger",
+                [](Grid2DPtr& self){ return std::make_shared<Schroedinger2D>(self); });
+
+        lua.registerFunction<std::shared_ptr<GridWaveFunction2D> (Grid2DPtr::*)(std::shared_ptr<GridWaveFunction2D>, std::shared_ptr<GridWaveFunction2D>)>("multiply",
+                [](Grid2DPtr&, std::shared_ptr<GridWaveFunction2D> a, std::shared_ptr<GridWaveFunction2D> b){
+                    return std::make_shared<GridWaveFunction2D>(a->multiply(*b));
+                });
+
+        expose_linear_space_operators<GridWaveFunction2D, complex>(lua);
+        lua.registerFunction<std::shared_ptr<GridWaveFunction> (GridWaveFunction2D::*)(double)>("slice_x",
+                [](GridWaveFunction2D& self, double x){ return std::make_shared<GridWaveFunction>(self.slice_x(x)); });
+        lua.registerFunction<std::shared_ptr<GridWaveFunction> (GridWaveFunction2D::*)(double)>("slice_y",
+                [](GridWaveFunction2D& self, double y){ return std::make_shared<GridWaveFunction>(self.slice_y(y)); });
+        lua.registerFunction("norm", &GridWaveFunction2D::norm);
+        lua.registerFunction("normalize", &GridWaveFunction2D::normalize);
+        lua.registerFunction("validate", &GridWaveFunction2D::validate);
+        lua.registerFunction("expect_x", &GridWaveFunction2D::expect_x);
+        lua.registerFunction("expect_y", &GridWaveFunction2D::expect_y);
+        lua.registerFunction("probability", &GridWaveFunction2D::probability);
+        lua.registerFunction("symmetrize", &GridWaveFunction2D::symmetrize);
+        lua.registerFunction<std::shared_ptr<GridWaveFunction2D> (GridWaveFunction2D::*)()>("copy",
+                [](GridWaveFunction2D& self){ return std::make_shared<GridWaveFunction2D>(self); });
+        lua.registerFunction<std::shared_ptr<GridDensityMatrix> (GridWaveFunction2D::*)(int)>("reduced",
+                [](GridWaveFunction2D& self, int particle){
+                    if(particle!=1 && particle!=2) throw std::invalid_argument("reduced: particle must be 1 or 2");
+                    return std::make_shared<GridDensityMatrix>(self.reduced(particle-1));
+                });
+
+        lua.registerFunction("set_mass", &Schroedinger2D::set_mass);
+        lua.registerFunction("set_nonlinearity", &Schroedinger2D::set_nonlinearity);
+        lua.registerFunction("set_potential", &Schroedinger2D::set_potential);
+        lua.registerFunction("set_potential_td", &Schroedinger2D::set_potential_td);
+        lua.registerFunction("set_absorber", &Schroedinger2D::set_absorber);
+        lua.registerFunction<void (Schroedinger2D::*)(std::shared_ptr<GridWaveFunction2D>, double, double)>("step",
+                [](Schroedinger2D& self, std::shared_ptr<GridWaveFunction2D> psi, double t, double dt){ self.step(*psi, t, dt); });
+        lua.registerFunction<void (Schroedinger2D::*)(std::shared_ptr<GridWaveFunction2D>, double, double, double)>("propagate",
+                [](Schroedinger2D& self, std::shared_ptr<GridWaveFunction2D> psi, double t_start, double t_final, double dt){ self.propagate(*psi, t_start, t_final, dt); });
+        lua.registerFunction<void (Schroedinger2D::*)(std::shared_ptr<GridWaveFunction2D>, double, int)>("relax",
+                [](Schroedinger2D& self, std::shared_ptr<GridWaveFunction2D> psi, double dt, int steps){ self.relax(*psi, dt, steps); });
+        lua.registerFunction<double (Schroedinger2D::*)(std::shared_ptr<GridWaveFunction2D>)>("energy",
+                [](Schroedinger2D& self, std::shared_ptr<GridWaveFunction2D> psi){ return self.energy(*psi); });
+        lua.registerFunction<double (Schroedinger2D::*)(std::shared_ptr<GridWaveFunction2D>)>("angular_momentum",
+                [](Schroedinger2D& self, std::shared_ptr<GridWaveFunction2D> psi){ return self.angular_momentum(*psi); });
+
+        /*
+         * Dirac
+         */
+        lua.writeFunction("spinor", [](std::shared_ptr<GridWaveFunction> up, std::shared_ptr<GridWaveFunction> down){
+            return std::make_shared<GridSpinor>(*up, *down);
+        });
+        lua.registerFunction("norm", &GridSpinor::norm);
+        lua.registerFunction("normalize", &GridSpinor::normalize);
+        lua.registerFunction("validate", &GridSpinor::validate);
+        lua.registerFunction("expect_x", &GridSpinor::expect_x);
+        lua.registerFunction("probability", &GridSpinor::probability);
+
+        lua.registerFunction("set_mass", &Dirac1D::set_mass);
+        lua.registerFunction("set_c", &Dirac1D::set_c);
+        lua.registerFunction("set_potential", &Dirac1D::set_potential);
+        lua.registerFunction("set_absorber", &Dirac1D::set_absorber);
+        lua.registerFunction<void (Dirac1D::*)(std::shared_ptr<GridSpinor>, double, double, double)>("propagate",
+                [](Dirac1D& self, std::shared_ptr<GridSpinor> psi, double t_start, double t_final, double dt){ self.propagate(*psi, t_start, t_final, dt); });
+        lua.registerFunction<void (Dirac1D::*)(std::shared_ptr<GridSpinor>, int)>("project",
+                [](Dirac1D& self, std::shared_ptr<GridSpinor> psi, int sign){ self.project(*psi, sign); });
+        lua.registerFunction<double (Dirac1D::*)(std::shared_ptr<GridSpinor>)>("positive_energy_fraction",
+                [](Dirac1D& self, std::shared_ptr<GridSpinor> psi){ return self.positive_energy_fraction(*psi); });
+        lua.registerFunction<double (Dirac1D::*)(std::shared_ptr<GridSpinor>)>("velocity",
+                [](Dirac1D& self, std::shared_ptr<GridSpinor> psi){ return self.velocity(*psi); });
+        lua.registerFunction<double (Dirac1D::*)(std::shared_ptr<GridSpinor>)>("energy",
+                [](Dirac1D& self, std::shared_ptr<GridSpinor> psi){ return self.energy(*psi); });
+    }
+
     void System::expose_plot(){
         lua.registerFunction("wavefunction", &System::plot_wavefunction);
+        lua.registerFunction("wave", &System::plot_wave);
+        lua.registerFunction("wave2d", &System::plot_wave2d);
+        lua.registerFunction("momentum", &System::plot_momentum);
         lua.registerFunction("wigner", &System::plot_wigner);
+        lua.registerFunction("ensemble", &System::plot_ensemble);
+        lua.registerFunction("density_matrix", &System::plot_density_matrix);
         lua.registerFunction("scalar", &System::plot_scalar);
+        lua.registerFunction("levels", &System::plot_levels);
+        lua.registerFunction("trajectories", &System::plot_trajectories);
+        lua.registerFunction("carpet", &System::plot_carpet);
+        lua.registerFunction("field", &System::plot_field);
+        lua.registerFunction("marginals", &System::plot_marginals);
+        lua.registerFunction("spinor", &System::plot_spinor);
     }
 
     bool System::execute(const std::string& code){
@@ -297,26 +551,216 @@ namespace core::lua{
     /*
      * Plots
      */
-    void System::plot_wavefunction(std::shared_ptr<WaveFunction> wavefunction, std::string title, int points){
-        if(points<2) points = 200;
-        auto [lower, upper] = wavefunction->basis->plot_boundaries();
-        Eigen::VectorXd x(points);
-        for(int i=0; i<points; i++) x(i) = lower + 1.*i/points*(upper - lower);
-        Eigen::VectorXcd vals = wavefunction->grid(x);
+    void System::plot_wavefunction(AnyWaveFunction wavefunction, std::string title, int points){
+        json plot = { {"type", "plot"}, {"kind", "wavefunction"}, {"title", title} };
 
-        emit({ {"type", "plot"}, {"kind", "wavefunction"}, {"title", title},
-               {"lower", lower}, {"upper", upper},
-               {"re", encode_f32_from(vals.real())}, {"im", encode_f32_from(vals.imag())} });
+        if(auto* spectral = boost::get<std::shared_ptr<WaveFunction>>(&wavefunction)){
+            if(points<2) points = 200;
+            auto [lower, upper] = (*spectral)->basis->plot_boundaries();
+            Eigen::VectorXd x(points);
+            for(int i=0; i<points; i++) x(i) = lower + 1.*i/points*(upper - lower);
+            Eigen::VectorXcd vals = (*spectral)->grid(x);
+
+            plot["lower"] = lower;
+            plot["upper"] = upper;
+            plot["re"] = encode_f32_from(vals.real());
+            plot["im"] = encode_f32_from(vals.imag());
+        }else{
+            auto& psi = *boost::get<std::shared_ptr<GridWaveFunction>>(wavefunction);
+            int stride = stride_for(psi.grid->size, points>0 ? points : 2048);
+
+            plot["lower"] = psi.grid->lower;
+            plot["upper"] = psi.grid->upper;
+            plot["re"] = encode_f32(strided(psi.psi.real(), stride));
+            plot["im"] = encode_f32(strided(psi.psi.imag(), stride));
+        }
+
+        emit(std::move(plot));
     }
 
-    void System::plot_wigner(std::shared_ptr<DensityOperator> density_operator, std::string title, int points){
+    void System::plot_wave(std::shared_ptr<Schroedinger1D> system, std::shared_ptr<GridWaveFunction> wavefunction, std::string title){
+        const GridWaveFunction& psi = *wavefunction;
+        int stride = stride_for(psi.grid->size, 2048);
+
+        emit({ {"type", "plot"}, {"kind", "wavefunction"}, {"title", title},
+               {"lower", psi.grid->lower}, {"upper", psi.grid->upper},
+               {"re", encode_f32(strided(psi.psi.real(), stride))},
+               {"im", encode_f32(strided(psi.psi.imag(), stride))},
+               {"V", encode_f32(strided(system->V, stride))} });
+    }
+
+    void System::plot_momentum(std::shared_ptr<GridWaveFunction> wavefunction, std::string title, double p_max){
+        Eigen::ArrayXd p;
+        Eigen::ArrayXcd phi;
+        wavefunction->momentum_space(p, phi);
+
+        if(!(p_max>0.)) p_max = wavefunction->grid->k_max();
+        std::vector<float> re, im;
+        double lower = 0., upper = 0.;
+        bool first = true;
+        for(int i=0; i<p.size(); i++){
+            if(std::abs(p(i))>p_max) continue;
+            if(first){ lower = p(i); first = false; }
+            upper = p(i);
+            re.push_back(float(phi(i).real()));
+            im.push_back(float(phi(i).imag()));
+        }
+        // The frontend places sample i at lower + i*(upper-lower)/n
+        if(re.size()>1) upper += (upper-lower)/(re.size()-1);
+
+        emit({ {"type", "plot"}, {"kind", "wavefunction"}, {"title", title}, {"space", "p"},
+               {"lower", lower}, {"upper", upper}, {"re", encode_f32(re)}, {"im", encode_f32(im)} });
+    }
+
+    void System::plot_wigner(AnyState state, std::string title, int points){
         json plot = { {"type", "plot"}, {"kind", "wigner"}, {"title", title} };
         if(points<2) points = 128;
-        wigner_to_json(WignerFunction{ *density_operator, points }, plot);
+
+        if(auto* rho = boost::get<std::shared_ptr<DensityOperator>>(&state)){
+            wigner_to_json(WignerFunction{ **rho, points }, plot);
+        }else if(auto* psi = boost::get<std::shared_ptr<GridWaveFunction>>(&state)){
+            wigner_to_json((*psi)->wigner(points), plot);
+        }else{
+            wigner_to_json(boost::get<std::shared_ptr<GridDensityMatrix>>(state)->wigner(points), plot);
+        }
+
         emit(std::move(plot));
+    }
+
+    void System::plot_ensemble(std::shared_ptr<ClassicalEnsemble> ensemble, std::shared_ptr<Schroedinger1D> system, std::string title, int points){
+        json plot = { {"type", "plot"}, {"kind", "wigner"}, {"title", title}, {"classical", true} };
+        if(points<2) points = 128;
+        wigner_to_json(ensemble->histogram(*system->grid, points), plot);
+        emit(std::move(plot));
+    }
+
+    void System::plot_density_matrix(std::shared_ptr<GridDensityMatrix> rho, std::string title, int points){
+        const Grid& g = *rho->grid;
+        int stride = stride_for(g.size, points>0 ? points : 256);
+        int n = (g.size + stride - 1)/stride;
+
+        std::vector<float> data;
+        data.reserve(n*n);
+        for(int iy=0; iy<g.size; iy+=stride){
+            for(int ix=0; ix<g.size; ix+=stride) data.push_back(float(std::abs(rho->rho(ix, iy))));
+        }
+
+        emit({ {"type", "plot"}, {"kind", "image"}, {"title", title},
+               {"x0", g.lower}, {"x1", g.upper}, {"y0", g.lower}, {"y1", g.upper}, {"nx", n}, {"ny", n},
+               {"xlabel", "x"}, {"ylabel", "x'"}, {"data", encode_f32(data)} });
     }
 
     void System::plot_scalar(std::string title, double t, std::string name, double value){
         emit({ {"type", "plot"}, {"kind", "scalar"}, {"title", title}, {"t", t}, {"name", name}, {"value", value} });
+    }
+
+    void System::plot_levels(std::shared_ptr<Schroedinger1D> system, int n, std::string title){
+        const Grid& g = *system->grid;
+        int stride = stride_for(g.size, 512);
+
+        json plot = { {"type", "plot"}, {"kind", "levels"}, {"title", title},
+                      {"lower", g.lower}, {"upper", g.upper}, {"V", encode_f32(strided(system->V, stride))} };
+        plot["energies"] = json::array();
+        plot["states"] = json::array();
+        for(auto& state: system->eigenstates(n)){
+            plot["energies"].push_back(state.first);
+            plot["states"].push_back(encode_f32(strided(state.second->psi.real(), stride)));
+        }
+
+        emit(std::move(plot));
+    }
+
+    void System::plot_trajectories(std::shared_ptr<BohmianTrajectories> trajectories, std::string title){
+        json plot = { {"type", "plot"}, {"kind", "paths"}, {"title", title}, {"xlabel", "t"}, {"ylabel", "x"} };
+
+        std::vector<float> t(trajectories->times.begin(), trajectories->times.end());
+        plot["t"] = encode_f32(t);
+        plot["paths"] = json::array();
+        for(int i=0; i<trajectories->x.size(); i++){
+            std::vector<float> path;
+            path.reserve(trajectories->history.size());
+            for(auto& positions: trajectories->history) path.push_back(float(positions(i)));
+            plot["paths"].push_back(encode_f32(path));
+        }
+
+        emit(std::move(plot));
+    }
+
+    void System::plot_carpet(std::shared_ptr<SpaceTime> carpet, std::string title){
+        if(carpet->rows.empty()) return;
+
+        std::vector<float> data;
+        for(auto& row: carpet->rows){
+            for(int i=0; i<row.size(); i++) data.push_back(float(row(i)));
+        }
+
+        emit({ {"type", "plot"}, {"kind", "image"}, {"title", title},
+               {"x0", carpet->lower}, {"x1", carpet->upper}, {"y0", carpet->times.front()}, {"y1", carpet->times.back()},
+               {"nx", carpet->rows[0].size()}, {"ny", carpet->rows.size()},
+               {"xlabel", "x"}, {"ylabel", "t"}, {"data", encode_f32(data)} });
+    }
+
+    void System::emit_field(const GridWaveFunction2D& wavefunction, const Schroedinger2D* system, const std::string& title){
+        const Grid& gx = *wavefunction.grid->x;
+        const Grid& gy = *wavefunction.grid->y;
+        int sx = stride_for(gx.size, 256);
+        int sy = stride_for(gy.size, 256);
+
+        std::vector<float> re, im, V;
+        for(int iy=0; iy<gy.size; iy+=sy){
+            for(int ix=0; ix<gx.size; ix+=sx){
+                re.push_back(float(wavefunction.psi(ix, iy).real()));
+                im.push_back(float(wavefunction.psi(ix, iy).imag()));
+                if(system) V.push_back(float(system->V(ix, iy)));
+            }
+        }
+
+        json plot = { {"type", "plot"}, {"kind", "field"}, {"title", title},
+                      {"x0", gx.lower}, {"x1", gx.upper}, {"y0", gy.lower}, {"y1", gy.upper},
+                      {"nx", (gx.size + sx - 1)/sx}, {"ny", (gy.size + sy - 1)/sy},
+                      {"re", encode_f32(re)}, {"im", encode_f32(im)} };
+        if(system) plot["V"] = encode_f32(V);
+
+        emit(std::move(plot));
+    }
+
+    void System::plot_field(std::shared_ptr<GridWaveFunction2D> wavefunction, std::string title){
+        emit_field(*wavefunction, nullptr, title);
+    }
+
+    void System::plot_wave2d(std::shared_ptr<Schroedinger2D> system, std::shared_ptr<GridWaveFunction2D> wavefunction, std::string title){
+        emit_field(*wavefunction, system.get(), title);
+    }
+
+    void System::plot_marginals(std::shared_ptr<GridWaveFunction2D> wavefunction, std::string title){
+        const Grid& gx = *wavefunction->grid->x;
+        const Grid& gy = *wavefunction->grid->y;
+        if(gx.size != gy.size || gx.lower != gy.lower || gx.upper != gy.upper){
+            throw std::invalid_argument("marginals: both coordinates need the same grid");
+        }
+        int stride = stride_for(gx.size, 1024);
+
+        json plot = { {"type", "plot"}, {"kind", "curves"}, {"title", title}, {"lower", gx.lower}, {"upper", gx.upper}, {"xlabel", "x"} };
+        plot["series"] = json::array({
+            { {"name", "particle 1"}, {"y", encode_f32(strided(wavefunction->marginal(0), stride))} },
+            { {"name", "particle 2"}, {"y", encode_f32(strided(wavefunction->marginal(1), stride))} },
+        });
+
+        emit(std::move(plot));
+    }
+
+    void System::plot_spinor(std::shared_ptr<Dirac1D> system, std::shared_ptr<GridSpinor> spinor, std::string title){
+        const Grid& g = *spinor->grid;
+        int stride = stride_for(g.size, 2048);
+
+        json plot = { {"type", "plot"}, {"kind", "curves"}, {"title", title}, {"lower", g.lower}, {"upper", g.upper}, {"xlabel", "x"} };
+        plot["series"] = json::array({
+            { {"name", "total density"},  {"y", encode_f32(strided(spinor->density(), stride))} },
+            { {"name", "upper component"},   {"y", encode_f32(strided(spinor->up.abs2(), stride))} },
+            { {"name", "lower component"}, {"y", encode_f32(strided(spinor->down.abs2(), stride))} },
+        });
+        plot["V"] = encode_f32(strided(system->V, stride));
+
+        emit(std::move(plot));
     }
 }
