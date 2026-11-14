@@ -1,10 +1,13 @@
-js/www
-js/node_modules/
-lua/**/*
-!lua/**/*.lua
-cpp/dependencies/alglib/**/*
-cpp/dependencies/eigen/**/*
-!cpp/dependencies/alglib/Makefile
+# Build output
+build
+result
 cpp/build
-**/.tern-port
+
+# Results written by `onedse script.lua`
+/*/[0-9]*/
+lua/*/
+
 **/.DS_Store
+
+# Editor / language server caches
+.ccls-cache

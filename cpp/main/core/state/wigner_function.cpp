@@ -4,7 +4,7 @@
 #include <cmath>
 #include <stdexcept>
 #include <math.h>
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 
 
 #include "core/discretization/basis.h"
@@ -29,43 +29,49 @@ namespace core::state{
 
     WignerFunction::WignerFunction(const DensityOperator& density_operator, int points){
         auto b = density_operator.basis->plot_boundaries();
-        lower_x = b.first;
-        upper_x = b.second;
-
-        upper_p =  .5*M_PI/(upper_x-lower_x) * points;
-        lower_p = -.5*M_PI/(upper_x-lower_x) * points;
-        
-        matrix = Eigen::MatrixXd::Zero(points, points);
-
-        for(std::pair<double, std::shared_ptr<WaveFunction>> p: density_operator.diagonalize()){
-            *this += p.first*WignerFunction{*(p.second), points};
-        }
-    }
-        
-    void WignerFunction::set_from_wavefunction(const WaveFunction& wavefunction, int points){
-        auto b = wavefunction.basis->plot_boundaries();
-        lower_x = b.first;
-        upper_x = b.second;
-
-        upper_p =  .5*M_PI/(upper_x-lower_x) * points;
-        lower_p = -.5*M_PI/(upper_x-lower_x) * points;
-        
-        matrix = Eigen::MatrixXd::Zero(points, points);
 
         Eigen::VectorXd x_grid(points);
-        for(int i=0; i<points; i++) x_grid(i) = lower_x + 1.*i/points*(upper_x-lower_x);
+        for(int i=0; i<points; i++) x_grid(i) = b.first + 1.*i/points*(b.second-b.first);
+
+        // rho(x_a, x_b) = sum_ij e_i(x_a)^* rho^{ij} e_j(x_b), in line with psi(x) = sum_i e_i(x)^* psi^i
+        Eigen::MatrixXcd basis_vals = density_operator.basis->evaluate(x_grid);
+        Eigen::MatrixXcd rho = basis_vals.conjugate() * density_operator.matrix * basis_vals.transpose();
+
+        *this = from_correlation(points, b.first, b.second,
+                density_operator.basis->boundary_conditions == Basis::BoundaryConditions::Periodic,
+                [&rho](int a, int b){ return rho(a, b); });
+    }
+
+    void WignerFunction::set_from_wavefunction(const WaveFunction& wavefunction, int points){
+        auto b = wavefunction.basis->plot_boundaries();
+
+        Eigen::VectorXd x_grid(points);
+        for(int i=0; i<points; i++) x_grid(i) = b.first + 1.*i/points*(b.second-b.first);
         Eigen::VectorXcd psi = wavefunction.grid(x_grid);
+
+        *this = from_correlation(points, b.first, b.second,
+                wavefunction.basis->boundary_conditions == Basis::BoundaryConditions::Periodic,
+                [&psi](int a, int b){ return psi(a)*std::conj(psi(b)); });
+    }
+
+    WignerFunction WignerFunction::from_correlation(int points, double lower_x, double upper_x, bool periodic,
+            const std::function<std::complex<double>(int, int)>& rho){
+
+        double upper_p =  .5*M_PI/(upper_x-lower_x) * points;
+        double lower_p = -.5*M_PI/(upper_x-lower_x) * points;
+
+        Eigen::MatrixXd matrix = Eigen::MatrixXd::Zero(points, points);
 
         FFT fft(2*points, true);
 
+        Eigen::VectorXcd tmp(2*points);
         for(int i=0; i<points; i++){
-            Eigen::VectorXcd tmp(2*points);
             for(int k=-points; k<points; k++){
-                if(wavefunction.basis->boundary_conditions == Basis::BoundaryConditions::Periodic){
-                    tmp(k+points) = std::conj(psi((i+k+points)%points)) * psi((i-k+points)%points);
+                if(periodic){
+                    tmp(k+points) = rho((i-k+points)%points, (i+k+points)%points);
                 }else{
                     // Default to Dirichlet
-                    tmp(k+points) = (i+k>=points || i+k<0 || i-k>=points || i-k<0) ? 0 : std::conj(psi(i+k)) * psi(i-k);
+                    tmp(k+points) = (i+k>=points || i+k<0 || i-k>=points || i-k<0) ? 0 : rho(i-k, i+k);
                 }
             }
             fft(tmp);
@@ -74,6 +80,8 @@ namespace core::state{
 
         // Normalization
         matrix *= std::sqrt(2)/M_PI * std::sqrt(points) * (upper_x-lower_x)/points;
+
+        return WignerFunction{lower_x, upper_x, lower_p, upper_p, matrix};
     }
 
 

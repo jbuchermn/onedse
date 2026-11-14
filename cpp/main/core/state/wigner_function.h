@@ -1,7 +1,9 @@
 #pragma once
 
+#include <complex>
+#include <functional>
 #include <Eigen/Dense>
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 
 #include "core/state/state.h"
 #include "core/state/wave_function.h"
@@ -28,6 +30,13 @@ namespace core::state{
 
         WignerFunction(const core::state::WaveFunction& wavefunction, int points);
         WignerFunction(const core::state::DensityOperator& density_operator, int points);
+
+        /**
+         * Wigner transform of a correlation function rho(a, b) = <x_a|rho|x_b> given on the
+         * equidistant grid x_a = lower_x + (upper_x-lower_x)/points * a, vanishing outside (unless periodic).
+         */
+        static WignerFunction from_correlation(int points, double lower_x, double upper_x, bool periodic,
+                const std::function<std::complex<double>(int, int)>& rho);
 
         void set_from_wavefunction(const core::state::WaveFunction& wavefunction, int points);
         void plot_to_terminal() const;

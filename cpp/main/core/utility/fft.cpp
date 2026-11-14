@@ -8,8 +8,8 @@ namespace core::utility{
         in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * size);
         out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * size);
 
-        if(forward) plan = fftw_plan_dft_1d(size, in, out, FFTW_FORWARD, FFTW_MEASURE);
-        else plan = fftw_plan_dft_1d(size, in, out, FFTW_BACKWARD,FFTW_MEASURE);
+        if(forward) plan = fftw_plan_dft_1d(size, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
+        else plan = fftw_plan_dft_1d(size, in, out, FFTW_BACKWARD,FFTW_ESTIMATE);
     }
 
     FFT::~FFT(){

@@ -1,9 +1,0 @@
-[submodule "server/dependencies/Simple-Web-Server"]
-	path = cpp/dependencies/Simple-Web-Server
-	url = https://github.com/eidheim/Simple-Web-Server
-[submodule "server/dependencies/json"]
-	path = cpp/dependencies/json
-	url = https://github.com/nlohmann/json
-[submodule "server/dependencies/luawrapper"]
-	path = cpp/dependencies/luawrapper
-	url = https://github.com/ahupowerdns/luawrapper

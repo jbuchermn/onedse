@@ -1,11 +1,16 @@
+-- Lindblad equation: damped harmonic oscillator
+-- The most general Markovian master equation for a harmonic oscillator coupled to a bath
+-- (notation of arXiv:0705.2202), with diffusion and friction. An excited state loses its
+-- Wigner negativity and relaxes towards a thermal state.
+
 -- Basis and initial state
 basis = orthogonal_hermite(30)
 
 -- Superposition of two Gaussians
 -- wf = basis:wavefunction(
---   	function(x) 
---     	return complex(math.exp(-(x-5.)*(x-5.)/2.) + math.exp(-(x+5.)*(x+5.)/2.), 0) 
--- 	end, 
+--       function(x) 
+--         return complex(math.exp(-(x-5.)*(x-5.)/2.) + math.exp(-(x+5.)*(x+5.)/2.), 0) 
+--     end, 
 --     0
 -- )
 
@@ -107,27 +112,29 @@ prop = op:diagonal_propagator()
 -- prop = op:rk_propagator("RK4")
 
 t=0
-t_step = math.pi/100.
+t_step = math.pi/50.
 t_final = 3.*math.pi
 while t<t_final do
-  	print(t .. ":\n  Trace = " .. tostring(rho:trace()))
-	plot:wigner(rho, "Wigner/" .. t, 128)
+      print(t .. ":\n  Trace = " .. tostring(rho:trace()))
+    plot:wigner(rho, "Wigner/" .. string.format("t = %.2f", t), 128)
+    plot:scalar("Purity and entropy", t, "purity", rho:purity())
+    plot:scalar("Purity and entropy", t, "entropy", rho:entropy())
     data = rho:diagonalize()
 
     print("  Probabilities: ")
-	for i, v in ipairs(data) do
-		print("    " .. v[1])
+    for i, v in ipairs(data) do
+        print("    " .. v[1])
         if(v[1] > 0.01) then
-		    plot:wavefunction(v[2], "Diagonalized #" .. i .. "/" .. t, 200)
+            plot:wavefunction(v[2], "Diagonalized #" .. i .. "/" .. string.format("t = %.2f", t), 200)
         end
-	end
+    end
   
-  	t_next = t + t_step
-  	if t_next>t_final then t_next = t_final end
-	prop:propagate(rho, t, t_next, 0.)
-	-- prop:propagate_const_step(rho, t, t_next, 5.e-6)
-	rho:validate()
+      t_next = t + t_step
+      if t_next>t_final then t_next = t_final end
+    prop:propagate(rho, t, t_next, 0.)
+    -- prop:propagate_const_step(rho, t, t_next, 5.e-6)
+    rho:validate()
   
-  	t = t_next
+      t = t_next
 end
-plot:wigner(rho, "Wigner/" .. t, 128)
+plot:wigner(rho, "Wigner/" .. string.format("t = %.2f", t), 128)

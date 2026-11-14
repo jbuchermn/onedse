@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>onedse - quantum mechanics in phase space</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>onedse</h1>
+        <span class="tagline">quantum mechanics in phase space</span>
+        <span class="spacer"></span>
+        <button id="theme" class="ghost" title="Toggle light / dark">Theme</button>
+    </header>
+
+    <div class="layout">
+        <nav id="examples" aria-label="Examples"></nav>
+
+        <main>
+            <section class="intro">
+                <h2 id="title">Loading...</h2>
+                <p id="description"></p>
+            </section>
+
+            <section class="editor">
+                <div class="toolbar">
+                    <button id="run" class="primary" title="Ctrl/Cmd + Enter">Run</button>
+                    <button id="stop" disabled>Stop</button>
+                    <button id="reset" class="ghost" title="Discard your changes to this example">Reset script</button>
+                    <span id="status" role="status"></span>
+                    <span class="spacer"></span>
+                    <button id="toggle-editor" class="ghost">Hide script</button>
+                </div>
+                <textarea id="code" spellcheck="false" autocomplete="off" autocapitalize="off" aria-label="Lua script"></textarea>
+                <pre id="console" hidden></pre>
+            </section>
+
+            <section class="transport" id="transport" hidden>
+                <button id="play" title="Space">Play</button>
+                <input id="slider" type="range" min="0" max="0" value="0" step="1" aria-label="Frame">
+                <span id="frame-label"></span>
+                <label>Speed
+                    <select id="speed">
+                        <option value="8">slow</option>
+                        <option value="20" selected>normal</option>
+                        <option value="45">fast</option>
+                    </select>
+                </label>
+            </section>
+
+            <section id="panels" class="panels"></section>
+        </main>
+    </div>
+
+    <div id="tooltip" class="tooltip" hidden></div>
+    <script type="module" src="app.js"></script>
+</body>
+</html>

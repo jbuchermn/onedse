@@ -5,7 +5,7 @@
 #include <vector>
 #include <utility>
 #include <Eigen/Dense>
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 
 #include "core/state/state.h"
 #include "core/discretization/basis.h"
@@ -33,6 +33,10 @@ namespace core::state{
         void validate() const override;
 
         std::complex<double> trace() const;
+        /// tr rho^2
+        double purity() const;
+        /// von Neumann entropy -tr rho ln rho
+        double entropy() const;
 
         void add_wavefunction(double probability, std::shared_ptr<core::state::WaveFunction> wavefunction);
         void set_from_wavefunctions(DiagonalRepresentation wavefunctions);

@@ -1,5 +1,6 @@
 #include <iostream>
 #include <Eigen/Dense>
+#include <Eigen/Eigenvalues>
 #include <sstream>
 #include <iomanip>
 #include <exception>
@@ -45,6 +46,21 @@ namespace core::state{
         return (matrix * basis->get_metric_cov()).trace();
     }
         
+    double DensityOperator::purity() const{
+        return (matrix * basis->get_metric_cov() * matrix * basis->get_metric_cov()).trace().real();
+    }
+
+    double DensityOperator::entropy() const{
+        // Eigenvalues of rho^i_j = rho^{ik} g_{kj}
+        Eigen::ComplexEigenSolver<Eigen::MatrixXcd> solver(matrix * basis->get_metric_cov(), false);
+        double res = 0.;
+        for(int i=0; i<solver.eigenvalues().rows(); i++){
+            double p = solver.eigenvalues()(i).real();
+            if(p>1.e-14) res -= p*std::log(p);
+        }
+        return res;
+    }
+
     void DensityOperator::add_wavefunction(double probability, std::shared_ptr<WaveFunction> wavefunction){
         matrix += probability * wavefunction->vector * wavefunction->vector.adjoint();
     }

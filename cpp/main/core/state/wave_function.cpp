@@ -7,7 +7,7 @@
 #include <cmath>
 #include <stdexcept>
 #include <Eigen/Dense>
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 
 #include <boost/math/special_functions/fpclassify.hpp>
 

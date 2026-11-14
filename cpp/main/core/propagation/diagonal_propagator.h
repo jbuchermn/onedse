@@ -35,7 +35,10 @@ namespace core::propagation{
             Eigen::VectorXcd exponential(eigenvalues.rows());
             for(int i=0; i<exponential.rows(); i++) exponential(i) = exp(t_step*eigenvalues(i));
 
-            state.vector = trafo_from_diagonal * exponential.asDiagonal() * trafo_to_diagonal *  state.vector;
+            // Evaluate right to left: three matrix-vector products instead of matrix-matrix products
+            Eigen::VectorXcd diagonal = trafo_to_diagonal * state.vector;
+            diagonal = exponential.cwiseProduct(diagonal);
+            state.vector = trafo_from_diagonal * diagonal;
         }
 
         typename Propagator<StateClass>::StepSizeHistogram propagate(StateClass& state, double t_start, double t_final, double epsilon=1.e-9) override{

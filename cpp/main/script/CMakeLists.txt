@@ -1,6 +1,3 @@
-set(script_TARGET onedse)
-add_executable(${script_TARGET} main.cpp)
-target_link_libraries(${script_TARGET}
-    core
-    ${dependencies_LIBRARIES}
-)
+add_executable(onedse main.cpp)
+target_link_libraries(onedse core)
+install(TARGETS onedse RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

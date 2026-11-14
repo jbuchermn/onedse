@@ -5,7 +5,7 @@
 #include <memory>
 #include <iomanip>
 #include <Eigen/Dense>
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 
 #include "core/state/state.h"
 #include "core/discretization/basis.h"

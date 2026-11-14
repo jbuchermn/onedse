@@ -1,156 +1,183 @@
-import sys
+"""
+Render the results of `onedse script.lua` (data.json) with matplotlib.
+
+    python3 plot.py result/folder [--frames 4]
+
+Writes one PNG per panel into the result folder. Animated panels are shown as a
+row of evenly spaced frames; use the web frontend to see them move.
+"""
+import base64
 import json
+import os
+import re
+import sys
 
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.animation as anim
-from mpl_toolkits.axes_grid1 import make_axes_locatable
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt  # noqa: E402
 
 
-if(len(sys.argv) < 2):
-    print("Usage: plot.py result/folder")
-    exit(1)
+def decode(b64):
+    return np.frombuffer(base64.b64decode(b64), dtype="<f4")
 
-working_dir = sys.argv[1] + "/"
 
-data = None
-try:
-    data = json.load(open(working_dir + "data.json"))
-except Exception:
-    print("Could not read data")
-    exit(1)
+def load(folder):
+    with open(os.path.join(folder, "data.json")) as f:
+        data = json.load(f)
 
-if 'plots' not in data:
-    exit(0)
+    panels = {}
+    for message in data.get("plots", []):
+        title, _, label = message["title"].partition("/")
+        panel = panels.setdefault(title, {"title": title, "kind": message["kind"], "frames": []})
+        message["label"] = label
+        panel["frames"].append(message)
+    return list(panels.values())
 
-"""
-Sort plots by basename
-"""
-plots = []
-for d in data['plots']:
-    title = d['title'].split("/")[0]
-    for p in plots:
-        if(p['title'] == title):
-            p['plots'] += [d]
-            break
+
+def pick(frames, count):
+    if len(frames) <= count:
+        return frames
+    return [frames[i] for i in np.linspace(0, len(frames) - 1, count).round().astype(int)]
+
+
+def draw_wavefunction(ax, frame):
+    re, im = decode(frame["re"]), decode(frame["im"])
+    x = np.linspace(frame["lower"], frame["upper"], len(re), endpoint=False)
+    ax.plot(x, re, lw=0.8, label="Re")
+    ax.plot(x, im, lw=0.8, label="Im")
+    ax.plot(x, re**2 + im**2, lw=1.5, color="k", label=r"$|\psi|^2$")
+    ax.set_xlabel("p" if frame.get("space") == "p" else "x")
+    ax.legend(fontsize=7)
+
+
+def draw_wigner(ax, frame):
+    w = decode(frame["data"]).reshape(frame["nx"], frame["np"]).T
+    limit = max(np.abs(w).max(), 1e-12)
+    extent = [frame["lower_x"], frame["upper_x"], frame["lower_p"], frame["upper_p"]]
+    # Diverging map with a neutral midpoint: negative values are the quantum signature
+    im = ax.imshow(w, origin="lower", cmap="RdBu_r", vmin=-limit, vmax=limit, extent=extent, aspect="auto")
+    ax.set_xlabel("x")
+    ax.set_ylabel("p")
+    plt.colorbar(im, ax=ax, fraction=0.046)
+
+
+def draw_image(ax, frame):
+    z = decode(frame["data"]).reshape(frame["ny"], frame["nx"])
+    extent = [frame["x0"], frame["x1"], frame["y0"], frame["y1"]]
+    im = ax.imshow(z, origin="lower", cmap="Blues", extent=extent, aspect="auto")
+    ax.set_xlabel(frame.get("xlabel", "x"))
+    ax.set_ylabel(frame.get("ylabel", "y"))
+    plt.colorbar(im, ax=ax, fraction=0.046)
+
+
+def draw_field(ax, frame):
+    shape = (frame["ny"], frame["nx"])
+    psi = decode(frame["re"]).reshape(shape) + 1j*decode(frame["im"]).reshape(shape)
+    density = np.abs(psi)**2
+    # Hue: phase, brightness: density
+    hsv = np.stack([(np.angle(psi)/(2*np.pi)) % 1, np.full(shape, 0.85), (density/max(density.max(), 1e-30))**0.45], axis=-1)
+    extent = [frame["x0"], frame["x1"], frame["y0"], frame["y1"]]
+    ax.imshow(matplotlib.colors.hsv_to_rgb(hsv), origin="lower", extent=extent, aspect="auto")
+    ax.set_xlabel("x")
+    ax.set_ylabel("y")
+
+
+def draw_curves(ax, frame):
+    for series in frame["series"]:
+        y = decode(series["y"])
+        ax.plot(np.linspace(frame["lower"], frame["upper"], len(y), endpoint=False), y, label=series["name"])
+    ax.set_xlabel(frame.get("xlabel", "x"))
+    ax.legend(fontsize=7)
+
+
+def draw_paths(ax, frame):
+    t = decode(frame["t"])
+    for path in frame["paths"]:
+        ax.plot(t, decode(path), lw=0.6, color="C0")
+    ax.set_xlabel(frame.get("xlabel", "t"))
+    ax.set_ylabel(frame.get("ylabel", "x"))
+
+
+def draw_levels(ax, frame):
+    V = decode(frame["V"])
+    x = np.linspace(frame["lower"], frame["upper"], len(V), endpoint=False)
+    energies = frame["energies"]
+    spacing = (energies[-1] - energies[0])/max(len(energies) - 1, 1) or 1.
+    states = [decode(s) for s in frame["states"]]
+    amplitude = 0.38*spacing/max(np.abs(s).max() for s in states)
+    ax.plot(x, V, color="gray")
+    for E, psi in zip(energies, states):
+        ax.axhline(E, color="lightgray", lw=0.5)
+        ax.plot(np.linspace(frame["lower"], frame["upper"], len(psi), endpoint=False), E + amplitude*psi, color="C0")
+    ax.set_ylim(min(V.min(), energies[0]) - 0.3*spacing, energies[-1] + 1.6*spacing)
+    ax.set_xlabel("x")
+    ax.set_ylabel("E")
+
+
+DRAW = {
+    "wavefunction": draw_wavefunction,
+    "wigner": draw_wigner,
+    "image": draw_image,
+    "field": draw_field,
+    "curves": draw_curves,
+    "paths": draw_paths,
+    "levels": draw_levels,
+}
+
+
+def plot_panel(panel, folder, count):
+    filename = os.path.join(folder, re.sub(r"[^A-Za-z0-9_.-]+", "_", panel["title"]).strip("_") + ".png")
+
+    if panel["kind"] == "scalar":
+        fig, ax = plt.subplots(figsize=(6, 3.5))
+        series = {}
+        for frame in panel["frames"]:
+            t, v = series.setdefault(frame["name"], ([], []))
+            t.append(frame["t"])
+            v.append(frame["value"])
+        for name, (t, v) in series.items():
+            ax.plot(t, v, label=name)
+        ax.set_xlabel("t")
+        ax.legend(fontsize=8)
+        ax.set_title(panel["title"])
+    elif panel["kind"] in DRAW:
+        frames = pick(panel["frames"], count)
+        fig, axes = plt.subplots(1, len(frames), figsize=(4.5*len(frames), 3.8), squeeze=False)
+        for ax, frame in zip(axes[0], frames):
+            DRAW[panel["kind"]](ax, frame)
+            ax.set_title(frame["label"] or panel["title"], fontsize=9)
+        fig.suptitle(panel["title"])
     else:
-        plots += [{'title': title, 'plots': [d]}]
+        print("Skipping \"%s\": unknown kind %s" % (panel["title"], panel["kind"]))
+        return
+
+    fig.tight_layout()
+    fig.savefig(filename, dpi=130)
+    plt.close(fig)
+    print("Wrote %s" % filename)
 
 
-def plot_wavefunction(plots):
-    print("Plotting wavefunction \"%s\"..." % plots['title'])
+def main():
+    args = sys.argv[1:]
+    count = 4
+    if "--frames" in args:
+        i = args.index("--frames")
+        count = int(args[i + 1])
+        del args[i:i + 2]
+    if len(args) != 1 or args[0].startswith("--"):
+        print(__doc__)
+        sys.exit(1)
 
-    def get_data(i):
-        x = np.linspace(plots['plots'][i]['wavefunction']['lower'], plots['plots'][i]['wavefunction']['upper'], len(plots['plots'][i]['wavefunction']['data']))
-        y_re = [y[0] for y in plots['plots'][i]['wavefunction']['data']]
-        y_im = [y[1] for y in plots['plots'][i]['wavefunction']['data']]
-        y_sq = [y[0]**2 + y[1]**2 for y in plots['plots'][i]['wavefunction']['data']]
-        return x, y_re, y_im, y_sq
+    try:
+        panels = load(args[0])
+    except (OSError, ValueError) as e:
+        print("Could not read data: %s" % e)
+        sys.exit(1)
 
-    def plot(x, y_re, y_im, y_sq):
-        fig = plt.figure()
-
-        line_re, = plt.plot(x, y_re, label='Re')
-        line_im, = plt.plot(x, y_im, label='Im')
-        line_sq, = plt.plot(x, y_sq, label='Norm^2')
-        plt.legend()
-
-        return fig, line_re, line_im, line_sq
-
-    if(len(plots['plots']) == 1):
-        x, y_re, y_im, y_sq = get_data(0)
-        fig, l1, l2, l3 = plot(x, y_re, y_im, y_sq)
-        plt.title(plots['plots'][0]['title'])
-        plt.savefig(working_dir + plots['plots'][0]['title'].replace("/", "_") + '.pdf')
-        plt.close(fig)
-
-    else:
-        x, y_re, y_im, y_sq = get_data(0)
-        fig, line_re, line_im, line_sq = plot(x, y_re, y_im, y_sq)
-
-        def animate(i):
-            _, y_re, y_im, y_sq = get_data(i)
-            line_re.set_ydata(y_re)
-            line_im.set_ydata(y_im)
-            line_sq.set_ydata(y_sq)
-
-            return line_re, line_im, line_sq
-
-        ani = anim.FuncAnimation(fig, animate, np.arange(0, len(plots['plots']) - 1), interval=1)
-
-        first_title = plots['plots'][0]['title']
-        last_title = plots['plots'][-1]['title']
-        first_time = float(first_title.split("/")[1])
-        last_time = float(last_title.split("/")[1])
-        plt.title('%s: %f - %f' % (plots['title'], first_time, last_time))
-
-        Writer = anim.writers['ffmpeg']
-        writer = Writer(fps=5, metadata=dict(artist='onedse'), bitrate=1800)
-        ani.save(working_dir + plots['title'] + '.mp4', writer=writer)
-        plt.close(fig)
+    for panel in panels:
+        plot_panel(panel, args[0], count)
 
 
-def plot_wigner(plots):
-    print("Plotting Wigner function \"%s\"..." % plots['title'])
-
-    def get_data(i):
-        Z = np.array(plots['plots'][i]['wigner']['data'])
-        Z = np.transpose(Z)
-
-        X = (plots['plots'][i]['wigner']['lower_x'], plots['plots'][i]['wigner']['upper_x'])
-        P = (plots['plots'][i]['wigner']['lower_p'], plots['plots'][i]['wigner']['upper_p'])
-
-        return X, P, Z
-
-    def plot(X, P, Z):
-        fig = plt.figure()
-        ax = fig.add_subplot(111)
-
-        div = make_axes_locatable(ax)
-        cax = div.append_axes('right', '5%', '5%')
-
-        # W(p,x) is always in [-1/pi, 1/pi]
-        im = ax.imshow(Z, origin='lower', cmap=plt.cm.seismic, aspect='equal', extent=[*X, *P], vmin=-1.1 / np.pi, vmax=1.1 / np.pi, interpolation='bicubic')
-        cb = fig.colorbar(im, cax=cax)
-
-        return fig, ax, im, cb
-
-    if(len(plots['plots']) == 1):
-        X, P, Z = get_data(0)
-        fig, ax, im, cb = plot(X, P, Z)
-        ax.set_title(plots['plots'][0]['title'])
-        plt.savefig(working_dir + plots['plots'][0]['title'].replace("/", "_") + '.pdf')
-        plt.close(fig)
-
-    else:
-        X, P, Z = get_data(0)
-        fig, ax, im, cb = plot(X, P, Z)
-
-        def animate(i):
-            X, P, Z = get_data(i)
-            im.set_data(Z)
-
-        ani = anim.FuncAnimation(fig, animate, np.arange(0, len(plots['plots']) - 1), interval=1)
-
-        first_title = plots['plots'][0]['title']
-        last_title = plots['plots'][-1]['title']
-        first_time = float(first_title.split("/")[1])
-        last_time = float(last_title.split("/")[1])
-        ax.set_title('%s: %f - %f' % (plots['title'], first_time, last_time))
-
-        Writer = anim.writers['ffmpeg']
-        writer = Writer(fps=15, metadata=dict(artist='onedse'), bitrate=1800)
-        ani.save(working_dir + plots['title'] + '.mp4', writer=writer)
-        plt.close(fig)
-
-
-"""
-Do plot
-"""
-for p in plots:
-    if('wigner' in p['plots'][0]):
-        plot_wigner(p)
-    elif('wavefunction' in p['plots'][0]):
-        plot_wavefunction(p)
-
-
+if __name__ == "__main__":
+    main()

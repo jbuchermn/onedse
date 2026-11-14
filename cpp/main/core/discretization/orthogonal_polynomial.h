@@ -28,9 +28,9 @@ namespace core::discretization{
         Eigen::VectorXcd evaluate_polynomials(double x, int derivative=0) const;
 
     public:
-        class alglib_error: public std::runtime_error{
+        class quadrature_error: public std::runtime_error{
         public:
-            alglib_error(std::string message);
+            quadrature_error(std::string message);
         };
 
         class unsupported_derivative_error: public std::runtime_error{

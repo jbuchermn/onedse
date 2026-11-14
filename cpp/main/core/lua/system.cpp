@@ -1,10 +1,13 @@
 #include <iostream>
+#include <utility>
+#include <vector>
+#include <cmath>
 #include <LuaContext.hpp>
 #include <boost/variant.hpp>
-#include <json.hpp>
-#include <utility>
+#include <nlohmann/json.hpp>
 
 #include "core/lua/system.h"
+#include "core/lua/expose.h"
 #include "core/discretization/basis.h"
 #include "core/discretization/scaled_basis.h"
 #include "core/discretization/orthogonal_chebyshev.h"
@@ -14,10 +17,12 @@
 #include "core/state/density_operator.h"
 #include "core/state/wigner_function.h"
 #include "core/map/map_wavefunction.h"
+#include "core/map/map_density_operator.h"
 #include "core/propagation/propagator.h"
 #include "core/propagation/runge_kutta.h"
 #include "core/propagation/diagonal_propagator.h"
-#include "core/lua/expose.h"
+#include "core/utility/encode.h"
+#include "core/utility/interrupt.h"
 
 using json = nlohmann::json;
 using Basis = core::discretization::Basis;
@@ -31,6 +36,9 @@ using WignerFunction = core::state::WignerFunction;
 using MapWaveFunction = core::map::MapWaveFunction;
 using MapDensityOperator = core::map::MapDensityOperator;
 
+using core::utility::encode_f32;
+using core::utility::encode_f32_from;
+
 template<class StateClass>
 using Propagator = core::propagation::Propagator<StateClass>;
 
@@ -39,14 +47,99 @@ using RungeKutta = core::propagation::RungeKutta<StateClass>;
 
 template<class StateClass>
 using DiagonalPropagator = core::propagation::DiagonalPropagator<StateClass>;
-        
+
 using DiagonalRepresentationLuaElement = std::vector<std::pair< int, boost::variant<double, std::shared_ptr<WaveFunction>>>>;
 using DiagonalRepresentationLua = std::vector<std::pair<int, DiagonalRepresentationLuaElement>>;
 
+using complex = std::complex<double>;
+
+namespace{
+    /*
+     * LuaContext keeps its lua_State private, but we need it to install an interrupt
+     * hook. Explicit template instantiation may legally name private members.
+     */
+    template<typename Tag, typename Tag::type Member>
+    struct Rob{
+        friend typename Tag::type get(Tag){ return Member; }
+    };
+    struct LuaStateTag{
+        typedef lua_State* LuaContext::*type;
+        friend type get(LuaStateTag);
+    };
+    template struct Rob<LuaStateTag, &LuaContext::mState>;
+
+    void interrupt_hook(lua_State* L, lua_Debug*){
+        if(core::utility::interrupt_flag.load(std::memory_order_relaxed)){
+            luaL_error(L, "Interrupted");
+        }
+    }
+
+    void wigner_to_json(const WignerFunction& wigner, json& plot){
+        plot["lower_x"] = wigner.get_lower_x();
+        plot["upper_x"] = wigner.get_upper_x();
+        plot["lower_p"] = wigner.get_lower_p();
+        plot["upper_p"] = wigner.get_upper_p();
+        plot["nx"] = wigner.matrix.rows();
+        plot["np"] = wigner.matrix.cols();
+
+        std::vector<float> data;
+        data.reserve(wigner.matrix.size());
+        for(int i=0; i<wigner.matrix.rows(); i++){
+            for(int j=0; j<wigner.matrix.cols(); j++) data.push_back(float(wigner.matrix(i, j)));
+        }
+        plot["data"] = encode_f32(data);
+    }
+}
+
 namespace core::lua{
-    System::System(){
+    System::System(Sink sink_, bool sandbox): sink(sink_){
         expose_complex<double>(lua);
 
+        /*
+         * Print
+         */
+        lua.registerFunction("stdout", &System::print);
+        lua.writeVariable("plot", this);
+        lua.executeCode(R"(
+            print = function(...)
+                local parts = {}
+                for i = 1, select("#", ...) do parts[i] = tostring((select(i, ...))) end
+                plot:stdout(table.concat(parts, "\t") .. "\n")
+            end
+        )");
+
+        // Removed from the standard library in Lua 5.3, but too useful for physics to miss
+        lua.executeCode(R"(
+            math.sinh = math.sinh or function(x) return (math.exp(x) - math.exp(-x))/2 end
+            math.cosh = math.cosh or function(x) return (math.exp(x) + math.exp(-x))/2 end
+            math.tanh = math.tanh or function(x)
+                if x > 20 then return 1 elseif x < -20 then return -1 end
+                local a, b = math.exp(x), math.exp(-x)
+                return (a - b)/(a + b)
+            end
+        )");
+
+        if(sandbox){
+            lua.executeCode(R"(
+                os = { time = os.time, clock = os.clock, date = os.date, difftime = os.difftime }
+                io = nil; package = nil
+                debug = { traceback = debug.traceback }   -- needed for error reporting
+                require = nil; dofile = nil; loadfile = nil; load = nil; loadstring = nil
+                string.dump = nil; collectgarbage = nil
+            )");
+        }
+
+        expose_spectral();
+        expose_plot();
+
+        lua_State* L = lua.*get(LuaStateTag());
+        lua_sethook(L, interrupt_hook, LUA_MASKCOUNT, 10000);
+    }
+
+    /*
+     * Galerkin (spectral) discretisation: arbitrary operators, density operators, Lindblad equations
+     */
+    void System::expose_spectral(){
         /*
          * Constructors
          */
@@ -74,7 +167,7 @@ namespace core::lua{
         expose_linear_space_operators<MapDensityOperator,  std::complex<double>>(lua);
         expose_linear_space_operators<DensityOperator,     std::complex<double>>(lua);
         expose_linear_space_operators<WignerFunction,      double              >(lua);
-        
+
         lua.registerFunction("norm", &DensityOperator::norm);
         lua.registerFunction("norm", &WaveFunction::norm);
         lua.registerFunction("norm", &WignerFunction::norm);
@@ -83,12 +176,14 @@ namespace core::lua{
         lua.registerFunction("validate", &WignerFunction::validate);
 
         lua.registerFunction("trace", &DensityOperator::trace);
+        lua.registerFunction("purity", &DensityOperator::purity);
+        lua.registerFunction("entropy", &DensityOperator::entropy);
 
         /*
          * DensityOperator
          */
         lua.registerFunction("add", &DensityOperator::add_wavefunction);
-        lua.registerFunction<DiagonalRepresentationLua (DensityOperator::*)()>("diagonalize", 
+        lua.registerFunction<DiagonalRepresentationLua (DensityOperator::*)()>("diagonalize",
                 [](DensityOperator& self){
                     DensityOperator::DiagonalRepresentation rep = self.diagonalize();
                     DiagonalRepresentationLua result;
@@ -112,31 +207,31 @@ namespace core::lua{
         lua.registerFunction("add_right", &MapDensityOperator::add_right);
         lua.registerFunction("add_both", &MapDensityOperator::add_both);
 
-        lua.registerFunction<void (MapDensityOperator::*)(std::shared_ptr<MapWaveFunction>)>("add_from_wavefunction_left", 
+        lua.registerFunction<void (MapDensityOperator::*)(std::shared_ptr<MapWaveFunction>)>("add_from_wavefunction_left",
                 [](MapDensityOperator& self, std::shared_ptr<MapWaveFunction> wf){ self.add_from_wavefunction_left(*wf); });
 
-        lua.registerFunction<void (MapDensityOperator::*)(std::shared_ptr<MapWaveFunction>)>("add_from_wavefunction_right", 
+        lua.registerFunction<void (MapDensityOperator::*)(std::shared_ptr<MapWaveFunction>)>("add_from_wavefunction_right",
                 [](MapDensityOperator& self, std::shared_ptr<MapWaveFunction> wf){ self.add_from_wavefunction_right(*wf); });
 
-        lua.registerFunction<void (MapDensityOperator::*)(std::shared_ptr<MapWaveFunction>, std::shared_ptr<MapWaveFunction>)>("add_from_wavefunction_both", 
+        lua.registerFunction<void (MapDensityOperator::*)(std::shared_ptr<MapWaveFunction>, std::shared_ptr<MapWaveFunction>)>("add_from_wavefunction_both",
                 [](MapDensityOperator& self, std::shared_ptr<MapWaveFunction> left, std::shared_ptr<MapWaveFunction> right){ self.add_from_wavefunction_both(*left, *right); });
 
 
         /*
          * Propagator
          */
-        lua.registerFunction<void (Propagator<WaveFunction>::*)(std::shared_ptr<WaveFunction>, double, double)>("step", 
+        lua.registerFunction<void (Propagator<WaveFunction>::*)(std::shared_ptr<WaveFunction>, double, double)>("step",
                 [](Propagator<WaveFunction>& self, std::shared_ptr<WaveFunction> state, double t_start, double t_step){
                     self.step(*state, t_start, t_step);
                 }
         );
-        lua.registerFunction<void (Propagator<DensityOperator>::*)(std::shared_ptr<DensityOperator>, double, double)>("step", 
+        lua.registerFunction<void (Propagator<DensityOperator>::*)(std::shared_ptr<DensityOperator>, double, double)>("step",
                 [](Propagator<DensityOperator>& self, std::shared_ptr<DensityOperator> state, double t_start, double t_step){
                     self.step(*state, t_start, t_step);
                 }
         );
 
-        lua.registerFunction<void (Propagator<WaveFunction>::*)(std::shared_ptr<WaveFunction>, double, double, double)>("propagate", 
+        lua.registerFunction<void (Propagator<WaveFunction>::*)(std::shared_ptr<WaveFunction>, double, double, double)>("propagate",
                 [](Propagator<WaveFunction>& self, std::shared_ptr<WaveFunction> state, double t_start, double t_final, double epsilon){
                     if(epsilon>0.)
                         self.propagate(*state, t_start, t_final, epsilon);
@@ -144,7 +239,7 @@ namespace core::lua{
                         self.propagate(*state, t_start, t_final);
                 }
         );
-        lua.registerFunction<void (Propagator<DensityOperator>::*)(std::shared_ptr<DensityOperator>, double, double, double)>("propagate", 
+        lua.registerFunction<void (Propagator<DensityOperator>::*)(std::shared_ptr<DensityOperator>, double, double, double)>("propagate",
                 [](Propagator<DensityOperator>& self, std::shared_ptr<DensityOperator> state, double t_start, double t_final, double epsilon){
                     if(epsilon>0.)
                         self.propagate(*state, t_start, t_final, epsilon);
@@ -152,87 +247,76 @@ namespace core::lua{
                         self.propagate(*state, t_start, t_final);
                 }
         );
-        
-        lua.registerFunction<void (Propagator<WaveFunction>::*)(std::shared_ptr<WaveFunction>, double, double, double)>("propagate_const_step", 
+
+        lua.registerFunction<void (Propagator<WaveFunction>::*)(std::shared_ptr<WaveFunction>, double, double, double)>("propagate_const_step",
                 [](Propagator<WaveFunction>& self, std::shared_ptr<WaveFunction> state, double t_start, double t_final, double t_step){
                     self.propagate_const_step(*state, t_start, t_final, t_step);
                 }
         );
-        lua.registerFunction<void (Propagator<DensityOperator>::*)(std::shared_ptr<DensityOperator>, double, double, double)>("propagate_const_step", 
+        lua.registerFunction<void (Propagator<DensityOperator>::*)(std::shared_ptr<DensityOperator>, double, double, double)>("propagate_const_step",
                 [](Propagator<DensityOperator>& self, std::shared_ptr<DensityOperator> state, double t_start, double t_final, double t_step){
                     self.propagate_const_step(*state, t_start, t_final, t_step);
                 }
         );
-
-        /*
-         * Plot
-         */
-        lua.registerFunction("wavefunction", &System::plot_wavefunction);
-        lua.registerFunction("wigner", &System::plot_wigner);
-
-        lua.writeVariable("plot", this);
-
-        /*
-         * Print
-         */
-        lua.registerFunction("stdout", &System::print);
-        lua.executeCode(R"(
-            print = function(...)
-                for _, val in ipairs({...}) do
-                    plot:stdout(tostring(val))
-                end
-                plot:stdout("\n")
-            end
-        )");
     }
 
-    void System::execute(std::string code, json& result){
-        this->result = json();
-        this->print_stdout = "";
-        this->print_stderr = "";
+    void System::expose_plot(){
+        lua.registerFunction("wavefunction", &System::plot_wavefunction);
+        lua.registerFunction("wigner", &System::plot_wigner);
+        lua.registerFunction("scalar", &System::plot_scalar);
+    }
 
+    bool System::execute(const std::string& code){
         try{
             lua.executeCode(code);
         }catch(const std::exception& ex){
             print_exception(ex);
+            return false;
         }
-
-        this->result["stdout"] = this->print_stdout;
-        this->result["stderr"] = this->print_stderr;
-        result = std::move(this->result);
+        return true;
     }
 
-    void System::plot_wavefunction(std::shared_ptr<WaveFunction> wavefunction, std::string name, int points){
-        json plot;
-        plot["title"] = name;
-
-        wavefunction->to_json(plot["wavefunction"], points);
-
-        result["plots"].push_back(plot);
-    }
-
-    void System::plot_wigner(std::shared_ptr<DensityOperator> density_operator, std::string name, int points){
-        json plot;
-        plot["title"] = name;
-
-        WignerFunction wigner { *density_operator, points };
-        wigner.to_json(plot["wigner"]);
-
-        result["plots"].push_back(plot);
+    void System::emit(json&& message){
+        core::utility::check_interrupt();
+        if(sink) sink(message);
     }
 
     void System::print(std::string data){
-        std::cout<<data;
-        print_stdout += data;
+        emit({ {"type", "stdout"}, {"text", data} });
     }
 
     void System::print_exception(const std::exception& e, int level){
-        std::cerr << std::string(2*level, ' ') << "exception: " << e.what() << std::endl;
-        print_stderr += std::string(2*level, ' ') + "exception: " + e.what() + "\n";
+        if(sink) sink({ {"type", "stderr"}, {"text", std::string(2*level, ' ') + e.what() + "\n"} });
         try {
             std::rethrow_if_nested(e);
         } catch(const std::exception& e) {
             print_exception(e, level+1);
         } catch(...) {}
+    }
+
+    /*
+     * Plots
+     */
+    void System::plot_wavefunction(std::shared_ptr<WaveFunction> wavefunction, std::string title, int points){
+        if(points<2) points = 200;
+        auto [lower, upper] = wavefunction->basis->plot_boundaries();
+        Eigen::VectorXd x(points);
+        for(int i=0; i<points; i++) x(i) = lower + 1.*i/points*(upper - lower);
+        Eigen::VectorXcd vals = wavefunction->grid(x);
+
+        emit({ {"type", "plot"}, {"kind", "wavefunction"}, {"title", title},
+               {"lower", lower}, {"upper", upper},
+               {"re", encode_f32_from(vals.real())}, {"im", encode_f32_from(vals.imag())} });
+    }
+
+    void System::plot_wigner(std::shared_ptr<DensityOperator> density_operator, std::string title, int points){
+        json plot = { {"type", "plot"}, {"kind", "wigner"}, {"title", title} };
+        if(points<2) points = 128;
+        wigner_to_json(WignerFunction{ *density_operator, points }, plot);
+        emit(std::move(plot));
+    }
+
+    void System::plot_scalar(std::string title, double t, std::string name, double value){
+        emit({ {"type", "plot"}, {"kind", "scalar"}, {"title", title}, {"t", t}, {"name", name}, {"value", value} });
     }
 }
